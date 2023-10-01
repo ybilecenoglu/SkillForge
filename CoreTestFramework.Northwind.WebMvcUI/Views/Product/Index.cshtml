@@ -1,0 +1,78 @@
+@{
+  ViewBag.Title = "Ürünler";
+  Layout = "_Layout";
+}
+@section Styles{
+<link rel="stylesheet" href="~/adminlte/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="~/adminlte/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+<link rel="stylesheet" href="~/adminlte/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+}
+<div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0">Ürünler</h1>
+        </div><!-- /.col -->
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#">Ürünler</a></li>
+            <li class="breadcrumb-item active">Index</li>
+          </ol>
+        </div><!-- /.col -->
+      </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </div>
+  <div class="content-header">
+    <div class = "row">
+      <div class ="col-12">
+        <div class ="card">
+          <div class = "card-header">
+            <h3 class="card-title">Ürün Listesi</h3>
+          </div>
+          <div class="card-body">
+            <div class="dataTables_wrapper dt-bootstrap4">
+              <div class="row"></div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <table id="data-table-product" class="table table-bordered table-striped dataTable dtr-inline">
+                    <thead>
+                      <tr>
+                        <th>İşlemler</th>
+                        <th>Ürün Adı</th>
+                        <th>Tedarikçi</th>
+                        <th>Kategori</th>
+                        <th>Birim Adeti</th>
+                        <th>Fiyati</th>
+                        <th>Stok Adeti</th>
+                        <th>Aktif Mi?</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!--DataTable ServerSide-->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  @section Scripts{
+<script src="~/adminlte/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="~/adminlte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="~/adminlte/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="~/adminlte/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<script src="~/adminlte/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+<script src="~/adminlte/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+<script src="~/adminlte/plugins/jszip/jszip.min.js"></script>
+<script src="~/adminlte/plugins/pdfmake/pdfmake.min.js"></script>
+<script src="~/adminlte/plugins/pdfmake/vfs_fonts.js"></script>
+<script src="~/adminlte/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+<script src="~/adminlte/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+<script src="~/adminlte/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+<script type="text/javascript">
+</script>
+
+  }
