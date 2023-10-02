@@ -1,7 +1,5 @@
-﻿using System.Linq.Dynamic;
-using CoreTestFramework.Core.Common;
-using CoreTestFramework.Northwind.Business.Abstract;
-using CoreTestFramework.Northwind.Entities.Concrate;
+﻿using CoreTestFramework.Northwind.Business.Abstract;
+using CoreTestFramework.Northwind.WebMvcUI.Models;
 using DataTables.AspNet.Core;
 using Microsoft.AspNetCore.Mvc;
 namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
@@ -15,15 +13,17 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
             _productService = productService;
         }
 
-        public async Task<IActionResult> Index(ProductViewModel vm = null)
+        public  IActionResult Index(ProductViewModel vm)
         {
-            var data = await _productService.GetProductListAsync();
             return View();
         }
 
+        
+        [Route("Product/PageData")]
         [HttpPost]
-        public IActionResult PageData()
+        public JsonResult PageData(IDataTablesRequest request, string publisherRecId)
         {
+            var a = request;
             return Json("");
         }
     }

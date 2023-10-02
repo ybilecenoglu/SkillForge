@@ -1,3 +1,5 @@
+@using CoreTestFramework.Northwind.WebMvcUI.Models;
+@model ProductViewModel;
 @{
   ViewBag.Title = "Ürünler";
   Layout = "_Layout";
@@ -74,5 +76,39 @@
 <script src="~/adminlte/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
 <script type="text/javascript">
 </script>
+<script type="application/javascript">
+  $(document).ready(function(){
 
+    $('#data-table-product').DataTable(
+      {
+        "processing": true,
+        "serverSide": true,
+        "filter": true,
+
+        "ajax": {
+            "url": "/Product/PageData",
+            "type": "POST",
+            "datatype": "json"
+        },
+        
+        "columnDefs": [{
+            "targets": [0],
+            "visible": false,
+            "searchable": false
+        }],
+        "columns": [
+                  {data: "product_id", name: "Islemler", sortable: false, orderable: false, searchable: false},  
+                  {data: "product_name", name: "UrunAdi", sortable: true, orderable: true, searchable: true},
+                  {data: "supplier", name: "Tedarikci", sortable: true, orderable: true, searchable: true},
+                  {data: "category", name: "Kategori", sortable: true, orderable: true, searchable: true},
+                  {data: "quantity_per_unit", name: "BirimAdedi", sortable: true, orderable: true, searchable: true},
+                  {data: "unit_price", name: "Fiyati", sortable: true, orderable: true, searchable: true},
+                  {data: "units_in_stock", name: "StokAdeti", sortable: true, orderable: true, searchable: true},
+                  {data: "discontinued", name: "AktifMi?", sortable: true, orderable: true, searchable: true}
+                  
+        ]
+      }
+    );
+  });
+</script>
   }

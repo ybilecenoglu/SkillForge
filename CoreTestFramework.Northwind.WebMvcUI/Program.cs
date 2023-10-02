@@ -1,7 +1,6 @@
 using CoreTestFramework.Northwind.Business.Abstract;
 using CoreTestFramework.Northwind.Business.Concrate;
 using CoreTestFramework.Northwind.DataAccess.Concrate;
-
 //Proje servis conteineri kapsayıcı servis ağı
 var builder = WebApplication.CreateBuilder(args);
 

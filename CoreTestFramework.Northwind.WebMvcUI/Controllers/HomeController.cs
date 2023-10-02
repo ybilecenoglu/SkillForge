@@ -5,7 +5,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
     public class HomeController : Controller
     {
         
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             return View();
         }

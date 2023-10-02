@@ -16,7 +16,7 @@ public partial class Product : IEntity
 
     public int? category_id { get; set; }
 
-    public string? quantity_per_unit { get; set; }
+    public string quantity_per_unit { get; set; }
 
     public double? unit_price { get; set; }
 
