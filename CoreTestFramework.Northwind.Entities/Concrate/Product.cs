@@ -26,17 +26,19 @@ public partial class Product : IEntity
 
     public int discontinued { get; set; }
 
-     public string categoryName(){
-        
+    public string categoryName()
+    {
         using (var db = new NorthwindContext())
         {
             var category_result = db.Categories.Where(c => c.category_id == category_id).FirstOrDefault();
             return category_result.category_name;
         }
     }
-    public string supplierName(){
-        using(var db = new NorthwindContext()){
-            var supplier_result = db.Suppliers.Where(s => s.supplier_Id == supplier_id).FirstOrDefault();
+    public string supplierName()
+    {
+        using (var db = new NorthwindContext())
+        {
+            var supplier_result = db.Suppliers.Where(s => s.supplier_id == supplier_id).FirstOrDefault();
             return supplier_result.company_name;
         }
     }

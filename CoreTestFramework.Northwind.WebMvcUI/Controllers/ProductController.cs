@@ -7,6 +7,7 @@ using CoreTestFramework.Northwind.WebMvcUI.ViewModels;
 using DataTables.AspNet.AspNetCore;
 using DataTables.AspNet.Core;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
 {
@@ -14,7 +15,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
     {
         private IProductService _productService;
         private readonly IMapper _mapper;
-        public ProductController(IProductService productService, IMapper mapper )
+        public ProductController(IProductService productService, IMapper mapper)
         {
             _productService = productService;
             _mapper = mapper;
@@ -29,7 +30,9 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
             Result result = new Result { Success = false, };
             Result<List<ProductDTO>> product_result = new Result<List<ProductDTO>>();
             DataTablesResponse response;
-            if (request == null)
+            try
+            {
+                if (request == null)
             {
                 result.Message = "İstek elde edilemedi.";
                 TempData["result"] = result;
@@ -67,6 +70,13 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
             }
             response = DataTablesResponse.Create(request, product_result.Data.Count(), product_result.Data.Count(), dataPage);
             return new DataTablesJsonResult(response, true);
+            }
+            catch (System.Exception ex)
+            {
+                string message = ex.Message;
+                throw;
+            }
+            
         }
     }
 }

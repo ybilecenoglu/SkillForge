@@ -1,7 +1,7 @@
-using AutoMapper;
 using CoreTestFramework.Northwind.Business.Abstract;
 using CoreTestFramework.Northwind.Business.Concrate;
 using CoreTestFramework.Northwind.DataAccess.Concrate;
+using CoreTestFramework.Northwind.Entities.Concrate;
 using CoreTestFramework.Northwind.WebMvcUI.Common;
 using DataTables.AspNet.AspNetCore;
 // namespace CoreTestFramework.Northwind.WebMvcUI{
@@ -25,6 +25,7 @@ var builder = WebApplication.CreateBuilder(args);
 //mvc, restapi, razorpages şablonları ile çalışabiliriz. Hangi şablon ile çalışacaksak belirtiyoruz.
 builder.Services.AddRazorPages();
 
+builder.Services.AddTransient<NorthwindContext>();
 builder.Services.AddTransient<ProductDAL>();
 builder.Services.AddSingleton<IProductService, ProductManager>();
 

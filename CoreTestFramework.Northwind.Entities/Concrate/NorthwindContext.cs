@@ -1,10 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CoreTestFramework.Northwind.Entities.Concrate
 {
@@ -23,7 +17,7 @@ namespace CoreTestFramework.Northwind.Entities.Concrate
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Product>().ToTable("products","public");
-            modelBuilder.Entity<Supplier>().ToTable("supplier","public");
+            modelBuilder.Entity<Supplier>().ToTable("suppliers","public");
             modelBuilder.Entity<Category>().ToTable("categories","public");
         }
     }
