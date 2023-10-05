@@ -1,6 +1,4 @@
 ﻿using CoreTestFramework.Core.Entities;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace CoreTestFramework.Northwind.Entities.Concrate;
@@ -27,6 +25,21 @@ public partial class Product : IEntity
     public short? reorder_level { get; set; }
 
     public int discontinued { get; set; }
+
+     public string categoryName(){
+        
+        using (var db = new NorthwindContext())
+        {
+            var category_result = db.Categories.Where(c => c.category_id == category_id).FirstOrDefault();
+            return category_result.category_name;
+        }
+    }
+    public string supplierName(){
+        using(var db = new NorthwindContext()){
+            var supplier_result = db.Suppliers.Where(s => s.supplier_Id == supplier_id).FirstOrDefault();
+            return supplier_result.company_name;
+        }
+    }
 
     //public virtual Category? Category { get; set; }
 

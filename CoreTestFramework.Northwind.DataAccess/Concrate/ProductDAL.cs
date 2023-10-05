@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace CoreTestFramework.Northwind.DataAccess.Concrate
 {
-    public class ProductDAL : EntityRepositoryBase<Product, NorthwindContext>, IProductDAL
+    public class ProductDAL: EntityRepositoryBase<Product, NorthwindContext>, IProductDAL
     {
 
     }

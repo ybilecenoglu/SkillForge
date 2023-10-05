@@ -1,59 +1,55 @@
-@using CoreTestFramework.Northwind.WebMvcUI.Models;
-@model ProductViewModel;
 @{
-  ViewBag.Title = "Ürünler";
-  Layout = "_Layout";
+ViewBag.Title = "Ürün Listesi";
+Layout = "_Layout";
 }
 @section Styles{
 <link rel="stylesheet" href="~/adminlte/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
 <link rel="stylesheet" href="~/adminlte/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
 <link rel="stylesheet" href="~/adminlte/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
 }
+
+@Html.AntiForgeryToken()
 <div class="content-header">
-    <div class="container-fluid">
-      <div class="row mb-2">
-        <div class="col-sm-6">
-          <h1 class="m-0">Ürünler</h1>
-        </div><!-- /.col -->
-        <div class="col-sm-6">
-          <ol class="breadcrumb float-sm-right">
-            <li class="breadcrumb-item"><a href="#">Ürünler</a></li>
-            <li class="breadcrumb-item active">Index</li>
-          </ol>
-        </div><!-- /.col -->
-      </div><!-- /.row -->
-    </div><!-- /.container-fluid -->
-  </div>
-  <div class="content-header">
-    <div class = "row">
-      <div class ="col-12">
-        <div class ="card">
-          <div class = "card-header">
-            <h3 class="card-title">Ürün Listesi</h3>
-          </div>
-          <div class="card-body">
-            <div class="dataTables_wrapper dt-bootstrap4">
-              <div class="row"></div>
-              <div class="row">
-                <div class="col-sm-12">
-                  <table id="data-table-product" class="table table-bordered table-striped dataTable dtr-inline">
-                    <thead>
-                      <tr>
-                        <th>İşlemler</th>
-                        <th>Ürün Adı</th>
-                        <th>Tedarikçi</th>
-                        <th>Kategori</th>
-                        <th>Birim Adeti</th>
-                        <th>Fiyati</th>
-                        <th>Stok Adeti</th>
-                        <th>Aktif Mi?</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <!--DataTable ServerSide-->
-                    </tbody>
-                  </table>
-                </div>
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0">@ViewBag.Title</h1>
+      </div><!-- /.col -->
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a href="#">@ViewBag.Title</a></li>
+          <li class="breadcrumb-item active">Index</li>
+        </ol>
+      </div><!-- /.col -->
+    </div><!-- /.row -->
+  </div><!-- /.container-fluid -->
+</div>
+<div class="content-header">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="dataTables_wrapper dt-bootstrap4">
+            <div class="row"></div>
+            <div class="row">
+              <div class="col-sm-12">
+                <table id="data-table-product" class="table table-bordered table-striped dataTable dtr-inline">
+                  <thead>
+                    <tr>
+                      <th>İşlemler</th>
+                      <th>Ürün Adı</th>
+                      <th>Tedarikçi</th>
+                      <th>Kategori</th>
+                      <th>Birim Adeti</th>
+                      <th>Fiyati</th>
+                      <th>Stok Adeti</th>
+                      <th>Aktif Mi?</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!--DataTable ServerSide-->
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -61,7 +57,8 @@
       </div>
     </div>
   </div>
-  @section Scripts{
+</div>
+@section Scripts{
 <script src="~/adminlte/plugins/datatables/jquery.dataTables.min.js"></script>
 <script src="~/adminlte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
 <script src="~/adminlte/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
@@ -75,40 +72,41 @@
 <script src="~/adminlte/plugins/datatables-buttons/js/buttons.print.min.js"></script>
 <script src="~/adminlte/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
 <script type="text/javascript">
-</script>
-<script type="application/javascript">
-  $(document).ready(function(){
+  $(document).ready(function () {
 
-    $('#data-table-product').DataTable(
-      {
-        "processing": true,
-        "serverSide": true,
-        "filter": true,
-
-        "ajax": {
-            "url": "/Product/PageData",
-            "type": "POST",
-            "datatype": "json"
+    $('.table').DataTable({
+      destroy: true,
+      serverSide: true,
+      processing: true,
+      ajax: { url: '@Url.Action("PageData")' },
+      
+      pageLength: 10,
+      lengthMenu: [[10, 30, 50, 100, -1], [10, 30, 50, 100, "Tümü"]],
+      order: [[1, 'asc']],
+      searchDelay: 1000,
+      responsive: true,
+      columnDefs: [
+        {
+          render: function (data, type, row) {
+            var content = '';
+            content += '<a class="btn btn-primary btn-sm btn-flat margin-r-5" title="Detay" href="/Kullanici/Details/' + data + '"><i class="fa fa-bars"></i></a>';
+            content += '<a class="btn btn-warning btn-sm btn-flat" title="Düzenle" href="/Kullanici/Edit/' + data + '"><i class="fa fa-pencil"></i></a>';
+            return content;
+          },
+          targets: 0
         },
-        
-        "columnDefs": [{
-            "targets": [0],
-            "visible": false,
-            "searchable": false
-        }],
-        "columns": [
-                  {data: "product_id", name: "Islemler", sortable: false, orderable: false, searchable: false},  
-                  {data: "product_name", name: "UrunAdi", sortable: true, orderable: true, searchable: true},
-                  {data: "supplier", name: "Tedarikci", sortable: true, orderable: true, searchable: true},
-                  {data: "category", name: "Kategori", sortable: true, orderable: true, searchable: true},
-                  {data: "quantity_per_unit", name: "BirimAdedi", sortable: true, orderable: true, searchable: true},
-                  {data: "unit_price", name: "Fiyati", sortable: true, orderable: true, searchable: true},
-                  {data: "units_in_stock", name: "StokAdeti", sortable: true, orderable: true, searchable: true},
-                  {data: "discontinued", name: "AktifMi?", sortable: true, orderable: true, searchable: true}
-                  
-        ]
-      }
-    );
+      ],
+      columns: [
+        { data: "product_id", name: "product_id", title: 'İslemler', sortable: false,  searchable: false },
+        { data: "product_name", name: "product_name", title: 'Ürün Adı', sortable: true,  searchable: true },
+        { data: "supplier", name: "supplier", title: 'Tedarikçi', sortable: true,  searchable: true },
+        { data: "category", name: "category", title: 'Kategori', sortable: true, searchable: true },
+        { data: "quantity_per_unit", name: "quantity_per_unit", title: "Birim Adeti", sortable: true, searchable: true },
+        { data: "unit_price", name: "unit_price", title: "Fiyati", sortable: true, searchable: true, render: $.fn.dataTable.render.number(',', ',', 2, '') },
+        { data: "units_in_stock", name: "units_in_stock", title: "Stok Adeti", sortable: true, searchable: true },
+        { data: "discontinued", name: "discontinued", title: "Aktif Mi ?", sortable: true,searchable: true },
+      ],
+    });
   });
 </script>
-  }
+}

@@ -5,29 +5,29 @@ namespace CoreTestFramework.Northwind.Entities.Concrate;
 
 public partial class Supplier
 {
-    public int SupplierId { get; set; }
+    public int supplier_Id { get; set; }
 
-    public string CompanyName { get; set; } = null!;
+    public string company_name { get; set; } = null!;
 
-    public string? ContactName { get; set; }
+    public string? contact_name { get; set; }
 
-    public string? ContactTitle { get; set; }
+    public string? contact_title { get; set; }
 
-    public string? Address { get; set; }
+    public string? address { get; set; }
 
-    public string? City { get; set; }
+    public string? city { get; set; }
 
-    public string? Region { get; set; }
+    public string? region { get; set; }
 
-    public string? PostalCode { get; set; }
+    public string? postal_code { get; set; }
 
-    public string? Country { get; set; }
+    public string? country { get; set; }
 
-    public string? Phone { get; set; }
+    public string? phone { get; set; }
 
-    public string? Fax { get; set; }
+    public string? fax { get; set; }
 
-    public string? HomePage { get; set; }
+    public string? home_page { get; set; }
 
-    public virtual ICollection<Product> Products { get; set; } = new List<Product>();
+    //public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 }

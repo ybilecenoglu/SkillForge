@@ -1,6 +1,24 @@
+using AutoMapper;
 using CoreTestFramework.Northwind.Business.Abstract;
 using CoreTestFramework.Northwind.Business.Concrate;
 using CoreTestFramework.Northwind.DataAccess.Concrate;
+using CoreTestFramework.Northwind.WebMvcUI.Common;
+using DataTables.AspNet.AspNetCore;
+// namespace CoreTestFramework.Northwind.WebMvcUI{
+//     public class Program{
+//         public static void Main(string[] args){
+//             var host = new WebHostBuilder()
+//                 .UseKestrel()
+//                 .UseContentRoot(System.IO.Directory.GetCurrentDirectory())
+//                 .UseIISIntegration()
+//                 .UseStartup<Startup>()
+//                 .Build();
+
+//             host.Run();
+//         }
+//     }
+// }
+
 //Proje servis conteineri kapsayıcı servis ağı
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,8 +28,18 @@ builder.Services.AddRazorPages();
 builder.Services.AddTransient<ProductDAL>();
 builder.Services.AddSingleton<IProductService, ProductManager>();
 
-var app = builder.Build();
+// builder.Services.AddControllersWithViews();
+// builder.Services.AddRouting(option => option.LowercaseUrls = true);
 
+
+builder.Services.RegisterDataTables();
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+// builder.Services.AddDbContext<NorthwindContext>(option => option.UseNpgsql(
+//     builder.Configuration.GetConnectionString("NorthwindContext")
+// ));
+
+var app = builder.Build();
 // // Configure the HTTP request pipeline.
 // if (!app.Environment.IsDevelopment())
 // {
@@ -27,12 +55,10 @@ var app = builder.Build();
 //js
 //lib
 app.UseStaticFiles();
-
 //MiddleWeare aktif edilmesi için kullanılan komut.
 app.UseRouting();
 
 // app.UseAuthorization();
-
 
 #region Default Routing Yapısı
 app.MapControllerRoute(

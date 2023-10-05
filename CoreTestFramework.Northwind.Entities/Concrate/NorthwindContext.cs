@@ -13,6 +13,8 @@ namespace CoreTestFramework.Northwind.Entities.Concrate
         private readonly string _connString = "Server=localhost;Port=5432;Database=NorthwindDb;User Id=postgres;Password=12345;";
        
         public DbSet<Product> Products { get; set; }
+        public DbSet<Supplier> Suppliers {get; set;}
+        public DbSet<Category> Categories {get; set;}
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -21,6 +23,8 @@ namespace CoreTestFramework.Northwind.Entities.Concrate
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Product>().ToTable("products","public");
+            modelBuilder.Entity<Supplier>().ToTable("supplier","public");
+            modelBuilder.Entity<Category>().ToTable("categories","public");
         }
     }
 }

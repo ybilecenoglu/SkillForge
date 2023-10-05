@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace CoreTestFramework.Core.DataAccess
 {
     //Database CRUD işlemlerini gerçekleştireceğimiz soyut katman T için IEntitiy interface türetilmeli ve newlenebilir olmalıdır.
-    public interface IEntityRepository<T> where T : IEntity, new()
+    public interface IEntityRepository<T>  where T : IEntity, new()
     {
         Task<Result<List<T>>> GetListAsync(Expression<Func<T, bool>> filter = null);
         Result<IQueryable<T>> GetQueryable(Expression<Func<T, bool>> filter = null);
@@ -20,6 +20,5 @@ namespace CoreTestFramework.Core.DataAccess
         Task<Result<int>> DeleteAsync(T entity);
         Task<Result<int>> DeleteRangeAsync(List<T> entity);
         Task<Result<T>> UpdateAsync(T entity);
-
     }
 }

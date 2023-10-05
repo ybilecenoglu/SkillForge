@@ -5,13 +5,13 @@ namespace CoreTestFramework.Northwind.Entities.Concrate;
 
 public partial class Category
 {
-    public int CategoryId { get; set; }
+    public int category_id { get; set; }
 
-    public string CategoryName { get; set; } = null!;
+    public string category_name { get; set; } = null!;
 
-    public string? Description { get; set; }
+    public string? description { get; set; }
 
-    public byte[]? Picture { get; set; }
+    public byte[]? picture { get; set; }
 
-    public virtual ICollection<Product> Products { get; set; } = new List<Product>();
+    //public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 }

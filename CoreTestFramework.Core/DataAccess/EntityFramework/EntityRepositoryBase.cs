@@ -1,30 +1,15 @@
 ﻿using CoreTestFramework.Core.Common;
-using CoreTestFramework.Core.DataAccess.Nhibarnate;
 using CoreTestFramework.Core.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Net.WebSockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CoreTestFramework.Core.DataAccess.EntityFramework
 {
     //CRUD işlemlerini gerçekleştireceğimiz somut sınıf, IEntityRepository interface türetilmiştir TEntity için class olmalı IEntity interfaceden türetilmeli ve newlenebilir olmalıdır.
     //Standart CRUD işlemlerini gerçekleştirdiğimiz sınıf
-    public class EntityRepositoryBase<TEntity, TContext> : IEntityRepository<TEntity> where TEntity : class, IEntity, new()
-        where TContext : DbContext, new()
+    public class EntityRepositoryBase<TEntity, TContext> : IEntityRepository<TEntity> where TEntity : class, IEntity,  new()
+     where  TContext : DbContext, new()
     {
-        //Queryable DbSet için property tanımımızı yapıyoruz
-        private DbSet<TEntity> _entities;
-
-        public EntityRepositoryBase()
-        {
-            //entities property içerisine context gelen entity set ediyoruz.
-           _entities =  new TContext().Set<TEntity>();
-        }
         public async Task<Result<TEntity>> AddAsync(TEntity entity)
         {
             var add_result = new Result<TEntity> { Success = false };
@@ -165,12 +150,16 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
         }
         public Result<IQueryable<TEntity>> GetQueryable(Expression<Func<TEntity, bool>> filter = null)
         {
-            var queryable_result = new Result<IQueryable<TEntity>> { Success= false };
+            var queryable_result = new Result<IQueryable<TEntity>> { Success = false };
             try
             {
-                queryable_result.Data = filter != null ? _entities.Where(filter) : _entities;
-                queryable_result.Success = true;
-                queryable_result.Message = "Success";
+                using (var db = new TContext())
+                {
+                    queryable_result.Data = filter != null ? db.Set<TEntity>().Where(filter) : db.Set<TEntity>();
+                    queryable_result.Success = true;
+                    queryable_result.Message = "Success";
+                }
+
             }
             catch (Exception ex)
             {
@@ -179,5 +168,6 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
 
             return queryable_result;
         }
+
     }
 }
