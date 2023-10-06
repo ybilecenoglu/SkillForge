@@ -25,6 +25,7 @@ public partial class Product : IEntity
     public short? reorder_level { get; set; }
 
     public int discontinued { get; set; }
+    public string product_image {get; set;}
 
     public string categoryName()
     {

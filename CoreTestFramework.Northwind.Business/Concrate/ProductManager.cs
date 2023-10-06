@@ -20,11 +20,16 @@ namespace CoreTestFramework.Northwind.Business.Concrate
             return get_list_result;
             
         }
-
         public Result<IQueryable<Product>> GetProductQueryable(Expression<Func<Product, bool>> filter = null)
         {
             var get_queryable_result = _productDal.GetQueryable(filter);
             return get_queryable_result;
+        }
+
+        public async Task<Result<Product>> GetProducttAsync(Expression<Func<Product, bool>> filter = null)
+        {
+            var product_result = await _productDal.FindById(filter);
+            return product_result;
         }
     }
 }

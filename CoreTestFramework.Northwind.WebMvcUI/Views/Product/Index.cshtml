@@ -74,10 +74,12 @@ Layout = "_Layout";
 <script type="text/javascript">
   $(document).ready(function () {
 
-    $('.table').DataTable({
+    $('#data-table-product').DataTable({
       destroy: true,
       serverSide: true,
-      processing: true,
+      "processing": true,
+        "language": {
+            processing: '<i class="fa fa-spinner fa-spin fa-2x fa-fw"></i>'},
       ajax: { url: '@Url.Action("PageData")' },
       
       pageLength: 10,
@@ -89,8 +91,8 @@ Layout = "_Layout";
         {
           render: function (data, type, row) {
             var content = '';
-            content += '<a class="btn btn-primary btn-sm btn-flat margin-r-5" title="Detay" href="/Kullanici/Details/' + data + '"><i class="fa fa-bars"></i></a>';
-            content += '<a class="btn btn-warning btn-sm btn-flat" title="Düzenle" href="/Kullanici/Edit/' + data + '"><i class="fa fa-pencil"></i></a>';
+            content += '<a class="btn btn-primary btn-sm btn-flat margin-r-5" title="Detay" href="/Product/Details/' + data + '"><i class="fa fa-bars"></i></a>';
+            content += '<a class="btn btn-danger btn-sm btn-flat" title="Sil" href="/Product/Delete/' + data + '"><i class="fa fa-trash"></i></a>';
             return content;
           },
           targets: 0
@@ -99,14 +101,44 @@ Layout = "_Layout";
       columns: [
         { data: "product_id", name: "product_id", title: 'İslemler', sortable: false,  searchable: false },
         { data: "product_name", name: "product_name", title: 'Ürün Adı', sortable: true,  searchable: true },
-        { data: "supplier", name: "supplier", title: 'Tedarikçi', sortable: true,  searchable: true },
-        { data: "category", name: "category", title: 'Kategori', sortable: true, searchable: true },
-        { data: "quantity_per_unit", name: "quantity_per_unit", title: "Birim Adeti", sortable: true, searchable: true },
-        { data: "unit_price", name: "unit_price", title: "Fiyati", sortable: true, searchable: true, render: $.fn.dataTable.render.number(',', ',', 2, '') },
-        { data: "units_in_stock", name: "units_in_stock", title: "Stok Adeti", sortable: true, searchable: true },
-        { data: "discontinued", name: "discontinued", title: "Aktif Mi ?", sortable: true,searchable: true },
+        { data: "supplier", name: "supplier", title: 'Tedarikçi', sortable: false,  searchable: false },
+        { data: "category", name: "category", title: 'Kategori', sortable: false, searchable: false },
+        { data: "quantity_per_unit", name: "quantity_per_unit", title: "Birim Adeti", sortable: true, searchable: false },
+        { data: "unit_price", name: "unit_price", title: "Fiyati", sortable: true, searchable: false, render: $.fn.dataTable.render.number(',', ',', 2, '') },
+        { data: "units_in_stock", name: "units_in_stock", title: "Stok Adeti", sortable: false, searchable: false },
+        { data: "discontinued", name: "discontinued", title: "Aktif Mi ?", sortable: false, searchable: false, render: function(data){
+          if (data != null && data == 1) {
+            return '<input type="checkbox" checked />'
+          }
+          else {
+            return '<input type="checkbox" />'
+          }
+        } },
       ],
-    });
-  });
+      
+      "initComplete": function (settings, json) {
+				var input = $('.dataTables_filter input').unbind(),
+					self = this.api(),
+					$searchButton = $('<button>').html('<i class="fa fa-search"></i>').addClass('btn btn-default btn-sm btn-flat').click(function () {
+						self.search(input.val()).draw();
+					}),
+					$clearButton = $('<button>').html('<i class="fa fa-times"></i>').addClass('btn btn-default btn-sm btn-flat').click(function () {
+						input.val('');
+						$searchButton.click();
+					});
+				
+          $('.dataTables_filter').append($searchButton, $clearButton);
+
+				$(".dataTables_filter input")
+					.unbind()
+					.bind("input keyup", function (e) {
+						if (e.keyCode == 13) {
+							self.search(this.value).draw();
+						}
+						return;
+					});
+			},
+		});
+	});
 </script>
 }

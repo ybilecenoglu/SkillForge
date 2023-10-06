@@ -4,50 +4,30 @@ using CoreTestFramework.Northwind.DataAccess.Concrate;
 using CoreTestFramework.Northwind.Entities.Concrate;
 using CoreTestFramework.Northwind.WebMvcUI.Common;
 using DataTables.AspNet.AspNetCore;
-// namespace CoreTestFramework.Northwind.WebMvcUI{
-//     public class Program{
-//         public static void Main(string[] args){
-//             var host = new WebHostBuilder()
-//                 .UseKestrel()
-//                 .UseContentRoot(System.IO.Directory.GetCurrentDirectory())
-//                 .UseIISIntegration()
-//                 .UseStartup<Startup>()
-//                 .Build();
 
-//             host.Run();
-//         }
-//     }
-// }
-
-//Proje servis conteineri kapsayıcı servis ağı
 var builder = WebApplication.CreateBuilder(args);
 
 //mvc, restapi, razorpages şablonları ile çalışabiliriz. Hangi şablon ile çalışacaksak belirtiyoruz.
 builder.Services.AddRazorPages();
 
 builder.Services.AddTransient<NorthwindContext>();
-builder.Services.AddTransient<ProductDAL>();
+builder.Services.AddSingleton<ProductDAL>();
 builder.Services.AddSingleton<IProductService, ProductManager>();
 
 // builder.Services.AddControllersWithViews();
-// builder.Services.AddRouting(option => option.LowercaseUrls = true);
 
+// builder.Services.AddRouting(option => option.LowercaseUrls = true);
 
 builder.Services.RegisterDataTables();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
+
 // builder.Services.AddDbContext<NorthwindContext>(option => option.UseNpgsql(
 //     builder.Configuration.GetConnectionString("NorthwindContext")
 // ));
 
 var app = builder.Build();
-// // Configure the HTTP request pipeline.
-// if (!app.Environment.IsDevelopment())
-// {
-//     app.UseExceptionHandler("/Error");
-//     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-//     app.UseHsts();
-// }
+
 
 // app.UseHttpsRedirection();
 
