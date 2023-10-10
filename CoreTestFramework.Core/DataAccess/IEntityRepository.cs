@@ -14,10 +14,10 @@ namespace CoreTestFramework.Core.DataAccess
     {
         Task<Result<List<T>>> GetListAsync(Expression<Func<T, bool>> filter = null);
         Result<IQueryable<T>> GetQueryable(Expression<Func<T, bool>> filter = null);
-        Task<Result<T>> FindById(object id);
+        Task<Result<T>> FindById(int id);
         Task<Result<T>> AddAsync(T entity);
         Task<Result<int>> AddRangeAsync(List<T> entity);
-        Task<Result<int>> DeleteAsync(T entity);
+        Task<Result> DeleteAsync(T entity);
         Task<Result<int>> DeleteRangeAsync(List<T> entity);
         Task<Result<T>> UpdateAsync(T entity);
     }

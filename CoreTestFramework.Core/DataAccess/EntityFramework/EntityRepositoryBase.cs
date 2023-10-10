@@ -50,9 +50,9 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
 
             return add_range_result;
         }
-        public async Task<Result<int>> DeleteAsync(TEntity entity)
+        public async Task<Result> DeleteAsync(TEntity entity)
         {
-            var delete_result = new Result<int> { Success = false };
+            var delete_result = new Result { Success = false };
             try
             {
                 using (var db = new TContext())
@@ -109,7 +109,7 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
             }
             return update_result;
         }
-        public async Task<Result<TEntity>> FindById(object id)
+        public async Task<Result<TEntity>> FindById(int id)
         {
             var get_result = new Result<TEntity> { Success = false };
             try

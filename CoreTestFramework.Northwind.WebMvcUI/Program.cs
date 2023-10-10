@@ -19,7 +19,7 @@ builder.Services.AddSingleton<IProductService, ProductManager>();
 // builder.Services.AddRouting(option => option.LowercaseUrls = true);
 
 builder.Services.RegisterDataTables();
-
+builder.Services.AddSession();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // builder.Services.AddDbContext<NorthwindContext>(option => option.UseNpgsql(
@@ -47,6 +47,7 @@ app.MapControllerRoute(
     pattern: "{controller=home}/{action=index}/{id?}");
 #endregion
 
+app.UseSession();
 app.MapRazorPages();
 
 app.Run();

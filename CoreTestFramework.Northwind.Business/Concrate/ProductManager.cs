@@ -26,10 +26,16 @@ namespace CoreTestFramework.Northwind.Business.Concrate
             return get_queryable_result;
         }
 
-        public async Task<Result<Product>> GetProducttAsync(Expression<Func<Product, bool>> filter = null)
+        public async Task<Result<Product>> GetProductAsync(int id)
         {
-            var product_result = await _productDal.FindById(filter);
+            var product_result = await _productDal.FindById(id);
             return product_result;
+        }
+
+        public async Task<Result> DeleteProductAsync(Product product)
+        {
+           var product_delete_result = await _productDal.DeleteAsync(product);
+           return product_delete_result;
         }
     }
 }

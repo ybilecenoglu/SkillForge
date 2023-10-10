@@ -4,6 +4,6 @@ namespace CoreTestFramework.Northwind.WebMvcUI.ViewModels
 {
     public class ProductViewModel
     {
-        public List<ProductDTO>? Products {get; set;}
+        public List<ProductDTO> Products {get; set;}
     }
 }

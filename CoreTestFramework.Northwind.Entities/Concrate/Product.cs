@@ -1,5 +1,6 @@
 ﻿using CoreTestFramework.Core.Entities;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CoreTestFramework.Northwind.Entities.Concrate;
 
@@ -10,8 +11,10 @@ public partial class Product : IEntity
 
     public string product_name { get; set; } = null!;
 
+    [ForeignKey("Supplier")]
     public int? supplier_id { get; set; }
 
+    [ForeignKey("Category")]
     public int? category_id { get; set; }
 
     public string quantity_per_unit { get; set; }
@@ -25,7 +28,7 @@ public partial class Product : IEntity
     public short? reorder_level { get; set; }
 
     public int discontinued { get; set; }
-    public string product_image {get; set;}
+    public string product_image { get; set; }
 
     public string categoryName()
     {
@@ -44,9 +47,9 @@ public partial class Product : IEntity
         }
     }
 
-    //public virtual Category? Category { get; set; }
+    public virtual Category Category { get; set; }
 
     //public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
-    //public virtual Supplier? Supplier { get; set; }
+    public virtual Supplier Supplier { get; set; }
 }

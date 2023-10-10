@@ -3,16 +3,20 @@ using CoreTestFramework.Core.Common;
 using CoreTestFramework.Northwind.Business.Abstract;
 using CoreTestFramework.Northwind.Entities.Concrate;
 using CoreTestFramework.Northwind.Entities.DTO;
+using CoreTestFramework.Northwind.WebMvcUI.Extension;
 using CoreTestFramework.Northwind.WebMvcUI.ViewModels;
 using DataTables.AspNet.AspNetCore;
 using DataTables.AspNet.Core;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using static CoreTestFramework.Northwind.WebMvcUI.Extension.QueryableExtension;
+
 namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
 {
     public class ProductController : Controller
     {
         private IProductService _productService;
+       
         private readonly IMapper _mapper;
         public ProductController(IProductService productService, IMapper mapper)
         {
@@ -77,8 +81,49 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
             }
             
         }
-        public async Task<ActionResult> Delete(int id) {
-            
+        public async Task<ActionResult> Delete(int id) 
+        {
+            var result = new Result { Success = false};
+            try
+            {
+                if(id == null){
+                    result.Success =false;
+                    result.Message = "Aranan ürün bulunamadı.";
+                    TempData["result"] = JsonConvert.SerializeObject(result);
+                    return RedirectToAction("Index");
+                }
+
+                var product = await _productService.GetProductAsync(id);
+                if(product != null){
+                    var delete_product_result = await _productService.DeleteProductAsync(product.Data);
+                    if(delete_product_result.Success == true){
+                        result.Success = true;
+                        result.Message = "Ürün silme işlemi başarılı.";
+                        TempData["result"] = JsonConvert.SerializeObject(result);
+                        return RedirectToAction("Index");
+                    }
+                    else{
+                        result.Success =delete_product_result.Success;
+                        result.Message = delete_product_result.Message;
+                        TempData["result"] = JsonConvert.SerializeObject(result);
+                        return RedirectToAction("Index");
+                        
+                    }
+                }
+                else{
+                    result.Success = false;
+                    result.Message ="Ürün bulunamadı.";
+                    return RedirectToAction("Index");
+                }
+
+            }
+            catch (System.Exception ex)
+            {
+                result.Success = false;
+                result.Message = ex.Message;
+            }
+
+            return View("Index");
         }
     }
 }

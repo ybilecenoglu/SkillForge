@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace CoreTestFramework.Core.Common
 {
+    
     public class Result
     {
         public Result()
