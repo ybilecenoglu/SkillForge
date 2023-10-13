@@ -7,49 +7,30 @@ namespace CoreTestFramework.Northwind.Entities.Concrate;
 public partial class Product : IEntity
 {
     [Key]
-    public int product_id { get; set; }
-
-    public string product_name { get; set; } = null!;
-
-    [ForeignKey("Supplier")]
-    public int? supplier_id { get; set; }
-
-    [ForeignKey("Category")]
-    public int? category_id { get; set; }
-
-    public string quantity_per_unit { get; set; }
-
-    public double? unit_price { get; set; }
-
-    public short? units_in_stock { get; set; }
-
-    public short? units_on_order { get; set; }
-
-    public short? reorder_level { get; set; }
-
-    public int discontinued { get; set; }
-    public string product_image { get; set; }
+    public int ProductID { get; set; }
+    public string ProductName { get; set; } = null!;
+    public int? SupplierID { get; set; }
+    public int? CategoryID { get; set; }
+    public string Unit { get; set; }
+    public double? Price { get; set; }
 
     public string categoryName()
     {
         using (var db = new NorthwindContext())
         {
-            var category_result = db.Categories.Where(c => c.category_id == category_id).FirstOrDefault();
-            return category_result.category_name;
+            var category_result = db.Categories.Where(c => c.CategoryID == CategoryID).FirstOrDefault();
+            return category_result.CategoryName;
         }
     }
     public string supplierName()
     {
         using (var db = new NorthwindContext())
         {
-            var supplier_result = db.Suppliers.Where(s => s.supplier_id == supplier_id).FirstOrDefault();
-            return supplier_result.company_name;
+            var supplier_result = db.Suppliers.Where(s => s.SupplierID == SupplierID).FirstOrDefault();
+            return supplier_result.SupplierName;
         }
     }
-
-    public virtual Category Category { get; set; }
-
-    //public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
-
-    public virtual Supplier Supplier { get; set; }
+    // public virtual Category Category { get; set; }
+    // public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+    // public virtual Supplier Supplier { get; set; }
 }

@@ -7,14 +7,20 @@ using DataTables.AspNet.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//Database Connection
+// builder.Services.AddDbContext<NorthwindContext>(options => {
+//     var config = builder.Configuration;
+//     var connectionString =config.GetConnectionString("NorthwindContext");
+//     options.UseSqlite(connectionString);
+// });
+
 //mvc, restapi, razorpages şablonları ile çalışabiliriz. Hangi şablon ile çalışacaksak belirtiyoruz.
 builder.Services.AddRazorPages();
+builder.Services.AddControllersWithViews();
 
 builder.Services.AddTransient<NorthwindContext>();
 builder.Services.AddSingleton<ProductDAL>();
 builder.Services.AddSingleton<IProductService, ProductManager>();
-
-// builder.Services.AddControllersWithViews();
 
 // builder.Services.AddRouting(option => option.LowercaseUrls = true);
 
@@ -28,18 +34,14 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 
-
-// app.UseHttpsRedirection();
-
+app.UseHttpsRedirection();
 //wwwroot klasörü altında 
 //css
 //js
 //lib
 app.UseStaticFiles();
-//MiddleWeare aktif edilmesi için kullanılan komut.
 app.UseRouting();
-
-// app.UseAuthorization();
+app.UseAuthorization();
 
 #region Default Routing Yapısı
 app.MapControllerRoute(

@@ -51,7 +51,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 var searchToUpperValue = request.Search.Value.Trim().ToUpper();
                 var searchToLowerValue = request.Search.Value.Trim().ToLower();
 
-                product_result.Data = product_result.Data.Where(p => p.product_name.ToUpper().Contains(searchToUpperValue) || p.product_name.ToLower().Contains(searchToLowerValue));
+                product_result.Data = product_result.Data.Where(p => p.ProductName.ToUpper().Contains(searchToUpperValue) || p.ProductName.ToLower().Contains(searchToLowerValue));
             }
 
             var dataPage = product_result.Data;
@@ -124,6 +124,35 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
             }
 
             return View("Index");
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> Details(int id){
+             var result = new Result { Success = false};
+
+             var product_vm = new ProductViewModel();
+             try
+             {
+                if(id == null){
+                    result.Success =false;
+                    result.Message = "Aranan ürün bulunamadı.";
+                    TempData["result"] = JsonConvert.SerializeObject(result);
+                    return RedirectToAction("Index");
+                }
+                 var product = await _productService.GetProductAsync(id);
+                 if(product.Success == true){
+                    var mapped_list_product = _mapper.Map<ProductDTO>(product.Data);
+                    product_vm.Product = mapped_list_product;
+                    return View("Details", product_vm);
+                 }
+                 
+                 
+             }
+             catch (System.Exception ex)
+             {
+                
+             }
+             return View("Details");
         }
     }
 }
