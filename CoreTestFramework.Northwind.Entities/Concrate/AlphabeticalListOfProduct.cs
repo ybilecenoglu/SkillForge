@@ -21,7 +21,7 @@ public partial class AlphabeticalListOfProduct
 
     public short UnitsOnOrder { get; set; }
 
-    public short? ReorderLevel { get; set; }
+    public short ReorderLevel { get; set; }
 
     public bool Discontinued { get; set; }
 

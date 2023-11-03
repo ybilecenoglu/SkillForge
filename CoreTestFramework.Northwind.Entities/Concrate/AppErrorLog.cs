@@ -13,5 +13,5 @@ public partial class AppErrorLog
 
     public string Target { get; set; }
 
-    public DateTime? Date { get; set; }
+    public DateTime Date { get; set; }
 }

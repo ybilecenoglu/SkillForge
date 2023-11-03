@@ -6,20 +6,19 @@ namespace CoreTestFramework.Northwind.Entities.Concrate
     {
         private readonly string _connString = "Data Source= northwind.db";
 
-        public DbSet<Product> Products { get; set; }
-        public DbSet<Supplier> Suppliers {get; set;}
-        public DbSet<Category> Categories {get; set;}
+        public DbSet<Product> Products => Set<Product>();
+        public DbSet<Supplier> Suppliers => Set<Supplier>();
+        public DbSet<Category> Categories => Set<Category>();
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite(_connString);
         }
         
-        // protected override void OnModelCreating(ModelBuilder modelBuilder)
-        // {
-        //     modelBuilder.Entity<Product>().ToTable("products","public");
-        //     modelBuilder.Entity<Supplier>().ToTable("suppliers","public");
-        //     modelBuilder.Entity<Category>().ToTable("categories","public");
-        // }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Product>().Navigation(p => p.Supplier).AutoInclude();
+            modelBuilder.Entity<Product>().Navigation(p => p.Category).AutoInclude();
+        }
     }
 }

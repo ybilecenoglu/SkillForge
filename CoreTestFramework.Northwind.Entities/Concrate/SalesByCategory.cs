@@ -11,5 +11,5 @@ public partial class SalesByCategory
 
     public string ProductName { get; set; } = null!;
 
-    public decimal? ProductSales { get; set; }
+    public decimal ProductSales { get; set; }
 }

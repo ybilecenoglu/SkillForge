@@ -3,15 +3,14 @@ namespace CoreTestFramework.Northwind.Entities.DTO
     public class ProductDTO
     {
         public int ProductID { get; set; }
-
-        public string ProductName { get; set; } = null!;
-
-        public string Supplier { get; set; }
-
-        public string Category { get; set; }
-
-        public string Unit { get; set; }
-
-        public double? Price { get; set; }
+        public string ProductName { get; set; }
+        public string CompanyName { get; set; }
+        public string CategoryName { get; set; }
+        public string QuantityPerUnit { get; set; }
+        public double UnitPrice { get; set; }
+        public int UnitsInStock {get; set;}
+        public int UnitsOnOrder {get; set;}
+        public int ReorderLevel {get; set;}
+        public string Discontinued {get; set;}
     }
 }

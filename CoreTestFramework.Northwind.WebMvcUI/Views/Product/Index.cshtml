@@ -1,12 +1,16 @@
+@model CoreTestFramework.Northwind.WebMvcUI.ViewModels.ProductViewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
-ViewBag.Title = "Ürün Listesi";
-Layout = "_Layout";
+  ViewBag.Title = "Ürün Listesi";
+  Layout = "_Layout";
 }
+
 @section Styles{
 <link rel="stylesheet" href="~/adminlte/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
 <link rel="stylesheet" href="~/adminlte/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
 <link rel="stylesheet" href="~/adminlte/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
 }
+
 @Html.AntiForgeryToken()
 <div class="content-header">
   <div class="container-fluid">
@@ -23,7 +27,35 @@ Layout = "_Layout";
     </div><!-- /.row -->
   </div><!-- /.container-fluid -->
 </div>
-<div class="content-header">
+<div class="row">
+  <div class="col-md-6">
+    <div class="card card-primary">
+      <div class="card-header">
+        <h3 class="card-title">Filtre</h3>
+      </div>
+      <form asp-controller="Product" asp-action="Index" method="post">
+      <div class="card-body">
+        <div class="form-group">
+        <label for="CategoryID">Kategori</label>
+        <select asp-for="CategoryID" asp-items="Model.Categories" class="form-control">
+          <option value="0">Seçiniz</option>
+        </select>
+        </div>
+        <div class="form-group">
+          <label for="SupplierID">Tedarikçi</label>
+          <select asp-for="SupplierID" asp-items="Model.Suppliers" class="form-control">
+            <option value="0">Seçiniz</option>
+          </select>
+          </div>
+      </div>
+      <div class="card-footer">
+        <button type="submit" class="btn btn-primary">Getir</button>
+      </div>
+    </form>
+      </div>
+</div>
+</div>
+
   <div class="row">
     <div class="col-12">
       <div class="card">
@@ -37,10 +69,14 @@ Layout = "_Layout";
                     <tr>
                       <th>İşlemler</th>
                       <th>Ürün Adı</th>
-                      <th>Tedarikçi</th>
-                      <th>Kategori</th>
-                      <th>Adet</th>
-                      <th>Fiyati</th>
+                      <th>Tedarikçi Firma</th>
+                      <th>Kategori Adı</th>
+                      <th>Birim Miktarı</th>
+                      <th>Fiyatı</th>
+                      <th>Adeti</th>
+                      <th>Sipariş Miktarı</th>
+                      <th>Yeni Sipariş</th>
+                      <th>Aktif Mi</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -54,7 +90,6 @@ Layout = "_Layout";
       </div>
     </div>
   </div>
-</div>
 <div class="modal fade" id="modal-overlay" style="display: none;" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -86,7 +121,6 @@ Layout = "_Layout";
 <script src="~/adminlte/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
 <script src="~/adminlte/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
 <script src="~/adminlte/plugins/jszip/jszip.min.js"></script>
-<script src="~/adminlte/plugins/pdfmake/pdfmake.min.js"></script>
 <script src="~/adminlte/plugins/pdfmake/vfs_fonts.js"></script>
 <script src="~/adminlte/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
 <script src="~/adminlte/plugins/datatables-buttons/js/buttons.print.min.js"></script>
@@ -99,51 +133,82 @@ Layout = "_Layout";
       $('#modal-overlay').load(url);
     }
 
+
+    var categoryID = $('#CategoryID').val();
+    var supplierID = $('#SupplierID').val();
+
     $('#data-table-product').DataTable({
       destroy: true,
       serverSide: true,
-      "processing": true,
-      "language": {
+      processing: true,
+      language: {
         processing: '<i class="fa fa-spinner fa-spin fa-2x fa-fw"></i>'
       },
-      ajax: { url: '@Url.Action("PageData")' },
 
+      ajax: 
+      { 
+        url: '@Url.Action("PageData")', 
+        type: 'POST',
+        data: {categoryID: categoryID, supplierID : supplierID}
+      },
       pageLength: 10,
       lengthMenu: [[10, 30, 50, 100, -1], [10, 30, 50, 100, "Tümü"]],
       order: [[1, 'asc']],
       searchDelay: 1000,
       responsive: true,
-      columnDefs: [
-        {
-          render: function (data, type, row) {
-            var content = '';
-            content += '<a class="btn btn-primary btn-sm btn-flat margin-r-5" title="Detay" onclick="Details(' + data + ')"><i class="fa fa-bars"></i></a>';
-            content += '<a class="btn btn-danger btn-sm btn-flat" title="Sil" href="/Product/Delete/' + data + '"><i class="fa fa-trash"></i></a>';
-            return content;
-          },
-          targets: 0
-        },
-      ],
+      dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>" +
+                    "<'row'<'col-sm-12 text-right'B>>" +
+                    "<'row'<'col-sm-12'tr>>" +
+                    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+                buttons: [
+                    {
+                        extend: 'excel',
+                        text: '<i class="fa fa-file-excel-o" title="Excel"></i>&nbsp;Excel',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+                    {
+                        extend: 'copyHtml5',
+                        text: '<i class="fa fa-copy" title="Kopyala"></i>&nbsp;Kopyala',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+                    {
+                        extend: 'colvis',
+                        text: '<i class="fa fa-columns" title="Görünür Kolonlar"></i>&nbsp;Sütun Seçici',
+                    }
+                ],
       columns: [
-        { data: "ProductID", name: "ProductID", title: 'İslemler', sortable: false, searchable: false },
-        { data: "ProductName", name: "ProductName", title: 'Ürün Adı', sortable: true, searchable: true },
-        { data: "Supplier", name: "Supplier", title: 'Tedarikçi', sortable: false, searchable: false },
-        { data: "Category", name: "Category", title: 'Kategori', sortable: false, searchable: false },
-        { data: "Unit", name: "Unit", title: "Adet", sortable: true, searchable: false },
-        { data: "Price", name: "Price", title: "Fiyati", sortable: true, searchable: false, render: $.fn.dataTable.render.number(',', ',', 2, '') },
-        
-        // { data: "units_in_stock", name: "units_in_stock", title: "Stok Adeti", sortable: false, searchable: false },
-        // {
-        //   data: "discontinued", name: "discontinued", title: "Aktif Mi ?", sortable: false, searchable: false, render: function (data) {
-        //     if (data != null && data == 1) {
-        //       return '<input type="checkbox" checked />'
-        //     }
-        //     else {
-        //       return '<input type="checkbox" />'
-        //     }
-        //   }
-        // },
+        { data: "productID", name: "ProductID", sortable: false, searchable: false, render: function(data) {
+          var content = '';
+          content += '<a class="btn btn-primary btn-sm btn-flat margin-r-5" title="Detay" onclick="Details(' + data + ')"><i class="fa fa-bars"></i></a>';
+          content +='<a class="btn btn-danger btn-sm btn-flat" title="Sil" href="/Product/Delete/' + data + '"><i class="fa fa-trash"></i></a>';
+          return content;
+        } },
+        { data: "productName", name: "ProductName", sortable: true, searchable: true },
+        { data: "companyName", name: "CompanyName", sortable: false, searchable: false },
+        { data: "categoryName", name: "CategoryName", sortable: false, searchable: false },
+        { data: "quantityPerUnit", name: "QuantityPerUnit", sortable: false, searchable: false },
+        { data: "unitPrice", name: "UnitPrice",sortable: true, searchable: false, render: $.fn.dataTable.render.number(',', ',', 2, '') },
+        { data: "unitsInStock", name: "UnitsInStock",sortable: true, searchable: false },
+        { data: "unitsOnOrder", name: "UnitsOnOrder", sortable: false, searchable: false },
+        { data: "reorderLevel", name: "ReorderLevel", sortable: false, searchable: false },
+        {
+           data: "discontinued", name: "Discontinued", sortable: false, searchable: false, render: function (data) {
+             if (data != null && data == 1) {
+               return '<input type="checkbox"  checked disabled/>'
+             }
+             else {
+               return '<input type="checkbox" disabled/>'
+             }
+           }
+         }
       ],
+      language: {
+				url: '/adminlte/plugins/datatables/Turkish.json'
+			},
 
       "initComplete": function (settings, json) {
         var input = $('.dataTables_filter input').unbind(),

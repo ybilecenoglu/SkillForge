@@ -9,9 +9,9 @@ public partial class ProductsByCategory
 
     public string ProductName { get; set; } = null!;
 
-    public string? QuantityPerUnit { get; set; }
+    public string QuantityPerUnit { get; set; }
 
-    public short? UnitsInStock { get; set; }
+    public short UnitsInStock { get; set; }
 
     public bool Discontinued { get; set; }
 }

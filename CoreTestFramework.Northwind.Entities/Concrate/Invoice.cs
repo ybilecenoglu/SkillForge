@@ -5,31 +5,31 @@ namespace CoreTestFramework.Northwind.Entities.Concrate;
 
 public partial class Invoice
 {
-    public string? ShipName { get; set; }
+    public string ShipName { get; set; }
 
-    public string? ShipAddress { get; set; }
+    public string ShipAddress { get; set; }
 
-    public string? ShipCity { get; set; }
+    public string ShipCity { get; set; }
 
-    public string? ShipRegion { get; set; }
+    public string ShipRegion { get; set; }
 
-    public string? ShipPostalCode { get; set; }
+    public string ShipPostalCode { get; set; }
 
-    public string? ShipCountry { get; set; }
+    public string ShipCountry { get; set; }
 
-    public string? CustomerId { get; set; }
+    public string CustomerId { get; set; }
 
     public string CustomerName { get; set; } = null!;
 
-    public string? Address { get; set; }
+    public string Address { get; set; }
 
-    public string? City { get; set; }
+    public string City { get; set; }
 
-    public string? Region { get; set; }
+    public string Region { get; set; }
 
-    public string? PostalCode { get; set; }
+    public string PostalCode { get; set; }
 
-    public string? Country { get; set; }
+    public string Country { get; set; }
 
     public string Salesperson { get; set; } = null!;
 

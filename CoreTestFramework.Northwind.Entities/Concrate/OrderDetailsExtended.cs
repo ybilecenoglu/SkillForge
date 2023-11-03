@@ -17,5 +17,5 @@ public partial class OrderDetailsExtended
 
     public float Discount { get; set; }
 
-    public decimal? ExtendedPrice { get; set; }
+    public decimal ExtendedPrice { get; set; }
 }

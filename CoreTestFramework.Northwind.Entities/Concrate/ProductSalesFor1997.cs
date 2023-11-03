@@ -9,5 +9,5 @@ public partial class ProductSalesFor1997
 
     public string ProductName { get; set; } = null!;
 
-    public decimal? ProductSales { get; set; }
+    public decimal ProductSales { get; set; }
 }

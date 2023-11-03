@@ -106,15 +106,18 @@
   <script src="~/adminlte/plugins/toastr/toastr.min.js"></script>
   @RenderSection("Scripts",false)
   <script>
-    $(document).ready(function () {
+    
       var json_text = '@Html.Raw(TempData["result"])';
-      var result = JSON.parse(json_text);
-      if (result.Success == false) {
-        toastr.error(result.Message);
-      } else {
+      if (json_text) {
+          var result = JSON.parse(json_text);
+        if (result.Success == false) {
+          toastr.error('Silme işlemi başarısız oldu.');
+        } else {
+          toastr.success('Silme işlemi başarısız oldu.');
+        }
       }
+      
 
-    });
 
     document.querySelectorAll(".nav-link").forEach((link) => {
       if (link.href === window.location.href) {

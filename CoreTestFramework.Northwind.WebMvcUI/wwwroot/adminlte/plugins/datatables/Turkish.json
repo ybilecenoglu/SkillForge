@@ -1,0 +1,24 @@
+{
+	"sDecimal": ",",
+	"sEmptyTable": "Tabloda herhangi bir veri mevcut değil",
+	"sInfo": "_TOTAL_ kayıttan _START_ - _END_ arasındaki kayıtlar gösteriliyor",
+	"sInfoEmpty": "Kayıt bulunamadı.",
+	"sInfoFiltered": "(_MAX_ kayıt içerisinden bulunan)",
+	"sInfoPostFix": "",
+	"sInfoThousands": ".",
+	"sLengthMenu": "Sayfada _MENU_ kayıt göster",
+	"sLoadingRecords": "Yükleniyor...",
+	"sProcessing": "<div class=\"overlay\"><i class=\"fa fa-refresh fa-spin\"></i></div>",
+	"sSearch": "Ara:",
+	"sZeroRecords": "Eşleşen kayıt bulunamadı",
+	"oPaginate": {
+		"sFirst": "İlk",
+		"sLast": "Son",
+		"sNext": "Sonraki",
+		"sPrevious": "Önceki"
+	},
+	"oAria": {
+		"sSortAscending": ": artan sütun sıralamasını aktifleştir",
+		"sSortDescending": ": azalan sütun soralamasını aktifleştir"
+	}
+}

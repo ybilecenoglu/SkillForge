@@ -9,9 +9,8 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Common
         public MappingProfile()
         {
             CreateMap<Product, ProductDTO>()
-            .ForMember(dto => dto.Supplier, entity => entity.MapFrom(p => p.supplierName()))
-            .ForMember(dto => dto.Category, entity => entity.MapFrom(p => p.categoryName()));
-            
+            .ForMember(dto => dto.CompanyName, entity => entity.MapFrom(p => p.Supplier.CompanyName))
+            .ForMember(dto => dto.CategoryName, entity => entity.MapFrom(p => p.Category.CategoryName));
         }
     }
 }
