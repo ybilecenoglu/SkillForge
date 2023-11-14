@@ -1,0 +1,87 @@
+@model ProductViewModel
+@{
+    ViewBag.Title = "Ürün Ekle";
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-md-6">
+          <h1 class="m-0">@ViewBag.Title</h1>
+        </div><!-- /.col -->
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#">@ViewBag.Title</a></li>
+            <li class="breadcrumb-item active">Index</li>
+          </ol>
+        </div><!-- /.col -->
+      </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </div>
+
+<div class="row">
+    <div class="col-md-12">
+    <div class="card card-primary">
+    <div class="card-header">
+      <h3 class="card-title">Ürün Ekleme Formu</h3>
+      </div>
+      <form asp-controller="Product" asp-action="Create" method="post">
+        <div class="card-body">
+          <input type="hidden" asp-for="@Model.Product.ProductID" class="form-control" />
+          <div class="form-group">
+            <label>Ürün Adı</label>
+            <input asp-for="@Model.Product.ProductName" class="form-control" />
+        </div>
+      <div class="form-group">
+      <label>Kategoriler</label>
+      <select asp-for="@Model.CategoryID" asp-items="@Model.Categories" class="form-control">
+      </select>
+      </div>
+      <div class="form-group">
+        <label>Tedarikçiler</label>
+        <select runat="server" asp-for="@Model.SupplierID" asp-items="@Model.Suppliers" class="form-control">
+        </select>
+        </div>
+        <div class="form-group">
+            <label>Birim Miktarı</label>
+            <input asp-for="@Model.Product.QuantityPerUnit" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label>Fiyat</label>
+          <input asp-for="@Model.Product.UnitPrice" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label>Adet</label>
+        <input asp-for="@Model.Product.UnitsInStock" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label>Sipariş Miktarı</label>
+        <input asp-for="@Model.Product.UnitsOnOrder" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label>Yeni Sipariş</label>
+        <input asp-for="@Model.Product.ReorderLevel" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label>Aktif Mi ?</label>
+        <br />
+        <input type="checkbox" asp-for="@Model.Product.AktifMi" data-bootstrap-switch="" data-off-color="danger" data-on-color="success">
+      </div>
+      <div class="card-footer">
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+      </div>
+    </div>
+        </form>
+      </div>
+  </div>
+  </div>
+
+@section Scripts{
+      <script src="~/adminlte/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+      <script>
+        $("input[data-bootstrap-switch]").each(function(){
+              $(this).bootstrapSwitch('state', $(this).prop('checked'));
+        })
+      </script>
+  }
+  

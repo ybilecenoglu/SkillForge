@@ -1,9 +1,13 @@
+using System.Data;
+
 namespace CoreTestFramework.Northwind.Entities.DTO
 {
     public class ProductDTO
     {
         public int ProductID { get; set; }
         public string ProductName { get; set; }
+        public int SupplierID {get; set;}
+        public int CategoryID {get; set;}
         public string CompanyName { get; set; }
         public string CategoryName { get; set; }
         public string QuantityPerUnit { get; set; }
@@ -12,5 +16,7 @@ namespace CoreTestFramework.Northwind.Entities.DTO
         public int UnitsOnOrder {get; set;}
         public int ReorderLevel {get; set;}
         public string Discontinued {get; set;}
+
+        public bool AktifMi{get; set;}
     }
 }

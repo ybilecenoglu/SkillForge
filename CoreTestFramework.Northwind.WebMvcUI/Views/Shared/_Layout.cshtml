@@ -15,7 +15,6 @@
   <link rel="stylesheet" href="~/adminlte/plugins/toastr/toastr.min.css">
   @RenderSection("Styles", false)
 </head>
-
 <body class="hold-transition sidebar-mini layout-fixed">
   <div class="wrapper">
     <div class="preloader flex-column justify-content-center align-items-center">
@@ -106,25 +105,21 @@
   <script src="~/adminlte/plugins/toastr/toastr.min.js"></script>
   @RenderSection("Scripts",false)
   <script>
-    
       var json_text = '@Html.Raw(TempData["result"])';
       if (json_text) {
           var result = JSON.parse(json_text);
         if (result.Success == false) {
-          toastr.error('Silme işlemi başarısız oldu.');
+          toastr.error(result.Message);
         } else {
-          toastr.success('Silme işlemi başarısız oldu.');
+          toastr.success(result.Message);
         }
       }
-      
-
-
     document.querySelectorAll(".nav-link").forEach((link) => {
       if (link.href === window.location.href) {
         link.classList.add("active");
       }
     });
   </script>
+  @await Html.PartialAsync("_Modal");
 </body>
-
 </html>

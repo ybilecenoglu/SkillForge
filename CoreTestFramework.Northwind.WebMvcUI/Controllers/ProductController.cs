@@ -3,12 +3,10 @@ using CoreTestFramework.Core.Common;
 using CoreTestFramework.Northwind.Business.Abstract;
 using CoreTestFramework.Northwind.Entities.Concrate;
 using CoreTestFramework.Northwind.Entities.DTO;
-using CoreTestFramework.Northwind.WebMvcUI.Common;
 using CoreTestFramework.Northwind.WebMvcUI.Extension;
 using CoreTestFramework.Northwind.WebMvcUI.ViewModels;
 using DataTables.AspNet.AspNetCore;
 using DataTables.AspNet.Core;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -48,9 +46,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
 
                 return View(vm);
             }
-            
         }
-
         [HttpPost]
         public async Task<IActionResult> PageData(IDataTablesRequest request, int categoryID, int supplierID)
         {
@@ -137,7 +133,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                     result.Success =false;
                     result.Message = "Aranan ürün bulunamadı.";
                     TempData["result"] = JsonConvert.SerializeObject(result);
-                    return RedirectToAction("Index");
+                    return Json(result);
                 }
 
                 var product = await _productService.GetProductAsync(id);
@@ -147,20 +143,20 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                         result.Success = true;
                         result.Message = "Ürün silme işlemi başarılı.";
                         TempData["result"] = JsonConvert.SerializeObject(result);
-                        return RedirectToAction("Index");
+                        return Json(result);
                     }
                     else{
                         result.Success =delete_product_result.Success;
                         result.Message = delete_product_result.Message;
                         TempData["result"] = JsonConvert.SerializeObject(result);
-                        return RedirectToAction("Index");
+                        return Json(result);
                         
                     }
                 }
                 else{
                     result.Success = false;
                     result.Message ="Ürün bulunamadı.";
-                    return RedirectToAction("Index");
+                    return Json(result);
                 }
 
             }
@@ -170,36 +166,161 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 result.Message = ex.Message;
             }
 
-            return View("Index");
+            return Json(result);
         }
-        
-        [HttpPost]
-        public async Task<IActionResult> Details(int id){
+        public async Task<IActionResult> Edit(int id)
+        {
              var result = new Result { Success = false};
-
              var product_vm = new ProductViewModel();
              try
              {
                 if(id == null){
                     result.Success =false;
-                    result.Message = "Aranan ürün bulunamadı.";
+                    result.Message = "Seçili ürün bulunamadı.";
                     TempData["result"] = JsonConvert.SerializeObject(result);
                     return RedirectToAction("Index");
                 }
                  var product = await _productService.GetProductAsync(id);
-                 if(product.Success == true){
+                 if(product.Success == true && product.Data != null){
+
+                    product_vm.CategoryID = product.Data.CategoryID;
+                    product_vm.SupplierID = product.Data.SupplierID;
                     var mapped_list_product = _mapper.Map<ProductDTO>(product.Data);
                     product_vm.Product = mapped_list_product;
-                    return View("Details", product_vm);
+                    
+                    var categories = await _northwindContext.Categories.ToListAsync();
+                    product_vm.Categories = new SelectList(categories, "CategoryID","CategoryName", product_vm.CategoryID);
+                    var suppliers = await _northwindContext.Suppliers.ToListAsync();
+                    product_vm.Suppliers = new SelectList(suppliers, "SupplierID","CompanyName", product_vm.SupplierID);
+                    
+                    return PartialView(product_vm);
                  }
-                 
                  
              }
              catch (System.Exception ex)
              {
-                
+                result.Success =false;
+                result.Message = ex.Message;
+                TempData["result"] = JsonConvert.SerializeObject(result);
+                return RedirectToAction("Index");
              }
-             return View("Details");
+             
+             return RedirectToAction("Index");
+        }
+        [HttpPost]
+        public async Task<IActionResult> Edit(ProductViewModel vm = null)
+        {
+            var result = new Result{ Success = false};
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    if(ViewBag.ProductID == vm.Product.ProductID){
+
+                    }
+                    var get_product_result = await _productService.GetProductAsync(vm.Product.ProductID);
+                    if (get_product_result.Success && get_product_result.Data != null)
+                    {
+                        get_product_result.Data.ProductName = vm.Product.ProductName;
+                        get_product_result.Data.SupplierID = vm.SupplierID;
+                        get_product_result.Data.CategoryID = vm.CategoryID;
+                        get_product_result.Data.QuantityPerUnit = vm.Product.QuantityPerUnit;
+                        get_product_result.Data.UnitPrice = vm.Product.UnitPrice;
+                        get_product_result.Data.UnitsInStock = vm.Product.UnitsInStock;
+                        get_product_result.Data.ReorderLevel = vm.Product.ReorderLevel;
+                        get_product_result.Data.UnitsOnOrder = vm.Product.UnitsOnOrder;
+                        if(vm.Product.AktifMi == true){
+                           get_product_result.Data.Discontinued = "1";
+                        }
+                        else
+                           get_product_result.Data.Discontinued = "0";
+                        
+                        
+                        var update_result = await _productService.UpdateProductAsync(get_product_result.Data);
+                        if (update_result.Success == false)
+                        {
+                           result.Message = update_result.Message;
+                           TempData["result"] = JsonConvert.SerializeObject(result);
+                           return View(vm);
+                        }
+                    }
+                    else {
+                        result.Message = "Güncellenecek ürün bulunamadı";
+                        TempData["result"] = JsonConvert.SerializeObject(result);
+                        return PartialView(vm);
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                result.Message = ex.Message;
+                TempData["result"] = JsonConvert.SerializeObject(result);
+                return View(vm);
+            }
+             result.Success = true;
+             result.Message = $"{vm.Product.ProductName} güncelleme işlemi başarıyla gerçekleşti";
+             TempData["result"] = JsonConvert.SerializeObject(result);
+
+            return RedirectToAction("Index");
+        }
+        public async Task<IActionResult> Create()
+        {
+            var viewModel = new ProductViewModel();
+            try
+            {
+                var categories = await _northwindContext.Categories.ToListAsync();
+                viewModel.Categories = new SelectList(categories, "CategoryID","CategoryName", viewModel.CategoryID);
+                var suppliers = await _northwindContext.Suppliers.ToListAsync();
+                viewModel.Suppliers = new SelectList(suppliers, "SupplierID", "CompanyName", viewModel.SupplierID);
+            }
+            catch (System.Exception)
+            {
+                
+                throw;
+            }
+            return View(viewModel);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Create(ProductViewModel vm = null)
+        {
+            var result = new Result {Success = false};
+            try
+            {
+                var product = new Product {
+                    ProductName = vm.Product.ProductName,
+                    CategoryID = vm.CategoryID,
+                    SupplierID = vm.SupplierID,
+                    QuantityPerUnit = vm.Product.QuantityPerUnit,
+                    UnitPrice = vm.Product.UnitPrice,
+                    UnitsInStock = vm.Product.UnitsInStock,
+                    UnitsOnOrder = vm.Product.UnitsOnOrder,
+                    ReorderLevel = vm.Product.ReorderLevel,
+                    Discontinued = vm.Product.AktifMi == true ? "1" : "0"
+                };
+
+                var add_product_result = await _productService.AddProductAsync(product);
+                if (add_product_result.Success == false)
+                {
+                    result.Success = false;
+                    result.Message = add_product_result.Message;
+                    TempData["result"] = JsonConvert.SerializeObject(result);
+                    return View(vm);
+                }
+            }
+            catch (System.Exception  ex)
+            {
+                    result.Success = false;
+                    result.Message = ex.Message;
+                    TempData["result"] = JsonConvert.SerializeObject(result);
+                    return View(vm);
+            }
+            
+            result.Success = true;
+            result.Message = $"{vm.Product.ProductName} kaydı başarıyla eklendi.";
+            TempData["result"] = JsonConvert.SerializeObject(result);
+
+           return RedirectToAction("Index");
         }
     }
+
 }
