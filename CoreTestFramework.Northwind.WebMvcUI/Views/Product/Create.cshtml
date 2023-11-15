@@ -26,8 +26,8 @@
       <h3 class="card-title">Ürün Ekleme Formu</h3>
       </div>
       <form asp-controller="Product" asp-action="Create" method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
         <div class="card-body">
-          <input type="hidden" asp-for="@Model.Product.ProductID" class="form-control" />
           <div class="form-group">
             <label>Ürün Adı</label>
             <input asp-for="@Model.Product.ProductName" class="form-control" />

@@ -15,4 +15,9 @@
     <ProjectReference Include="..\CoreTestFramework.Northwind.DataAccess\CoreTestFramework.Northwind.DataAccess.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.8.0" />
+    <PackageReference Include="PostSharp" Version="2023.0.8" />
+  </ItemGroup>
+
 </Project>

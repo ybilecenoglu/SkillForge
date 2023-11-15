@@ -7,6 +7,7 @@ using CoreTestFramework.Northwind.WebMvcUI.Extension;
 using CoreTestFramework.Northwind.WebMvcUI.ViewModels;
 using DataTables.AspNet.AspNetCore;
 using DataTables.AspNet.Core;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -306,6 +307,19 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                     TempData["result"] = JsonConvert.SerializeObject(result);
                     return View(vm);
                 }
+            }
+            catch(ValidationException validationEx){
+                    
+                    foreach (var error in validationEx.Errors)
+                    {
+                        ModelState.AddModelError("Hata",error.ErrorMessage);
+                    }
+                    var categories = await _northwindContext.Categories.ToListAsync();
+                    vm.Categories = new SelectList(categories, "CategoryID","CategoryName", vm.CategoryID);
+                    var suppliers = await _northwindContext.Suppliers.ToListAsync();
+                    vm.Suppliers = new SelectList(suppliers, "SupplierID", "CompanyName", vm.SupplierID);
+                    return View(vm);
+
             }
             catch (System.Exception  ex)
             {

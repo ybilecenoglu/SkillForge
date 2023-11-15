@@ -17,5 +17,4 @@
     <PackageReference Include="DataTables.AspNet.Mvc5" Version="2.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.TagHelpers" Version="2.2.0" />
   </ItemGroup>
-
 </Project>

@@ -17,7 +17,6 @@ var builder = WebApplication.CreateBuilder(args);
 //mvc, restapi, razorpages şablonları ile çalışabiliriz. Hangi şablon ile çalışacaksak belirtiyoruz.
 builder.Services.AddRazorPages();
 builder.Services.AddControllersWithViews();
-
 builder.Services.AddTransient<NorthwindContext>();
 builder.Services.AddSingleton<ProductDAL>();
 builder.Services.AddSingleton<IProductService, ProductManager>();

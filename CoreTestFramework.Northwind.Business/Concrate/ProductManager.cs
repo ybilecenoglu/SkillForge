@@ -1,5 +1,7 @@
-﻿using CoreTestFramework.Core.Common;
+﻿using CoreTestFramework.Core.Aspect.PostSharp;
+using CoreTestFramework.Core.Common;
 using CoreTestFramework.Northwind.Business.Abstract;
+using CoreTestFramework.Northwind.Business.ValidationRules.FluentValidation;
 using CoreTestFramework.Northwind.DataAccess.Concrate;
 using CoreTestFramework.Northwind.Entities.Concrate;
 using System.Linq.Expressions;
@@ -33,12 +35,15 @@ namespace CoreTestFramework.Northwind.Business.Concrate
            return product_delete_result;
         }
 
+        [FluentValidationAspect(typeof(ProductValidation))]
         public async Task<Result> UpdateProductAsync(Product product)
         {
             var product_update_result = await _productDal.UpdateAsync(product);
             return product_update_result;
         }
 
+        
+        [FluentValidationAspect(typeof(ProductValidation))]
         public async Task<Result> AddProductAsync(Product product){
             var product_create_result = await _productDal.AddAsync(product);
             return product_create_result;
