@@ -8,7 +8,7 @@
   <div class="card-header">
     <h3 class="card-title">@ViewBag.Title</h3>
     </div>
-    <form asp-controller="Product" asp-action="Edit" method="post" id="form-product">
+    <form method="post" id="form-product">
       <div class="card-body">
         <input type="hidden" asp-for="@Model.Product.ProductID" class="form-control" />
         <div class="form-group">
@@ -56,17 +56,61 @@
        }
     </div>
       </div>
+      <div class="card-footer">
+        <button type="submit" class="btn btn-primary">Devam</button>
+      </div>
       </form>
     </div>
 </div>
 </div>
+<div class="modal fade" id="modal-danger" role="dialog">
+  <div class="modal-dialog">
+  <div class="modal-content bg-danger">
+  <div class="modal-body">
+  <!--Dinamik içerik-->
+  </div>
+  <div class="modal-footer justify-content-between">
+  <button type="button" class="btn btn-outline-light" id="modal-hide">Tamam</button>
+  </div>
+  </div>
+  
+  </div>
+  
+  </div>
   <script>
-    function submitForm(){
-      document.forms["form-product"].submit();
-    }
-    $('#submit-modal').on('click', submitForm);
+    
+  $('#form-product').submit(function(event){
+     var form_data =$(this).serialize();
+     $('#overlay-process').fadeIn();
+     $.ajax({
+        type: 'POST',
+        url: '@Url.Action("Edit","Product")',
+        data: form_data
+     }).done(function(result){
+      if (result.Success == true) {
+            var url = '@Url.Action("Index", "Product")';
+            window.location.href = url;
+      }
+      else {
+        
+        result.Messages ="<ul><li>"+ result.Messages.join("</li><li>") + "</li></ul>";
+        $("#modal-danger .modal-body").html(result.Messages);
+        $("#modal-danger").modal("show");
+      }
+     });
+     event.preventDefault();
+    });
+    
+    $('#modal-hide').on('click', function(){
+      $('#modal-danger').modal('hide');
+    });
+
+    $('#submit-modal').on('click', function(){
+      $('#form-product').submit();
+    });
 
     $("input[data-bootstrap-switch]").each(function(){
           $(this).bootstrapSwitch('state', $(this).prop('checked'));
-    })
+    });
+    
   </script>

@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Web.Helpers;
+using AutoMapper;
 using CoreTestFramework.Core.Common;
 using CoreTestFramework.Northwind.Business.Abstract;
 using CoreTestFramework.Northwind.Entities.Concrate;
@@ -208,17 +209,13 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
              
              return RedirectToAction("Index");
         }
+        
         [HttpPost]
         public async Task<IActionResult> Edit(ProductViewModel vm = null)
         {
             var result = new Result{ Success = false};
             try
             {
-                if (ModelState.IsValid)
-                {
-                    if(ViewBag.ProductID == vm.Product.ProductID){
-
-                    }
                     var get_product_result = await _productService.GetProductAsync(vm.Product.ProductID);
                     if (get_product_result.Success && get_product_result.Data != null)
                     {
@@ -242,27 +239,35 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                         {
                            result.Message = update_result.Message;
                            TempData["result"] = JsonConvert.SerializeObject(result);
-                           return View(vm);
+                           return Json(result);
                         }
                     }
                     else {
                         result.Message = "Güncellenecek ürün bulunamadı";
                         TempData["result"] = JsonConvert.SerializeObject(result);
-                        return PartialView(vm);
+                        return Json(result);
                     }
-                }
+            }
+            catch (ValidationException validationEx)
+            {
+                    foreach (var error in validationEx.Errors)
+                    {
+                        result.Messages.Add(error.ErrorMessage);
+                    }
+                    return Json(result);
             }
             catch (System.Exception ex)
             {
                 result.Message = ex.Message;
                 TempData["result"] = JsonConvert.SerializeObject(result);
-                return View(vm);
+                return Json(result);
             }
+             
              result.Success = true;
              result.Message = $"{vm.Product.ProductName} güncelleme işlemi başarıyla gerçekleşti";
              TempData["result"] = JsonConvert.SerializeObject(result);
-
-            return RedirectToAction("Index");
+             
+             return Json(result);
         }
         public async Task<IActionResult> Create()
         {
@@ -276,7 +281,6 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
             }
             catch (System.Exception)
             {
-                
                 throw;
             }
             return View(viewModel);

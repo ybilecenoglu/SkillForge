@@ -4,7 +4,6 @@ using CoreTestFramework.Northwind.DataAccess.Concrate;
 using CoreTestFramework.Northwind.Entities.Concrate;
 using CoreTestFramework.Northwind.WebMvcUI.Common;
 using DataTables.AspNet.AspNetCore;
-
 var builder = WebApplication.CreateBuilder(args);
 
 //Database Connection
@@ -20,6 +19,12 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<NorthwindContext>();
 builder.Services.AddSingleton<ProductDAL>();
 builder.Services.AddSingleton<IProductService, ProductManager>();
+
+//JSON serileştirmesini yapılandırmaası lowercase için
+builder.Services.AddControllers().AddJsonOptions(jsonOptions =>
+    {
+        jsonOptions.JsonSerializerOptions.PropertyNamingPolicy = null;
+    });
 
 // builder.Services.AddRouting(option => option.LowercaseUrls = true);
 

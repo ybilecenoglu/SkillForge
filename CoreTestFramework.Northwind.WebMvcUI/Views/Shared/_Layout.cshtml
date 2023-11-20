@@ -109,9 +109,9 @@
       if (json_text) {
           var result = JSON.parse(json_text);
         if (result.Success == false) {
-          toastr.error(result.Messages);
+          toastr.error(result.Message);
         } else {
-          toastr.success(result.Messages);
+          toastr.success(result.Message);
         }
       }
     document.querySelectorAll(".nav-link").forEach((link) => {

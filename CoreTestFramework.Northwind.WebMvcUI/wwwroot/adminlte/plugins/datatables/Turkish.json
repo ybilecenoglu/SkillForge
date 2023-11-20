@@ -8,7 +8,7 @@
 	"sInfoThousands": ".",
 	"sLengthMenu": "Sayfada _MENU_ kayıt göster",
 	"sLoadingRecords": "Yükleniyor...",
-	"sProcessing": "<div class=\"overlay\"><i class=\"fa fa-refresh fa-spin\"></i></div>",
+	"sProcessing": "<div class=\"overlay\"><i class=\"fa fa-spinner fa-spin\"></i></div>",
 	"sSearch": "Ara:",
 	"sZeroRecords": "Eşleşen kayıt bulunamadı",
 	"oPaginate": {
