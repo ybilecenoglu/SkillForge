@@ -1,6 +1,7 @@
 ﻿using CoreTestFramework.Core.Common;
 using CoreTestFramework.Core.Entities;
 using Microsoft.EntityFrameworkCore;
+using PostSharp.Aspects.Advices;
 using System.Linq.Expressions;
 
 namespace CoreTestFramework.Core.DataAccess.EntityFramework
@@ -17,7 +18,8 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
             {
                 using (var db = new TContext())
                 {
-                    await db.AddAsync(entity);
+                    var added_entry = db.Entry(entity);
+                    added_entry.State = EntityState.Added;
                     await db.SaveChangesAsync();
                     add_result.Success = true;
                     add_result.Message = "Success";
@@ -57,7 +59,8 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
             {
                 using (var db = new TContext())
                 {
-                    db.Remove(entity);
+                    var delete_entry = db.Entry(entity);
+                    delete_entry.State = EntityState.Deleted;
                     await db.SaveChangesAsync();
 
                     delete_result.Success = true;
@@ -97,7 +100,8 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
             {
                 using (var db = new TContext())
                 {
-                    db.Update(entity);
+                    var update_entry = db.Entry(entity);
+                    update_entry.State = EntityState.Modified;
                     await db.SaveChangesAsync();
                     update_result.Success = true;
                     update_result.Message = "Success";

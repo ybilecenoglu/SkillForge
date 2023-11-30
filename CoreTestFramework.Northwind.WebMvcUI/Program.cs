@@ -1,9 +1,10 @@
 using CoreTestFramework.Northwind.Business.Abstract;
 using CoreTestFramework.Northwind.Business.Concrate;
 using CoreTestFramework.Northwind.DataAccess.Concrate;
-using CoreTestFramework.Northwind.Entities.Concrate;
+using CoreTestFramework.Northwind.Entities.Model;
 using CoreTestFramework.Northwind.WebMvcUI.Common;
 using DataTables.AspNet.AspNetCore;
+using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 //Database Connection

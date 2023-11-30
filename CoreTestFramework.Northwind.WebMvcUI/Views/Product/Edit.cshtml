@@ -1,18 +1,19 @@
 @model ProductViewModel
 @{
   ViewBag.Title = "Ürün Düzenle";
- }
+}
 <div class="row">
   <div class="col-md-12">
   <div class="card card-primary">
-  <div class="card-header">
+  <!-- <div class="card-header">
     <h3 class="card-title">@ViewBag.Title</h3>
-    </div>
+    </div> -->
     <form method="post" id="form-product">
       <div class="card-body">
+        <div asp-validation-summary="All" class="text-danger"></div>
         <input type="hidden" asp-for="@Model.Product.ProductID" class="form-control" />
         <div class="form-group">
-          <label>Product Name</label>
+          <label>Ürün Adı</label>
           <input asp-for="@Model.Product.ProductName" class="form-control" />
       </div>
     <div class="form-group">
@@ -56,61 +57,53 @@
        }
     </div>
       </div>
-      <div class="card-footer">
-        <button type="submit" class="btn btn-primary">Devam</button>
-      </div>
+      <!-- <div class="card-footer">
+        <button type="button" class="btn btn-primary" id="submit-button">Kaydet</button>
+      </div> -->
       </form>
     </div>
 </div>
 </div>
-<div class="modal fade" id="modal-danger" role="dialog">
-  <div class="modal-dialog">
-  <div class="modal-content bg-danger">
-  <div class="modal-body">
-  <!--Dinamik içerik-->
-  </div>
-  <div class="modal-footer justify-content-between">
-  <button type="button" class="btn btn-outline-light" id="modal-hide">Tamam</button>
-  </div>
-  </div>
-  
-  </div>
-  
-  </div>
   <script>
-    
-  $('#form-product').submit(function(event){
-     var form_data =$(this).serialize();
-     $('#overlay-process').fadeIn();
-     $.ajax({
-        type: 'POST',
-        url: '@Url.Action("Edit","Product")',
-        data: form_data
-     }).done(function(result){
-      if (result.Success == true) {
-            var url = '@Url.Action("Index", "Product")';
-            window.location.href = url;
-      }
-      else {
-        
-        result.Messages ="<ul><li>"+ result.Messages.join("</li><li>") + "</li></ul>";
-        $("#modal-danger .modal-body").html(result.Messages);
-        $("#modal-danger").modal("show");
-      }
-     });
-     event.preventDefault();
-    });
-    
-    $('#modal-hide').on('click', function(){
-      $('#modal-danger').modal('hide');
-    });
+    $(document).ready(function(){
+      $("input[data-bootstrap-switch]").each(function(){
+              $(this).bootstrapSwitch('state', $(this).prop('checked'));
+        });
+    $('#form-product').submit(function(event){
+       var form_data =$(this).serialize();
+       $('#overlay-process').fadeIn();
+       $('#submit-button').prop('disabled', true)
+       $.ajax({
+          type: 'POST',
+          url: '@Url.Action("Edit","Product")',
+          data: form_data
+       }).done(function(result){
+        if (result.Success == true) {
+            $('#modal-overlay .modal-content').addClass("bg-success");
+            ShowModal('Başarılı', result.Message, function (e) {
+                  $("#data-table-product").DataTable().ajax.reload(null,false);
+                  $('#modal-overlay .modal-content').removeClass("bg-success");
+            });
+        }
+        else {
+          alert(result.Messages.join('\n'));
+        }
+       }).always(function(){
+        $('#overlay-process').fadeOut();
+        $('#submit-button').prop('disabled', false)
+       });
+  
+       event.preventDefault();
+      });
+      
+      $('#modal-close').on('click', function(){
+        $('#modal-edit').modal('hide');
+      });
+  
+      $('#submit-button').on('click', function(e){
+        $('#form-product').submit();
+        e.preventDefault();
+      });
 
-    $('#submit-modal').on('click', function(){
-      $('#form-product').submit();
     });
-
-    $("input[data-bootstrap-switch]").each(function(){
-          $(this).bootstrapSwitch('state', $(this).prop('checked'));
-    });
-    
-  </script>
+    </script>

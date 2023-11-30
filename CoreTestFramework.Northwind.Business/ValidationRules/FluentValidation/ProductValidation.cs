@@ -1,4 +1,4 @@
-using CoreTestFramework.Northwind.Entities.Concrate;
+using CoreTestFramework.Northwind.Entities.Model;
 using FluentValidation;
 
 namespace CoreTestFramework.Northwind.Business.ValidationRules.FluentValidation{

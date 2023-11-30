@@ -3,7 +3,7 @@ using CoreTestFramework.Core.Common;
 using CoreTestFramework.Northwind.Business.Abstract;
 using CoreTestFramework.Northwind.Business.ValidationRules.FluentValidation;
 using CoreTestFramework.Northwind.DataAccess.Concrate;
-using CoreTestFramework.Northwind.Entities.Concrate;
+using CoreTestFramework.Northwind.Entities.Model;
 using System.Linq.Expressions;
 
 namespace CoreTestFramework.Northwind.Business.Concrate

@@ -2,7 +2,7 @@
 using AutoMapper;
 using CoreTestFramework.Core.Common;
 using CoreTestFramework.Northwind.Business.Abstract;
-using CoreTestFramework.Northwind.Entities.Concrate;
+using CoreTestFramework.Northwind.Entities.Model;
 using CoreTestFramework.Northwind.Entities.DTO;
 using CoreTestFramework.Northwind.WebMvcUI.Extension;
 using CoreTestFramework.Northwind.WebMvcUI.ViewModels;
@@ -12,6 +12,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using static CoreTestFramework.Northwind.WebMvcUI.Extension.QueryableExtension;
 
@@ -69,17 +70,16 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 if (supplierID > 0 && categoryID > 0)
                 {
                     product_result = await _productService.GetProductListAsync(p => p.SupplierID == supplierID && p.CategoryID == categoryID);
-                    
                 }
                 else if(supplierID > 0)
                 {
                     product_result = await _productService.GetProductListAsync(p => p.SupplierID == supplierID);
-                }      
+                }   
                 else if(categoryID > 0){
                    product_result = await _productService.GetProductListAsync(p => p.CategoryID == categoryID);
                 }
                 else
-                     product_result = await _productService.GetProductListAsync();
+                    product_result = await _productService.GetProductListAsync();
 
                 if (product_result.Success == false)
                 {
@@ -143,14 +143,12 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                     var delete_product_result = await _productService.DeleteProductAsync(product.Data);
                     if(delete_product_result.Success == true){
                         result.Success = true;
-                        result.Message = "Ürün silme işlemi başarılı.";
-                        TempData["result"] = JsonConvert.SerializeObject(result);
+                        result.Message = $"{product.Data.ProductName} silme işlemi başarıyla gerçekleşti";
                         return Json(result);
                     }
                     else{
                         result.Success =delete_product_result.Success;
                         result.Message = delete_product_result.Message;
-                        TempData["result"] = JsonConvert.SerializeObject(result);
                         return Json(result);
                         
                     }
@@ -165,7 +163,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
             catch (System.Exception ex)
             {
                 result.Success = false;
-                result.Message = ex.Message;
+                result.Message = "Ürün silme işlemi başarısız oldu";
             }
 
             return Json(result);
@@ -187,8 +185,8 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
 
                     product_vm.CategoryID = product.Data.CategoryID;
                     product_vm.SupplierID = product.Data.SupplierID;
-                    var mapped_list_product = _mapper.Map<ProductDTO>(product.Data);
-                    product_vm.Product = mapped_list_product;
+                    var mapped_product = _mapper.Map<ProductDTO>(product.Data);
+                    product_vm.Product = mapped_product;
                     
                     var categories = await _northwindContext.Categories.ToListAsync();
                     product_vm.Categories = new SelectList(categories, "CategoryID","CategoryName", product_vm.CategoryID);
@@ -265,7 +263,6 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
              
              result.Success = true;
              result.Message = $"{vm.Product.ProductName} güncelleme işlemi başarıyla gerçekleşti";
-             TempData["result"] = JsonConvert.SerializeObject(result);
              
              return Json(result);
         }
@@ -283,7 +280,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
             {
                 throw;
             }
-            return View(viewModel);
+            return PartialView(viewModel);
         }
         [HttpPost]
         public async Task<IActionResult> Create(ProductViewModel vm = null)
@@ -308,21 +305,17 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 {
                     result.Success = false;
                     result.Message = add_product_result.Message;
-                    TempData["result"] = JsonConvert.SerializeObject(result);
-                    return View(vm);
+                    // TempData["result"] = JsonConvert.SerializeObject(result);
+                    return Json(result);
                 }
             }
             catch(ValidationException validationEx){
                     
                     foreach (var error in validationEx.Errors)
                     {
-                        ModelState.AddModelError("Hata",error.ErrorMessage);
+                        result.Messages.Add(error.ErrorMessage);
                     }
-                    var categories = await _northwindContext.Categories.ToListAsync();
-                    vm.Categories = new SelectList(categories, "CategoryID","CategoryName", vm.CategoryID);
-                    var suppliers = await _northwindContext.Suppliers.ToListAsync();
-                    vm.Suppliers = new SelectList(suppliers, "SupplierID", "CompanyName", vm.SupplierID);
-                    return View(vm);
+                    return Json(result);
 
             }
             catch (System.Exception  ex)
@@ -330,14 +323,42 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                     result.Success = false;
                     result.Message = ex.Message;
                     TempData["result"] = JsonConvert.SerializeObject(result);
-                    return View(vm);
+                    return Json(result);
             }
             
             result.Success = true;
             result.Message = $"{vm.Product.ProductName} kaydı başarıyla eklendi.";
-            TempData["result"] = JsonConvert.SerializeObject(result);
+            // TempData["result"] = JsonConvert.SerializeObject(result);
+           return Json(result);
+        }
+        public async Task<IActionResult> Detail(int id) {
+            var result = new Result { Success = false};
+            var product_vm = new ProductViewModel();
+            try
+            {
+                if (id == 0)
+                {
+                    result.Message = "Aranan ürün bulunamadı.";
+                    TempData["result"] = JsonConvert.SerializeObject(result);
+                    return RedirectToAction("Index");
+                }
 
-           return RedirectToAction("Index");
+                var product_result = await _productService.GetProductAsync(id);
+                if (product_result.Success == true && product_result.Data != null)
+                {
+                    var mapped_product = _mapper.Map<ProductDTO>(product_result.Data);
+                    product_vm.Product = mapped_product;
+                }
+
+                return PartialView(product_vm);
+
+            }
+            catch (System.Exception ex)
+            {
+                result.Message = ex.Message;
+                TempData["result"] = JsonConvert.SerializeObject(result);
+                return RedirectToAction("Index");
+            }
         }
     }
 

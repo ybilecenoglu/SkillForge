@@ -13,10 +13,7 @@
   <div class="container-fluid">
     <div class="row mb-2">
       <div class="col-sm-6">
-        <a asp-action="Create" asp-controller="Product" class="btn btn-app bg-success">
-          <i class="fas fa-plus"></i> Yeni Ürün Ekle
-          </a>
-        <!-- <h1 class="m-0">@ViewBag.Title</h1> -->
+        <h1 class="m-0">@ViewBag.Title</h1>
       </div><!-- /.col -->
       <div class="col-sm-6">
         <ol class="breadcrumb float-sm-right">
@@ -64,9 +61,12 @@
             <div class="row">
               <div class="col-sm-12">
                 <table id="data-table-product" class="table table-bordered table-striped dataTable dtr-inline">
+                  <!-- <a asp-action="Create" asp-controller="Product" class="btn btn-default bg-success">
+                    <i class="fas fa-plus"></i> Yeni Ürün Ekle
+                    </a> -->
                   <thead>
                     <tr>
-                      <th>#</th>
+                      <th style="width: 100px;">#</th>
                       <th>Ürün Adı</th>
                       <th>Tedarikçi Firma</th>
                       <th>Kategori Adı</th>
@@ -89,6 +89,29 @@
       </div>
     </div>
   </div>
+  <div class="modal fade" id="modal-edit" role="dialog">
+    <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+    <!-- <div class="overlay">
+    <i class="fas fa-2x fa-sync fa-spin"></i>
+    </div> -->
+    <div class="modal-header">
+    <h4 class="modal-title"></h4>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">×</span>
+    </button>
+    </div>
+    <div class="modal-body">
+    <!--Dinamik oluşturalacak-->
+    </div>
+    <div class="modal-footer justify-content-between">
+    <button type="button" class="btn btn-primary" id="submit-button">Kaydet</button>
+    <button type="button" class="btn btn-outline-light" id="modal-close">Kapat</button>
+    </div>
+    </div>
+    </div>
+</div>
+
 @section Scripts{
 <script src="~/adminlte/plugins/datatables/jquery.dataTables.min.js"></script>
 <script src="~/adminlte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
@@ -108,7 +131,12 @@
     var categoryID = $('#CategoryID').val();
     var supplierID = $('#SupplierID').val();
 
-    $('#data-table-product').DataTable({
+    // $("#modal-overlay").on('hidden.bs.modal', function(){
+    //   $("#modal-overlay").removeData('bs.modal');
+    //    $("#modal-overlay").reload();
+    // });
+
+    var table = $('#data-table-product').DataTable({
       destroy: true,
       serverSide: true,
       processing: true,
@@ -128,17 +156,24 @@
       searchDelay: 1000,
       responsive: true,
       dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>" +
-                    "<'row'<'col-sm-12 text-right'B>>" +
+                    "<'row'<'col-sm-12'B>>" +
                     "<'row'<'col-sm-12'tr>>" +
                     "<'row'<'col-sm-5'i><'col-sm-7'p>>",
                 buttons: [
                     {
+                      text: '<i class="fas fa-plus" title="Ekle"></i>&nbsp; Yeni Ürün Ekle',
+                      attr: {
+                        id: 'create-button',
+                      }
+                    },
+                    {
                         extend: 'excel',
-                        text: '<i class="fa fa-file-excel-o" title="Excel"></i>&nbsp;Excel',
+                        text: '<i class="fa fa-file-excel" title="Excel"></i>&nbsp;Excel',
                         exportOptions: {
                             columns: ':visible'
                         }
                     },
+                    
                     {
                         extend: 'copyHtml5',
                         text: '<i class="fa fa-copy" title="Kopyala"></i>&nbsp;Kopyala',
@@ -154,15 +189,16 @@
       columns: [
         { data: "productID", name: "ProductID", sortable: false, searchable: false, render: function(data) {
           var content = '';
-          content += '<a class="btn btn-primary btn-sm btn-flat" id="edit-button" title="Detay" data-target="/Product/Edit/'+data+'"><i class="fa fa-edit"></i></a>';
+          content += '<a class="btn btn-primary btn-sm btn-flat" id="edit-button" title="Düzenle" data-target="/Product/Edit/'+data+'"><i class="fa fa-edit"></i></a>';
           content +='<a class="btn btn-danger btn-sm btn-flat" id="delete-button" title="Sil" data-href="/Product/Delete/' + data + '"><i class="fa fa-trash"></i></a>';
+          content += '<a class="btn btn-warning btn-sm btn-flat" id="detail-button" title="Görüntüle" data-target="/Product/Detail/' + data + '"><i class="fa fa-eye"></i></a>'
           return content;
         } },
         { data: "productName", name: "ProductName", sortable: true, searchable: true },
         { data: "companyName", name: "CompanyName", sortable: false, searchable: false },
         { data: "categoryName", name: "CategoryName", sortable: false, searchable: false },
         { data: "quantityPerUnit", name: "QuantityPerUnit", sortable: false, searchable: false },
-        { data: "unitPrice", name: "UnitPrice",sortable: true, searchable: false, render: $.fn.dataTable.render.number(',', ',', 2, '') },
+        { data: "unitPrice", name: "UnitPrice",sortable: true, searchable: false, render: $.fn.dataTable.render.number('.', ',', 2, '') },
         { data: "unitsInStock", name: "UnitsInStock",sortable: true, searchable: false },
         { data: "unitsOnOrder", name: "UnitsOnOrder", sortable: false, searchable: false },
         { data: "reorderLevel", name: "ReorderLevel", sortable: false, searchable: false },
@@ -189,8 +225,7 @@
             $searchButton.click();
           });
 
-        $('.dataTables_filter').append($searchButton, $clearButton);
-
+        
         $(".dataTables_filter input")
           .unbind()
           .bind("input keyup", function (e) {
@@ -201,65 +236,101 @@
           });
       },
     });
-  });
-</script>
-<script>
+    
+      $("#create-button").attr("data-target", "Product/Create");
+      $("#create-button").on("click", function(e) {
+      $("#overlay-process").fadeIn();
+                        var that = $(this);
+                        $.ajax({
+                          type: "GET",
+                          url: that.data("target")
+                        }).done(function(data) {
+                          $("#modal-overlay .modal-body").html(data);
+                          $("#modal-overlay .modal-title").html("Ürün Ekle");
+                          $("#modal-overlay").modal("show");
+                        }).fail(function(jqXHR, textStatus) {
+                          ShowModal("Hata!", "Form yüklenemedi");
+                          console.log("Request failed: " + textStatus);
+                        }).always(function() {
+                          $("#overlay-process").fadeOut();
+                        })
 
-function EditAction(e) {
-  var that = $(this);
-            //bu urlimizi post et
-            $.ajax ({
-              type: 'GET',
-              url: that.data('target')
-            }).done(function(data){
-                $("#modal-overlay .modal-body").html(data);
-                //sonra da modalimizi göster
-                $("#modal-overlay").modal("show");
-                
-            }).fail(function() {
-              $("#modal-overlay .modal-body").text("Error!!");
-                //sonra da modalimizi göster
-                $("#modal-overlay").modal("show");
-            }).always(function() {
-              $(".overlay").fadeOut();
-            })
-            e.preventDefault();
-          }
-           
+                        e.preventDefault();
+    });
+     
+    function EditAction(e) {
+      var that = $(this);
+      $("#overlay-process").fadeIn();
+                $.ajax ({
+                  type: 'GET',
+                  url: that.data('target')
+                }).done(function(data){
+                    $("#modal-edit .modal-body").html(data);
+                    $("#modal-edit .modal-title").html("Ürün Düzenle");
+                    $("#modal-edit").modal("show");
+                    
+                }).fail(function(jqXHR, textStatus) {
+                  ShowModal("Hata!", "Form yüklenemedi");
+                  console.log("Request failed: " + textStatus);
+                }).always(function() {
+                  $("#overlay-process").fadeOut();
+                })
+                e.preventDefault();
+              }
+    
+
     $('#data-table-product tbody').on('click', 'td #edit-button', EditAction);
 
- function DeleteAction(e) {
-        if (confirm('Silmek istediğinizen emin misiniz ?') == true) {
-
-            $('#delete-button').prop('disabled', true);
-            // $('#overlay-process').fadeIn();
-            var that = $(this);
-
-            $.ajax({
-            type: 'POST',
-            url: that.data('href'),
-        // }).done(function (result) {
-        //     if (result.Success == true) {
-        //         ShowModal('Başarılı', result.Messages, function (e) {
+    function DetailAction(e) {
+      var that = $(this);
+      $("#overlay-process").fadeIn();
+                $.ajax ({
+                  type: 'GET',
+                  url: that.data('target')
+                }).done(function(data){
+                    $("#modal-overlay .modal-body").html(data);
+                    $("#modal-overlay .modal-title").html("Ürün Detay");
+                    $("#modal-overlay").modal("show");
                     
-        //         });
-        //     } else {
-        //         alert('Hata', result.Messages);
-        //     }
-        // }).fail(function (jqXHR, textStatus) {
-        //     ShowModal('Hata', 'Hata oluştu.');
-        //     console.log("Request failed: " + textStatus);
-        }).always(function () {
-            // $('#fatura-sil').prop('disabled', false);
-            // $('#overlay-process').fadeOut();
-            
-            var url = '@Url.Action("Index", "Product")';
-            window.location.href = url;
-        });
-        e.preventDefault();
-        }
-    }
+                }).fail(function(jqXHR, textStatus) {
+                  ShowModal("Hata!", "Form yüklenemedi");
+                  console.log("Request failed: " + textStatus);
+                }).always(function() {
+                  $("#overlay-process").fadeOut();
+                })
+                e.preventDefault();
+              }
+    
+    $('#data-table-product tbody').on('click', 'td #detail-button', DetailAction);
 
-    $('#data-table-product tbody').on('click', 'td #delete-button', DeleteAction);
+  function DeleteAction(e) {
+          if (confirm('Silmek istediğinizen emin misiniz ?') == true) {
+              $('#overlay-process').fadeIn();
+              var that = $(this);
+              $.ajax({
+              type: 'POST',
+              url: that.data('href'),
+          }).done(function (result) {
+              if (result.Success == true) {
+                    $("#modal-overlay .modal-content").addClass("bg-success");
+                    ShowModal('Başarılı', result.Message, function (e) {
+                    $("#data-table-product").DataTable().ajax.reload(null,false);
+                    $("#modal-overlay .modal-content").removeClass("bg-success");
+                  });
+              } else {
+                toastr.error(result.Message);
+              }
+          }).fail(function (jqXHR, textStatus) {
+              ShowModal('Hata', 'Hata oluştu.');
+              console.log("Request failed: " + textStatus);
+          }).always(function () {
+              $('#overlay-process').fadeOut();
+          });
+          e.preventDefault();
+          }
+      }
+
+      $('#data-table-product tbody').on('click', 'td #delete-button', DeleteAction);
+  });
 </script>
 }

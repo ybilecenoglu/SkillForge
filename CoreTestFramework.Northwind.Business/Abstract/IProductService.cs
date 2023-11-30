@@ -1,5 +1,5 @@
 ﻿using CoreTestFramework.Core.Common;
-using CoreTestFramework.Northwind.Entities.Concrate;
+using CoreTestFramework.Northwind.Entities.Model;
 using System.Linq.Expressions;
 
 namespace CoreTestFramework.Northwind.Business.Abstract

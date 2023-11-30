@@ -1,5 +1,5 @@
 ﻿using CoreTestFramework.Core.DataAccess;
-using CoreTestFramework.Northwind.Entities.Concrate;
+using CoreTestFramework.Northwind.Entities.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
