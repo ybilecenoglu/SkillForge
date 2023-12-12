@@ -7,7 +7,7 @@ namespace CoreTestFramework.Northwind.Entities.Model;
 public partial class Employee
 {
     [Key]
-    public int EmployeeId { get; set; }
+    public int EmployeeID { get; set; }
 
     public string LastName { get; set; } = null!;
 

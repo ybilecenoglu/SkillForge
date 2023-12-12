@@ -5,6 +5,10 @@ using System.ComponentModel.DataAnnotations;
 namespace CoreTestFramework.Northwind.Entities.Model;
 public class Product : IEntity
 {
+    public Product()
+    {
+        OrderDetails = new HashSet<OrderDetail>();
+    }
     [Key]
     public int ProductID { get; set; }
     public string ProductName { get; set; }
@@ -18,7 +22,10 @@ public class Product : IEntity
     public string Discontinued {get; set;}
     public virtual Supplier Supplier {get; set;}
     public virtual Category Category {get; set;}
-    [OneToMany]
     public virtual ICollection<OrderDetail> OrderDetails { get; set; }
+
+    
+    
+
     
 }

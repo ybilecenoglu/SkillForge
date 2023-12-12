@@ -1,0 +1,21 @@
+@model ProductViewModel
+@{
+    ViewBag.Title= "Sipariş Detay";
+}
+<div class="row">
+    <div class="col-md-12">
+    <div class="card card-primary">
+    <!-- <div class="card-header">
+      <h3 class="card-title">@ViewBag.Title</h3>
+      </div> -->
+      <form>
+        <div class="card-body">
+            <div class="form-group">
+                <label>Müşteri Adı</label>
+                <input class="form-control" disabled asp-for="@Model.Order.CustomerName" />
+            </div>
+        </div>
+      </form>
+    </div>
+    </div>
+</div>

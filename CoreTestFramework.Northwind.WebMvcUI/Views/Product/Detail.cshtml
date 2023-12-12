@@ -56,40 +56,113 @@
       </label>
       </div>
       </div>
+      <br/>
       <div class="form-group">
-        <table class="table table-bordered">
-          <thead>
-            <tr>
-              <th style="width: 10px;">#</th>
-              <th>Sipariş Numarası</th>
-              <th>Fiyat</th>
-              <th>Sipariş Miktarı</th>
-              <th>İndirim</th>
-            </tr>
-          </thead>
-          <tbody>
-            @foreach (var order in Model.Product.OrderDetails)
-            {
-              <tr>
-                <td>@order.OrderID</td>
-                <td>@order.UnitPrice</td>
-                <td>@order.Quantity</td>
-                <td>@order.Discount</td>
-              </tr>
-            }
-          </tbody>
-        </table>
+        <div class="card">
+          <div class="card-header">
+            <h3>Siparişler</h3>
+          </div>
+          <div class="card-body">
+            <table class="table table-bordered" id="orders-table">
+              <thead>
+                <tr>
+                  <th style="width: 10px;">#</th>
+                  <th>Sipariş Numarası</th>
+                  <th>Fiyat</th>
+                  <th>Sipariş Miktarı</th>
+                  <th>İndirim</th>
+                </tr>
+              </thead>
+              <tbody>
+                @{
+                  decimal sumUnitPrice = 0;
+                  decimal sumQuantity = 0;
+                  float sumDiscount= 0;
+                }
+                @foreach (var order in Model.OrderDetails)
+                {
+                   sumUnitPrice += order.UnitPrice;
+                   sumQuantity += order.Quantity;
+                   sumDiscount += order.Discount;
+                  <tr>
+                    <td>
+                      <a class="btn btn-secondary btn-sm btn-flat" id="button-order-detail" title="Sipariş Ayrıntıları" data-target="/Product/_OrderDetail/@order.OrderID"><i class="fa fa-bars"></i></a>
+                    </td>
+                    <td>@order.OrderID</td>
+                    <td>@order.UnitPrice</td>
+                    <td>@order.Quantity</td>
+                    <td>@order.Discount</td>
+                  </tr>
+                }
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th>Toplam:</th>
+                  <th></th>
+                  <th>@string.Format("{0:#,0.00}", sumUnitPrice)</th>
+                  <th>@sumQuantity</th>
+                  <th>@string.Format("{0:P0}", sumDiscount)</th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   </form>
       </div>
     </div>
 </div>
+<div class="modal fade" id="modal-order" role="dialog">
+  <div class="modal-dialog modal-lg">
+  <div class="modal-content">
+  <div class="overlay" id="order-modal-overlay">
+  <i class="fas fa-2x fa-sync fa-spin"></i>
+  </div>
+  <div class="modal-header">
+  <h4 class="modal-title"></h4>
+  </div>
+  <div class="modal-body">
+  <!--Dinamik oluşturalacak-->
+  </div>
+  <div class="modal-footer justify-content-between">
+  <button type="button" class="btn btn-outline-light" id="close-order-detail">Kapat</button>
+  </div>
+  </div>
+  </div>
 </div>
   <script>
     $(document).ready(function(){
-      $('#modal-danger-close').on('click', function(){
-        $('#modal-danger').modal('hide');
+      var table = $('#orders-table').DataTable({
+        searchDelay: 1000,
+        pageLength: 5,
+        lengthMenu: [[5, 10, 20, 50, -1], [5, 10, 20, 50, "Tümü"]],
       });
+      
+      function OrderDetailAction(e){
+          var that = $(this);
+          $('#order-modal-overlay').fadeIn();
+          $.ajax({
+            type: 'GET',
+            url: that.data('target')
+          }).done(function(data){
+            $("#modal-order .modal-body").html(data);
+            $("#modal-order .modal-title").html("Sipariş Detay");
+            $("#modal-order").modal("show");
+          }).fail(function(jqXHR, textStatus) {
+                  ShowModal("Hata!", "Form yüklenemedi");
+                  console.log("Request failed: " + textStatus);
+          }).always(function(){
+            $('#order-modal-overlay').fadeOut();
+          });
+          e.preventDefault();
+      }
+      
+      $('#close-order-detail').on('click', function(e){
+       $('#modal-order').modal('hide');
+       e.preventDefault();
+      });
+      
+      $('#orders-table tbody').on('click', 'td #button-order-detail', OrderDetailAction);
     });
-    </script>
+</script>

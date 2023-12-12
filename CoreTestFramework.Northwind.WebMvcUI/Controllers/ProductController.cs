@@ -192,8 +192,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                     product_vm.Categories = new SelectList(categories, "CategoryID","CategoryName", product_vm.CategoryID);
                     var suppliers = await _northwindContext.Suppliers.ToListAsync();
                     product_vm.Suppliers = new SelectList(suppliers, "SupplierID","CompanyName", product_vm.SupplierID);
-                    
-                    return PartialView(product_vm);
+                   
                  }
                  
              }
@@ -205,7 +204,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 return RedirectToAction("Index");
              }
              
-             return RedirectToAction("Index");
+             return PartialView(product_vm);
         }
         
         [HttpPost]
@@ -233,11 +232,16 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                         
                         
                         var update_result = await _productService.UpdateProductAsync(get_product_result.Data);
-                        if (update_result.Success == false)
+                        if (update_result.Success == true)
                         {
-                           result.Message = update_result.Message;
-                           TempData["result"] = JsonConvert.SerializeObject(result);
-                           return Json(result);
+                            result.Success = true;
+                            result.Message = $"{vm.Product.ProductName} güncelleme işlemi başarıyla gerçekleşti";
+                            return Json(result);
+                        }
+                        else
+                        {
+                            result.Message = update_result.Message;
+                            return Json(result);
                         }
                     }
                     else {
@@ -260,11 +264,6 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 TempData["result"] = JsonConvert.SerializeObject(result);
                 return Json(result);
             }
-             
-             result.Success = true;
-             result.Message = $"{vm.Product.ProductName} güncelleme işlemi başarıyla gerçekleşti";
-             
-             return Json(result);
         }
         public async Task<IActionResult> Create()
         {
@@ -346,6 +345,8 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 var product_result = await _productService.GetProductAsync(id);
                 if (product_result.Success == true && product_result.Data != null)
                 {
+                    var orderDetails = await _northwindContext.OrderDetails.Where(od => od.ProductID == id).ToListAsync();
+                    product_vm.OrderDetails = orderDetails;
                     var mapped_product = _mapper.Map<ProductDTO>(product_result.Data);
                     product_vm.Product = mapped_product;
                 }
@@ -358,6 +359,37 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 result.Message = ex.Message;
                 TempData["result"] = JsonConvert.SerializeObject(result);
                 return RedirectToAction("Index");
+            }
+        }
+        public async Task<IActionResult> _OrderDetail(int id)
+        {
+            var result = new Result {Success = false};
+            var product_vm = new ProductViewModel();
+            try
+            {
+                if (id == null)
+                {
+                    result.Message = "Herhangi bir seçim yapılmadı.";
+                    return Json(result);
+                }
+
+                var order_detail = await _northwindContext.Orders.Where(o => o.OrderID == id).FirstOrDefaultAsync();
+                if (order_detail == null)
+                {
+                    result.Message = "Seçili sipariş bulunamadı.";
+                    return Json(result);
+                }
+                
+                var mapped_order_detail = _mapper.Map<OrderDTO>(order_detail);
+                product_vm.Order = mapped_order_detail;
+                
+                return PartialView(product_vm);
+
+            }
+            catch (System.Exception ex)
+            {
+                result.Message = ex.Message;
+                return Json(result);
             }
         }
     }

@@ -1,4 +1,4 @@
-<div class="modal fade" id="modal-overlay" role="dialog" tabindex="-1">
+<div class="modal fade" id="modal-overlay" role="dialog">
     <div class="modal-dialog modal-lg">
     <div class="modal-content">
     <!-- <div class="overlay">
@@ -14,7 +14,7 @@
     <!--Dinamik oluşturalacak-->
     </div>
     <div class="modal-footer justify-content-between">
-    <button type="button" class="btn btn-outline-light" data-dismiss="modal">Kapat</button>
+    <button type="button" class="btn btn-outline-light" id="modal-kapat">Kapat</button>
     </div>
     </div>
     </div>
@@ -35,5 +35,9 @@
 				modal.on('hide.bs.modal', hideEvent);
 			}
 		}
+
+        $('#modal-kapat').on('click', function(){
+            $('#modal-overlay').modal("hide");
+        })
 	});
 </script>

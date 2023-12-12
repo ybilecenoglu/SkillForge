@@ -1,4 +1,6 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
+using System.Text.Json.Serialization;
 using CoreTestFramework.Northwind.Entities.Model;
 
 namespace CoreTestFramework.Northwind.Entities.DTO
@@ -18,7 +20,5 @@ namespace CoreTestFramework.Northwind.Entities.DTO
         public int ReorderLevel {get; set;}
         public string Discontinued {get; set;}
         public bool AktifMi{get; set;}
-        
-        public ICollection<OrderDetail> OrderDetails { get; set; }
     }
 }

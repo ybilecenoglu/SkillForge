@@ -20,7 +20,6 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<NorthwindContext>();
 builder.Services.AddSingleton<ProductDAL>();
 builder.Services.AddSingleton<IProductService, ProductManager>();
-
 //JSON serileştirmesini yapılandırmaası lowercase için
 builder.Services.AddControllers().AddJsonOptions(jsonOptions =>
     {
@@ -47,7 +46,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
-
 #region Default Routing Yapısı
 app.MapControllerRoute(
     name: "default",

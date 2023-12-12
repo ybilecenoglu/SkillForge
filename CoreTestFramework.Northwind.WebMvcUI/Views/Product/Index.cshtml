@@ -89,26 +89,26 @@
       </div>
     </div>
   </div>
-  <div class="modal fade" id="modal-edit" role="dialog">
+  <div class="modal fade" id="modal-product" role="dialog">
     <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-    <!-- <div class="overlay">
+      <div class="modal-content">
+    <div class="overlay">
     <i class="fas fa-2x fa-sync fa-spin"></i>
-    </div> -->
-    <div class="modal-header">
-    <h4 class="modal-title"></h4>
-    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-    <span aria-hidden="true">×</span>
-    </button>
     </div>
+        <div class="modal-header">
+          <h4 class="modal-title"></h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+        </div>
     <div class="modal-body">
     <!--Dinamik oluşturalacak-->
     </div>
     <div class="modal-footer justify-content-between">
-    <button type="button" class="btn btn-primary" id="submit-button">Kaydet</button>
-    <button type="button" class="btn btn-outline-light" id="modal-close">Kapat</button>
+        <button type="button" class="btn btn-primary" id="submit-button">Kaydet</button>
+        <button type="button" class="btn btn-outline-light" data-dismiss="modal">Kapat</button>
     </div>
-    </div>
+      </div>
     </div>
 </div>
 
@@ -130,11 +130,17 @@
 
     var categoryID = $('#CategoryID').val();
     var supplierID = $('#SupplierID').val();
-
-    // $("#modal-overlay").on('hidden.bs.modal', function(){
-    //   $("#modal-overlay").removeData('bs.modal');
-    //    $("#modal-overlay").reload();
-    // });
+    
+    var modal = $('#modal-product');
+    modal.on("hidden.bs.modal", function(e){
+        //Modal-product nesnesi mi kapatıldı kontrol ediyoruz
+        if ($(e.target).is(modal)){
+          $('#submit-button').prop('disabled', false);
+          $('#modal-product .modal-body').html('');
+          $('#modal-product .modal-title').html('');
+        }
+        e.preventDefault();
+      });
 
     var table = $('#data-table-product').DataTable({
       destroy: true,
@@ -238,42 +244,41 @@
     });
     
       $("#create-button").attr("data-target", "Product/Create");
+      
       $("#create-button").on("click", function(e) {
-      $("#overlay-process").fadeIn();
+      $(".overlay").fadeIn();
                         var that = $(this);
                         $.ajax({
                           type: "GET",
                           url: that.data("target")
                         }).done(function(data) {
-                          $("#modal-overlay .modal-body").html(data);
-                          $("#modal-overlay .modal-title").html("Ürün Ekle");
-                          $("#modal-overlay").modal("show");
+                          modal.find(".modal-body").html(data);
+                          modal.find(".modal-title").html("Ürün Ekle");
+                          modal.modal('show');
                         }).fail(function(jqXHR, textStatus) {
                           ShowModal("Hata!", "Form yüklenemedi");
                           console.log("Request failed: " + textStatus);
                         }).always(function() {
-                          $("#overlay-process").fadeOut();
+                          $(".overlay").fadeOut();
                         })
-
-                        e.preventDefault();
-    });
+                  e.preventDefault();
+        });
      
     function EditAction(e) {
       var that = $(this);
-      $("#overlay-process").fadeIn();
+      $(".overlay").fadeIn();
                 $.ajax ({
                   type: 'GET',
                   url: that.data('target')
                 }).done(function(data){
-                    $("#modal-edit .modal-body").html(data);
-                    $("#modal-edit .modal-title").html("Ürün Düzenle");
-                    $("#modal-edit").modal("show");
-                    
+                  modal.find('.modal-body').html(data);
+                  modal.find('.modal-title').html("Ürün Düzenle");
+                  modal.modal('show');
                 }).fail(function(jqXHR, textStatus) {
                   ShowModal("Hata!", "Form yüklenemedi");
                   console.log("Request failed: " + textStatus);
                 }).always(function() {
-                  $("#overlay-process").fadeOut();
+                  $(".overlay").fadeOut();
                 })
                 e.preventDefault();
               }
@@ -283,20 +288,20 @@
 
     function DetailAction(e) {
       var that = $(this);
-      $("#overlay-process").fadeIn();
+      $(".overlay").fadeIn();
                 $.ajax ({
                   type: 'GET',
                   url: that.data('target')
                 }).done(function(data){
-                    $("#modal-overlay .modal-body").html(data);
-                    $("#modal-overlay .modal-title").html("Ürün Detay");
-                    $("#modal-overlay").modal("show");
-                    
+                  modal.find('.modal-body').html(data);
+                  modal.find('.modal-title').html("Ürün Detay");
+                  $('#submit-button').prop('disabled', true);
+                  modal.modal('show');
                 }).fail(function(jqXHR, textStatus) {
                   ShowModal("Hata!", "Form yüklenemedi");
                   console.log("Request failed: " + textStatus);
                 }).always(function() {
-                  $("#overlay-process").fadeOut();
+                  $(".overlay").fadeOut();
                 })
                 e.preventDefault();
               }
@@ -329,8 +334,8 @@
           e.preventDefault();
           }
       }
-
       $('#data-table-product tbody').on('click', 'td #delete-button', DeleteAction);
   });
+
 </script>
 }

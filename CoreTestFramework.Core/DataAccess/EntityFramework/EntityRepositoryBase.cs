@@ -8,108 +8,134 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
 {
     //CRUD işlemlerini gerçekleştireceğimiz somut sınıf, IEntityRepository interface türetilmiştir TEntity için class olmalı IEntity interfaceden türetilmeli ve newlenebilir olmalıdır.
     //Standart CRUD işlemlerini gerçekleştirdiğimiz sınıf
-    public class EntityRepositoryBase<TEntity, TContext> : IEntityRepository<TEntity> where TEntity : class, IEntity,  new()
-     where  TContext : DbContext, new()
+    public class EntityRepositoryBase<TEntity, TContext> : IEntityRepository<TEntity> where TEntity : class, IEntity, new()
+     where TContext : DbContext, new()
     {
         public async Task<Result<TEntity>> AddAsync(TEntity entity)
         {
             var add_result = new Result<TEntity> { Success = false };
-            try
-            {
-                using (var db = new TContext())
+            using (var db = new TContext())
                 {
-                    var added_entry = db.Entry(entity);
-                    added_entry.State = EntityState.Added;
-                    await db.SaveChangesAsync();
-                    add_result.Success = true;
-                    add_result.Message = "Success";
+                    using (var transaction = await db.Database.BeginTransactionAsync())
+                    {
+                        try
+                        {
+                            var added_entry = db.Entry(entity);
+                            added_entry.State = EntityState.Added;
+                            await db.SaveChangesAsync();
+                            add_result.Success = true;
+                            add_result.Message = "Success";
+                            await transaction.CommitAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            add_result.Message = ex.Message;
+                            await transaction.RollbackAsync();
+                        }
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                add_result.Message = ex.Message;
-            }
 
             return add_result;
         }
         public async Task<Result<int>> AddRangeAsync(List<TEntity> entity)
         {
             var add_range_result = new Result<int> { Success = false };
-            try
-            {
-                using (var db = new TContext())
+            using (var db = new TContext())
                 {
-                    await db.AddRangeAsync(entity);
-                    await db.SaveChangesAsync();
-                    add_range_result.Success = true;
-                    add_range_result.Message = "Success";
+                    using (var transaction = await db.Database.BeginTransactionAsync())
+                    {
+                        try
+                        {
+                            await db.AddRangeAsync(entity);
+                            await db.SaveChangesAsync();
+                            add_range_result.Success = true;
+                            add_range_result.Message = "Success";
+                            await transaction.CommitAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            add_range_result.Message = ex.Message;
+                            await transaction.RollbackAsync();
+                        } 
+                    }
+                    
                 }
-            }
-            catch (Exception ex)
-            {
-                add_range_result.Message = ex.Message;
-            }
-
             return add_range_result;
         }
         public async Task<Result> DeleteAsync(TEntity entity)
         {
             var delete_result = new Result { Success = false };
-            try
-            {
-                using (var db = new TContext())
+            using (var db = new TContext())
                 {
-                    var delete_entry = db.Entry(entity);
-                    delete_entry.State = EntityState.Deleted;
-                    await db.SaveChangesAsync();
-
-                    delete_result.Success = true;
-                    delete_result.Message = "Success";
+                    using (var transaction = await db.Database.BeginTransactionAsync())
+                    {
+                        try
+                        {
+                            var delete_entry = db.Entry(entity);
+                            delete_entry.State = EntityState.Deleted;
+                            await db.SaveChangesAsync();
+                            delete_result.Success = true;
+                            delete_result.Message = "Success";
+                            await transaction.CommitAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            delete_result.Message = ex.Message;
+                            await transaction.RollbackAsync();
+                        }
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                delete_result.Message = ex.Message;
-            }
+            
             return delete_result;
         }
         public async Task<Result<int>> DeleteRangeAsync(List<TEntity> entity)
         {
             var delete_range_result = new Result<int> { Success = false };
-            try
-            {
-                using (var db = new TContext())
+            using (var db = new TContext())
                 {
-                    db.RemoveRange(entity);
-                    await db.SaveChangesAsync();
-                    delete_range_result.Success = true;
-                    delete_range_result.Message = "Success";
+                    using (var transaction = await db.Database.BeginTransactionAsync())
+                    {
+                        try
+                        {
+                            db.RemoveRange(entity);
+                            await db.SaveChangesAsync();
+                            delete_range_result.Success = true;
+                            delete_range_result.Message = "Success";
+                            await transaction.CommitAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            delete_range_result.Message = ex.Message;
+                            await transaction.RollbackAsync();
+                        }
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                delete_range_result.Message = ex.Message;
-            }
-
+            
             return delete_range_result;
         }
         public async Task<Result<TEntity>> UpdateAsync(TEntity entity)
         {
             var update_result = new Result<TEntity> { Success = false };
-            try
+            using (var db = new TContext())
             {
-                using (var db = new TContext())
+                using (var transaction = await db.Database.BeginTransactionAsync())
                 {
-                    var update_entry = db.Entry(entity);
-                    update_entry.State = EntityState.Modified;
-                    await db.SaveChangesAsync();
-                    update_result.Success = true;
-                    update_result.Message = "Success";
+                    try
+                    {
+                        var update_entry = db.Entry(entity);
+                        update_entry.State = EntityState.Modified;
+                        await db.SaveChangesAsync();
+                        update_result.Success = true;
+                        update_result.Message = "Success";
+                        await transaction.CommitAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        update_result.Message = ex.Message;
+                        await transaction.RollbackAsync();
+                    }
+
                 }
-            }
-            catch (Exception ex)
-            {
-                update_result.Message = ex.Message;
             }
             return update_result;
         }

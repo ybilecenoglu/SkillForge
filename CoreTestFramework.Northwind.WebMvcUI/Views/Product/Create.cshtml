@@ -49,9 +49,6 @@
         <br />
         <input type="checkbox" asp-for="@Model.Product.AktifMi" data-bootstrap-switch="" data-off-color="danger" data-on-color="success">
       </div>
-      <div class="card-footer">
-        <button type="button" class="btn btn-primary" id="submit-button">Kaydet</button>
-      </div>
     </div>
         </form>
       </div>
@@ -71,12 +68,16 @@
             if (result.Success == true) {
                 $('#modal-overlay .modal-content').addClass("bg-success");
                 ShowModal('Başarılı', result.Message, function (e) {
-                  $("#data-table-product").DataTable().ajax.reload(null,false);
+                  $('#modal-product').modal("hide");
                   $('#modal-overlay .modal-content').removeClass("bg-success");
+                  $("#data-table-product").DataTable().ajax.reload(null,false);
                 })
             }
             else {
-              alert(result.Messages.join('\n'));
+              $('#modal-overlay .modal-content').addClass("bg-danger");
+              ShowModal('Hata', result.Messages, function(e){
+                $('#modal-overlay .modal-content').removeClass("bg-danger");
+              });
             }
           }).fail(function(jqXHR, textStatus){
             ShowModal('Error!', 'Hata oluştu.' );

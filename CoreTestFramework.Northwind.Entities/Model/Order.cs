@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using SQLite;
 using SQLiteNetExtensions.Attributes;
 
 namespace CoreTestFramework.Northwind.Entities.Model;
@@ -12,18 +13,18 @@ public partial class Order
         OrderDetails = new HashSet<OrderDetail>();
     }
     [Key]
-    public int OrderId { get; set; }
+    public int OrderID { get; set; }
 
-    public string CustomerId { get; set; }
+    public string CustomerID { get; set; }
 
-    public int EmployeeId { get; set; }
+    public int EmployeeID { get; set; }
 
     public DateTime OrderDate { get; set; }
 
     public DateTime RequiredDate { get; set; }
 
     public DateTime ShippedDate { get; set; }
-
+    [ForeignKey(typeof(Shipper))]
     public int ShipVia { get; set; }
 
     public decimal Freight { get; set; }
@@ -43,8 +44,8 @@ public partial class Order
     public virtual Customer Customer { get; set; }
 
     public virtual Employee Employee { get; set; }
+    
     [OneToMany]
     public virtual ICollection<OrderDetail> OrderDetails { get; set; }
-
-    public virtual Shipper ShipViaNavigation { get; set; }
+    public virtual Shipper Shippers { get; set; }
 }
