@@ -220,27 +220,27 @@
          }
       ],
       
-      "initComplete": function (settings, json) {
-        var input = $('.dataTables_filter input').unbind(),
-          self = this.api(),
-          $searchButton = $('<button>').html('<i class="fa fa-search"></i>').addClass('btn btn-default btn-sm btn-flat').click(function () {
-            self.search(input.val()).draw();
-          }),
-          $clearButton = $('<button>').html('<i class="fa fa-times"></i>').addClass('btn btn-default btn-sm btn-flat').click(function () {
-            input.val('');
-            $searchButton.click();
-          });
+      // "initComplete": function (settings, json) {
+      //   var input = $('.dataTables_filter input').unbind(),
+      //     self = this.api(),
+      //     $searchButton = $('<button>').html('<i class="fa fa-search"></i>').addClass('btn btn-default btn-sm btn-flat').click(function () {
+      //       self.search(input.val()).draw();
+      //     }),
+      //     $clearButton = $('<button>').html('<i class="fa fa-times"></i>').addClass('btn btn-default btn-sm btn-flat').click(function () {
+      //       input.val('');
+      //       $searchButton.click();
+      //     });
 
         
-        $(".dataTables_filter input")
-          .unbind()
-          .bind("input keyup", function (e) {
-            if (e.keyCode == 13) {
-              self.search(this.value).draw();
-            }
-            return;
-          });
-      },
+      //   $(".dataTables_filter input")
+      //     .unbind()
+      //     .bind("input keyup", function (e) {
+      //       if (e.keyCode == 13) {
+      //         self.search(this.value).draw();
+      //       }
+      //       return;
+      //     });
+      // },
     });
     
       $("#create-button").attr("data-target", "Product/Create");

@@ -1,11 +1,17 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace CoreTestFramework.Northwind.Entities.Model
 {
     public class NorthwindContext : DbContext
     {
-        private readonly string _connString = "Data Source= ../CoreTestFramework.Northwind.Entities/Database/northwind.db";
+        //private readonly string _connString = "Data Source= ../CoreTestFramework.Northwind.Entities/Database/northwind.db";
+        
+        // public NorthwindContext(DbContextOptions<NorthwindContext> options): base (options)
+        // {
+            
+        // }
 
         public DbSet<Product> Products => Set<Product>();
         public DbSet<Shipper> Shippers => Set<Shipper>();
@@ -19,11 +25,14 @@ namespace CoreTestFramework.Northwind.Entities.Model
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            
-            optionsBuilder.UseSqlite(_connString);
-            base.OnConfiguring(optionsBuilder);
+            //Microsoft.Extensions.Configuration.Json sınıfı ile json dosyamızı okuttuk.
+            IConfigurationRoot configuration = new ConfigurationBuilder()
+            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+            .AddJsonFile("appsettings.Development.json")
+            .Build();
+
+            optionsBuilder.UseSqlite(configuration.GetConnectionString("NorthwindContext"));
         }
-        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Product>().Navigation(p => p.Supplier).AutoInclude();

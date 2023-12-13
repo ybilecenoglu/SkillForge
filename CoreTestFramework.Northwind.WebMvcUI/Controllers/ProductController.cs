@@ -57,6 +57,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
             IQueryable<ProductDTO> products;
             Result<List<Product>> product_result = new Result<List<Product>>();
             DataTablesResponse response;
+
             try
             {
                 if (request == null)
@@ -230,7 +231,6 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                         else
                            get_product_result.Data.Discontinued = "0";
                         
-                        
                         var update_result = await _productService.UpdateProductAsync(get_product_result.Data);
                         if (update_result.Success == true)
                         {
@@ -330,7 +330,8 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
             // TempData["result"] = JsonConvert.SerializeObject(result);
            return Json(result);
         }
-        public async Task<IActionResult> Detail(int id) {
+        public async Task<IActionResult> Detail(int id) 
+        {
             var result = new Result { Success = false};
             var product_vm = new ProductViewModel();
             try

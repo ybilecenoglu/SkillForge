@@ -1,6 +1,7 @@
 ﻿using CoreTestFramework.Core.Common;
 using CoreTestFramework.Core.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using PostSharp.Aspects.Advices;
 using System.Linq.Expressions;
 
@@ -165,6 +166,7 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
             {
                 using (var db = new TContext())
                 {
+                    
                     get_list_result.Data = filter != null ? await db.Set<TEntity>().Where(filter).ToListAsync() : await db.Set<TEntity>().ToListAsync();
                     get_list_result.Success = true;
                     get_list_result.Message = "Success";
