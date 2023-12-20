@@ -7,10 +7,10 @@ namespace CoreTestFramework.Northwind.Entities.Model;
 
 public partial class Customer
 {
-    [Key]
-    public string CustomerID { get; set; } = null!;
+    
+    public string CustomerID { get; set; } 
 
-    public string CompanyName { get; set; } = null!;
+    public string CompanyName { get; set; } 
 
     public string ContactName { get; set; }
 
@@ -30,7 +30,7 @@ public partial class Customer
 
     public string Fax { get; set; }
 
-    [OneToMany]
+    
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
     public virtual ICollection<CustomerDemographic> CustomerTypes { get; set; } = new List<CustomerDemographic>();

@@ -11,8 +11,28 @@
       <form>
         <div class="card-body">
             <div class="form-group">
-                <label>Müşteri Adı</label>
+                <label>Sipariş Veren Müşteri</label>
                 <input class="form-control" disabled asp-for="@Model.Order.CustomerName" />
+            </div>
+            <div class="form-group">
+              <label>Sipariş Alan Çalışan</label>
+              <input class="form-control" disabled asp-for="@Model.Order.EmployeeName" />
+            </div>
+            <div class="form-group">
+              <label>Sipariş Taşıyıcı Firma</label>
+              <input class="form-control" disabled asp-for="@Model.Order.ShipperName" />
+            </div>
+            <div class="form-group">
+              <label>Sipariş Tarihi</label>
+              <input class="form-control" disabled asp-for="@Model.Order.OrderDate" />
+            </div>
+            <div class="form-group">
+              <label>Gönderilmesi Gereken Tarih</label>
+              <input class="form-control" disabled asp-for="@Model.Order.RequiredDate" />
+            </div>
+            <div class="form-group">
+              <label>Sevk Tarihi</label>
+              <input class="form-control" disabled asp-for="@Model.Order.ShippedDate" />
             </div>
         </div>
       </form>

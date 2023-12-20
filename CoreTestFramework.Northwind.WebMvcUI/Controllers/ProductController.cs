@@ -70,14 +70,14 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
 
                 if (supplierID > 0 && categoryID > 0)
                 {
-                    product_result = await _productService.GetProductListAsync(p => p.SupplierID == supplierID && p.CategoryID == categoryID);
+                    product_result = await _productService.GetProductListAsync(p => p.SupplierId == supplierID && p.CategoryId == categoryID);
                 }
                 else if(supplierID > 0)
                 {
-                    product_result = await _productService.GetProductListAsync(p => p.SupplierID == supplierID);
+                    product_result = await _productService.GetProductListAsync(p => p.SupplierId == supplierID);
                 }   
                 else if(categoryID > 0){
-                   product_result = await _productService.GetProductListAsync(p => p.CategoryID == categoryID);
+                   product_result = await _productService.GetProductListAsync(p => p.CategoryId == categoryID);
                 }
                 else
                     product_result = await _productService.GetProductListAsync();
@@ -92,6 +92,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
 
                 var mapped_list_product = _mapper.Map<List<ProductDTO>>(product_result.Data);
                 products = mapped_list_product.AsQueryable();
+                
                 if (!string.IsNullOrEmpty(request.Search.Value))
                 {
                     var searchToUpperValue = request.Search.Value.Trim().ToUpper();
@@ -151,7 +152,6 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                         result.Success =delete_product_result.Success;
                         result.Message = delete_product_result.Message;
                         return Json(result);
-                        
                     }
                 }
                 else{
@@ -184,8 +184,8 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                  var product = await _productService.GetProductAsync(id);
                  if(product.Success == true && product.Data != null){
 
-                    product_vm.CategoryID = product.Data.CategoryID;
-                    product_vm.SupplierID = product.Data.SupplierID;
+                    product_vm.CategoryID = product.Data.CategoryId;
+                    product_vm.SupplierID = product.Data.SupplierId;
                     var mapped_product = _mapper.Map<ProductDTO>(product.Data);
                     product_vm.Product = mapped_product;
                     
@@ -215,11 +215,13 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
             try
             {
                     var get_product_result = await _productService.GetProductAsync(vm.Product.ProductID);
+                    var products = await _productService.GetProductListAsync();
+                    
                     if (get_product_result.Success && get_product_result.Data != null)
                     {
                         get_product_result.Data.ProductName = vm.Product.ProductName;
-                        get_product_result.Data.SupplierID = vm.SupplierID;
-                        get_product_result.Data.CategoryID = vm.CategoryID;
+                        get_product_result.Data.SupplierId = vm.SupplierID;
+                        get_product_result.Data.CategoryId = vm.CategoryID;
                         get_product_result.Data.QuantityPerUnit = vm.Product.QuantityPerUnit;
                         get_product_result.Data.UnitPrice = vm.Product.UnitPrice;
                         get_product_result.Data.UnitsInStock = vm.Product.UnitsInStock;
@@ -289,8 +291,8 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
             {
                 var product = new Product {
                     ProductName = vm.Product.ProductName,
-                    CategoryID = vm.CategoryID,
-                    SupplierID = vm.SupplierID,
+                    CategoryId = vm.CategoryID,
+                    SupplierId = vm.SupplierID,
                     QuantityPerUnit = vm.Product.QuantityPerUnit,
                     UnitPrice = vm.Product.UnitPrice,
                     UnitsInStock = vm.Product.UnitsInStock,
@@ -346,8 +348,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 var product_result = await _productService.GetProductAsync(id);
                 if (product_result.Success == true && product_result.Data != null)
                 {
-                    var orderDetails = await _northwindContext.OrderDetails.Where(od => od.ProductID == id).ToListAsync();
-                    product_vm.OrderDetails = orderDetails;
+                    product_vm.OrderDetails = product_result.Data.OrderDetails.ToList();
                     var mapped_product = _mapper.Map<ProductDTO>(product_result.Data);
                     product_vm.Product = mapped_product;
                 }
@@ -373,14 +374,12 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                     result.Message = "Herhangi bir seçim yapılmadı.";
                     return Json(result);
                 }
-
                 var order_detail = await _northwindContext.Orders.Where(o => o.OrderID == id).FirstOrDefaultAsync();
                 if (order_detail == null)
                 {
                     result.Message = "Seçili sipariş bulunamadı.";
                     return Json(result);
                 }
-                
                 var mapped_order_detail = _mapper.Map<OrderDTO>(order_detail);
                 product_vm.Order = mapped_order_detail;
                 

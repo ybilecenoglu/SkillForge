@@ -1,6 +1,4 @@
 ﻿using CoreTestFramework.Core.Entities;
-using SQLiteNetExtensions.Attributes;
-using System.ComponentModel.DataAnnotations;
 
 namespace CoreTestFramework.Northwind.Entities.Model;
 public class Product : IEntity
@@ -9,11 +7,11 @@ public class Product : IEntity
     {
         OrderDetails = new HashSet<OrderDetail>();
     }
-    [Key]
+    
     public int ProductID { get; set; }
-    public string ProductName { get; set; }
-    public int SupplierID { get; set; }
-    public int CategoryID { get; set; }
+    public string ProductName { get; set;}
+    public int SupplierId { get; set; }
+    public int CategoryId { get; set; }
     public string QuantityPerUnit { get; set; }
     public double UnitPrice { get; set; }
     public int UnitsInStock {get; set;}
@@ -23,9 +21,4 @@ public class Product : IEntity
     public virtual Supplier Supplier {get; set;}
     public virtual Category Category {get; set;}
     public virtual ICollection<OrderDetail> OrderDetails { get; set; }
-
-    
-    
-
-    
 }

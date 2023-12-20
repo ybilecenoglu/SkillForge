@@ -5,7 +5,7 @@ namespace CoreTestFramework.Northwind.Entities.Model;
 
 public partial class Territory
 {
-    public string TerritoryId { get; set; } = null!;
+    public string TerritoryID { get; set; } = null!;
 
     public string TerritoryDescription { get; set; } = null!;
 

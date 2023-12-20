@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CoreTestFramework.Northwind.Entities.Model;
 
 public partial class Employee
 {
-    [Key]
     public int EmployeeID { get; set; }
 
     public string LastName { get; set; } = null!;
@@ -38,7 +36,7 @@ public partial class Employee
     public byte[] Photo { get; set; }
 
     public string Notes { get; set; }
-
+    
     public int ReportsTo { get; set; }
 
     public string PhotoPath { get; set; }
@@ -46,7 +44,8 @@ public partial class Employee
     public virtual ICollection<Employee> InverseReportsToNavigation { get; set; } = new List<Employee>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
-
+    
+    [ForeignKey("EmployeeID")]
     public virtual Employee ReportsToNavigation { get; set; }
 
     public virtual ICollection<Territory> Territories { get; set; } = new List<Territory>();

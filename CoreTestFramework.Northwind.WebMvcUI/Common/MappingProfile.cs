@@ -15,7 +15,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Common
             CreateMap<Order, OrderDTO>()
             .ForMember(dto => dto.CustomerName, entity => entity.MapFrom(o => o.Customer.ContactName))
             .ForMember(dto => dto.EmployeeName, entity => entity.MapFrom(o => o.Employee.FirstName + " " + o.Employee.LastName))
-            .ForMember(dto => dto.ShipName, entity => entity.MapFrom(o => o.Shippers.CompanyName));
+            .ForMember(dto => dto.ShipName, entity => entity.MapFrom(o => o.Shipper.CompanyName));
 
         }
     }

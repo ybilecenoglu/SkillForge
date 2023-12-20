@@ -1,14 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SQLiteNetExtensions.Attributes;
+﻿namespace CoreTestFramework.Northwind.Entities.Model;
 
-namespace CoreTestFramework.Northwind.Entities.Model;
 
-// [Keyless] //Primary Key olmayan entitiylerde "HasNoKey" fonksiyonuna alternatif olarak kullanildi
 public partial class OrderDetail
 {
-    public int? OrderID { get; set; }
+    public int OrderId { get; set; }
     
-    public int? ProductID { get; set; }
+    public int ProductId { get; set; }
 
     public decimal UnitPrice { get; set; }
 

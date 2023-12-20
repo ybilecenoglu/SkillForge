@@ -167,7 +167,7 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
                 using (var db = new TContext())
                 {
                     
-                    get_list_result.Data = filter != null ? await db.Set<TEntity>().Where(filter).ToListAsync() : await db.Set<TEntity>().ToListAsync();
+                    get_list_result.Data = filter != null ? await db.Set<TEntity>().Where(filter).AsNoTracking().ToListAsync() : await db.Set<TEntity>().AsNoTracking().ToListAsync();
                     get_list_result.Success = true;
                     get_list_result.Message = "Success";
                 }

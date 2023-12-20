@@ -21,8 +21,9 @@ namespace CoreTestFramework.Northwind.Entities.Model
         public DbSet<Order> Orders => Set<Order>();
         public DbSet<Customer> Customers => Set<Customer>();
         public DbSet<Employee> Employees => Set<Employee>();
+        public DbSet<Territory> Territories => Set<Territory>();
         public DbSet<CustomerDemographic> CustomerDemographics => Set<CustomerDemographic>();
-
+        
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //Microsoft.Extensions.Configuration.Json sınıfı ile json dosyamızı okuttuk.
@@ -33,28 +34,94 @@ namespace CoreTestFramework.Northwind.Entities.Model
 
             optionsBuilder.UseSqlite(configuration.GetConnectionString("NorthwindContext"));
         }
+        // public override int SaveChanges()
+        // {
+        //     //Product Sınıfı için ef taraflı tracking state göre kaydetmeden önce yapılacaklar
+        //     ChangeTracker.Entries().ToList().ForEach(e =>
+        //     {
+        //         if (e.Entity is Product product)
+        //         {
+        //             if (e.State == EntityState.Modified)
+        //             {
+        //                 product.Discontinued = "0";
+        //             }
+        //         }
+        //     });
+        //     return base.SaveChanges();
+        // }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            
+            // modelBuilder.Entity<Order>().Navigation(o => o.Customer).AutoInclude();
+            // modelBuilder.Entity<Order>().Navigation(o => o.Employee).AutoInclude();
+            //modelBuilder.Entity<Order>().Navigation(o => o.Shipper).AutoInclude();
+            
+            modelBuilder.Entity<Product>()
+            .HasKey(p => p.ProductID);
+            modelBuilder.Entity<Product>()
+            .HasMany(p => p.OrderDetails)
+            .WithOne(p => p.Product)
+            .HasForeignKey(p => p.ProductId);
+
+            modelBuilder.Entity<Category>()
+            .HasKey(c => c.CategoryID);
+            modelBuilder.Entity<Category>()
+            .HasMany(c => c.Products)
+            .WithOne(c => c.Category)
+            .HasForeignKey(c=> c.CategoryId);
+
+            modelBuilder.Entity<Supplier>()
+            .HasKey(s => s.SupplierID);
+            modelBuilder.Entity<Supplier>()
+            .HasMany(s => s.Products)
+            .WithOne(s => s.Supplier)
+            .HasForeignKey(s => s.SupplierId);
+
+            modelBuilder.Entity<Shipper>()
+            .HasKey(s => s.ShipperID);
+            modelBuilder.Entity<Shipper>()
+            .HasMany(s => s.Orders)
+            .WithOne(s => s.Shipper)
+            .HasForeignKey(s => s.ShipVia);
+
+            modelBuilder.Entity<Employee>()
+            .HasKey( e => e.EmployeeID);
+            modelBuilder.Entity<Employee>()
+            .HasMany(e => e.Orders)
+            .WithOne(e => e.Employee)
+            .HasForeignKey( e=> e.EmployeeId);
+           //Many-to-many RelationShip
+           modelBuilder.Entity<Employee>()
+           .HasMany(e => e.Territories)
+           .WithMany(e => e.Employees)
+           .UsingEntity<Dictionary<string,object>>(
+            "EmployeeTerritories",
+            x => x.HasOne<Territory>().WithMany().HasForeignKey("EmployeeID"),
+            x => x.HasOne<Employee>().WithMany().HasForeignKey("TerritoryID")
+           );
+           
+            modelBuilder.Entity<Customer>()
+            .HasKey(c => c.CustomerID);
+            modelBuilder.Entity<Customer>()
+            .HasMany(c => c.Orders)
+            .WithOne(c => c.Customer)
+            .HasForeignKey(c => c.CustomerId);
+            
+
+            modelBuilder.Entity<OrderDetail>(entity => {
+                entity.HasKey(x => new {x.OrderId, x.ProductId});
+            });
+            
+            modelBuilder.Entity<Territory>()
+            .HasKey(t => t.TerritoryID);
+
             modelBuilder.Entity<Product>().Navigation(p => p.Supplier).AutoInclude();
             modelBuilder.Entity<Product>().Navigation(p => p.Category).AutoInclude();
             modelBuilder.Entity<Product>().Navigation(p => p.OrderDetails).AutoInclude();
+            modelBuilder.Entity<OrderDetail>().Navigation(od => od.Order).AutoInclude();
+            modelBuilder.Entity<Order>().Navigation(o => o.Employee).AutoInclude();
+            modelBuilder.Entity<Employee>().Navigation(e => e.Territories).AutoInclude();
             
-            modelBuilder.Entity<Order>().Navigation(o => o.Customer).AutoInclude();
-
-            modelBuilder.Entity<Order>()
-            .HasOne(s => s.Shippers)
-            .WithMany(o => o.Orders)
-            .HasForeignKey(o => o.OrderID);
-
-            modelBuilder.Entity<Order>()
-            .HasOne(o => o.Customer)
-            .WithMany(c => c.Orders)
-            .HasForeignKey(o => o.CustomerID);
-
-            modelBuilder.Entity<OrderDetail>(entity => {
-                entity.HasKey(x => new {x.OrderID, x.ProductID});
-            });
-
             base.OnModelCreating(modelBuilder);
         }
     }

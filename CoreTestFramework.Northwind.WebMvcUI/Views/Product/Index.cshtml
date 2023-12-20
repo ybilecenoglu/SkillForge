@@ -30,7 +30,7 @@
       <div class="card-header">
         <h3 class="card-title">Filtre</h3>
       </div>
-      <form asp-controller="Product" asp-action="Index" method="post">
+      <form id="form-filtre" method="post">
       <div class="card-body">
         <div class="form-group">
         <label for="CategoryID">Kategori</label>
@@ -46,7 +46,7 @@
           </div>
       </div>
       <div class="card-footer">
-        <button type="submit" class="btn btn-primary">Getir</button>
+        <button type="submit" id="submit-filtre" class="btn btn-primary">Getir</button>
       </div>
     </form>
       </div>
@@ -142,107 +142,111 @@
         e.preventDefault();
       });
 
-    var table = $('#data-table-product').DataTable({
-      destroy: true,
-      serverSide: true,
-      processing: true,
-      language: {
-        processing: '<i class="fa fa-spinner fa-spin fa-2x fa-fw"></i>'
-      },
+      var table = $('#data-table-product').DataTable({
+        destroy: true,
+        serverSide: true,
+        processing: true,
+        language: {
+          processing: '<i class="fa fa-spinner fa-spin fa-2x fa-fw"></i>'
+        },
 
-      ajax: 
-      { 
-        url: '@Url.Action("PageData")', 
-        type: 'POST',
-        data: {categoryID: categoryID, supplierID : supplierID}
-      },
-      pageLength: 10,
-      lengthMenu: [[10, 30, 50, 100, -1], [10, 30, 50, 100, "Tümü"]],
-      order: [[1, 'asc']],
-      searchDelay: 1000,
-      responsive: true,
-      dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>" +
-                    "<'row'<'col-sm-12'B>>" +
-                    "<'row'<'col-sm-12'tr>>" +
-                    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-                buttons: [
-                    {
-                      text: '<i class="fas fa-plus" title="Ekle"></i>&nbsp; Yeni Ürün Ekle',
-                      attr: {
-                        id: 'create-button',
+        ajax: 
+        { 
+          url: '@Url.Action("PageData")', 
+          type: 'POST',
+          data: function(data)
+                  {
+                    data.categoryID= $('#CategoryID').val(), data.supplierID = $('#SupplierID').val();
+                  }
+        },
+        pageLength: 10,
+        lengthMenu: [[10, 30, 50, 100, -1], [10, 30, 50, 100, "Tümü"]],
+        order: [[1, 'asc']],
+        searchDelay: 350,
+        responsive: true,
+        dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>" +
+                      "<'row'<'col-sm-12'B>>" +
+                      "<'row'<'col-sm-12'tr>>" +
+                      "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+                  buttons: [
+                      {
+                        text: '<i class="fas fa-plus" title="Ekle"></i>&nbsp; Yeni Ürün Ekle',
+                        attr: {
+                          id: 'create-button',
+                        }
+                      },
+                      {
+                          extend: 'excel',
+                          text: '<i class="fa fa-file-excel" title="Excel"></i>&nbsp;Excel',
+                          exportOptions: {
+                              columns: ':visible'
+                          }
+                      },
+                      
+                      {
+                          extend: 'copyHtml5',
+                          text: '<i class="fa fa-copy" title="Kopyala"></i>&nbsp;Kopyala',
+                          exportOptions: {
+                              columns: ':visible'
+                          }
+                      },
+                      {
+                          extend: 'colvis',
+                          text: '<i class="fa fa-columns" title="Görünür Kolonlar"></i>&nbsp;Sütun Seçici',
                       }
-                    },
-                    {
-                        extend: 'excel',
-                        text: '<i class="fa fa-file-excel" title="Excel"></i>&nbsp;Excel',
-                        exportOptions: {
-                            columns: ':visible'
-                        }
-                    },
-                    
-                    {
-                        extend: 'copyHtml5',
-                        text: '<i class="fa fa-copy" title="Kopyala"></i>&nbsp;Kopyala',
-                        exportOptions: {
-                            columns: ':visible'
-                        }
-                    },
-                    {
-                        extend: 'colvis',
-                        text: '<i class="fa fa-columns" title="Görünür Kolonlar"></i>&nbsp;Sütun Seçici',
-                    }
-                ],
-      columns: [
-        { data: "productID", name: "ProductID", sortable: false, searchable: false, render: function(data) {
-          var content = '';
-          content += '<a class="btn btn-primary btn-sm btn-flat" id="edit-button" title="Düzenle" data-target="/Product/Edit/'+data+'"><i class="fa fa-edit"></i></a>';
-          content +='<a class="btn btn-danger btn-sm btn-flat" id="delete-button" title="Sil" data-href="/Product/Delete/' + data + '"><i class="fa fa-trash"></i></a>';
-          content += '<a class="btn btn-warning btn-sm btn-flat" id="detail-button" title="Görüntüle" data-target="/Product/Detail/' + data + '"><i class="fa fa-eye"></i></a>'
-          return content;
-        } },
-        { data: "productName", name: "ProductName", sortable: true, searchable: true },
-        { data: "companyName", name: "CompanyName", sortable: false, searchable: false },
-        { data: "categoryName", name: "CategoryName", sortable: false, searchable: false },
-        { data: "quantityPerUnit", name: "QuantityPerUnit", sortable: false, searchable: false },
-        { data: "unitPrice", name: "UnitPrice",sortable: true, searchable: false, render: $.fn.dataTable.render.number('.', ',', 2, '') },
-        { data: "unitsInStock", name: "UnitsInStock",sortable: true, searchable: false },
-        { data: "unitsOnOrder", name: "UnitsOnOrder", sortable: false, searchable: false },
-        { data: "reorderLevel", name: "ReorderLevel", sortable: false, searchable: false },
-        {
-           data: "discontinued", name: "Discontinued", sortable: false, searchable: false, render: function (data) {
-             if (data != null && data == 1) {
-               return '<input type="checkbox"  checked disabled/>'
-             }
-             else {
-               return '<input type="checkbox" disabled/>'
-             }
-           }
-         }
-      ],
-      
-      // "initComplete": function (settings, json) {
-      //   var input = $('.dataTables_filter input').unbind(),
-      //     self = this.api(),
-      //     $searchButton = $('<button>').html('<i class="fa fa-search"></i>').addClass('btn btn-default btn-sm btn-flat').click(function () {
-      //       self.search(input.val()).draw();
-      //     }),
-      //     $clearButton = $('<button>').html('<i class="fa fa-times"></i>').addClass('btn btn-default btn-sm btn-flat').click(function () {
-      //       input.val('');
-      //       $searchButton.click();
-      //     });
+                  ],
+        columns: [
+          { data: "productID", name: "ProductID", sortable: false, searchable: false, render: function(data) {
+            var content = '';
+            content += '<a class="btn btn-primary btn-sm btn-flat" id="edit-button" title="Düzenle" data-target="/Product/Edit/'+data+'"><i class="fa fa-edit"></i></a>';
+            content +='<a class="btn btn-danger btn-sm btn-flat" id="delete-button" title="Sil" data-href="/Product/Delete/' + data + '"><i class="fa fa-trash"></i></a>';
+            content += '<a class="btn btn-warning btn-sm btn-flat" id="detail-button" title="Görüntüle" data-target="/Product/Detail/' + data + '"><i class="fa fa-eye"></i></a>'
+            return content;
+          } },
+          { data: "productName", name: "ProductName", sortable: true, searchable: true },
+          { data: "companyName", name: "CompanyName", sortable: false, searchable: false },
+          { data: "categoryName", name: "CategoryName", sortable: false, searchable: false },
+          { data: "quantityPerUnit", name: "QuantityPerUnit", sortable: false, searchable: false },
+          { data: "unitPrice", name: "UnitPrice",sortable: true, searchable: false, render: $.fn.dataTable.render.number('.', ',', 2, '') },
+          { data: "unitsInStock", name: "UnitsInStock",sortable: true, searchable: false },
+          { data: "unitsOnOrder", name: "UnitsOnOrder", sortable: false, searchable: false },
+          { data: "reorderLevel", name: "ReorderLevel", sortable: false, searchable: false },
+          {
+            data: "discontinued", name: "Discontinued", sortable: false, searchable: false, render: function (data) {
+              if (data != null && data == 1) {
+                return '<input type="checkbox"  checked disabled/>'
+              }
+              else {
+                return '<input type="checkbox" disabled/>'
+              }
+            }
+          }
+        ],
 
-        
-      //   $(".dataTables_filter input")
-      //     .unbind()
-      //     .bind("input keyup", function (e) {
-      //       if (e.keyCode == 13) {
-      //         self.search(this.value).draw();
-      //       }
-      //       return;
-      //     });
-      // },
-    });
-    
+        // "initComplete": function (settings, json) {
+        //   var input = $('.dataTables_filter input').unbind(),
+        //     self = this.api(),
+        //     $searchButton = $('<button>').html('<i class="fa fa-search"></i>').addClass('btn btn-default btn-sm btn-flat').click(function () {
+        //       self.search(input.val()).draw();
+        //     }),
+        //     $clearButton = $('<button>').html('<i class="fa fa-times"></i>').addClass('btn btn-default btn-sm btn-flat').click(function () {
+        //       input.val('');
+        //       $searchButton.click();
+        //     });
+
+          
+        //   $(".dataTables_filter input")
+        //     .unbind()
+        //     .bind("input keyup", function (e) {
+        //       if (e.keyCode == 13) {
+        //         self.search(this.value).draw();
+        //       }
+        //       return;
+        //     });
+        // },
+      });
+      
+      //Buttona data-target attribute eklendi
       $("#create-button").attr("data-target", "Product/Create");
       
       $("#create-button").on("click", function(e) {
@@ -323,7 +327,10 @@
                     $("#modal-overlay .modal-content").removeClass("bg-success");
                   });
               } else {
-                toastr.error(result.Message);
+                $("#modal-overlay .modal-content").addClass("bg-danger");
+                ShowModal('Hata', result.Message, function(e){
+                  $("#modal-overlay .modal-content").removeClass("bg-danger");
+                });
               }
           }).fail(function (jqXHR, textStatus) {
               ShowModal('Hata', 'Hata oluştu.');
@@ -335,6 +342,14 @@
           }
       }
       $('#data-table-product tbody').on('click', 'td #delete-button', DeleteAction);
+
+      $('#form-filtre').submit(function(e){
+        $('#submit-filtre').prop('disabled', true);
+        table.ajax.reload();
+        e.preventDefault();
+        $('#submit-filtre').prop('disabled', false);
+      });
+      
   });
 
 </script>

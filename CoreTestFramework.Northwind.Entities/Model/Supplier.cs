@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 namespace CoreTestFramework.Northwind.Entities.Model;
 public class Supplier
 {
-    [Key]
+    
     public int SupplierID { get; set; }
     public string CompanyName { get; set; }
     public string ContactName { get; set; }
@@ -18,5 +18,5 @@ public class Supplier
     public string Phone { get; set; }
     public string Fax {get; set;}
     public string HomePage{get; set;}
-    public ICollection<Product> Products { get; set; } = new List<Product>();
+    public ICollection<Product> Products { get; set; }
 }
