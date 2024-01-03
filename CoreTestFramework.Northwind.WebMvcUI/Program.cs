@@ -1,5 +1,6 @@
 using CoreTestFramework.Northwind.Business.Abstract;
 using CoreTestFramework.Northwind.Business.Concrate;
+using CoreTestFramework.Northwind.DataAccess.Abstract;
 using CoreTestFramework.Northwind.DataAccess.Concrate;
 using CoreTestFramework.Northwind.Entities.Model;
 using CoreTestFramework.Northwind.WebMvcUI.Common;
@@ -17,10 +18,9 @@ var builder = WebApplication.CreateBuilder(args);
 //mvc, restapi, razorpages şablonları ile çalışabiliriz. Hangi şablon ile çalışacaksak belirtiyoruz.
 builder.Services.AddRazorPages();
 builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<NorthwindContext>();
-builder.Services.AddSingleton<ProductDAL>();
+builder.Services.AddDbContext<NorthwindContext>();
+builder.Services.AddSingleton<IProductDAL, ProductDAL>();
 builder.Services.AddSingleton<IProductService, ProductManager>();
-
 //JSON serileştirmesini yapılandırmaası lowercase için
 builder.Services.AddControllers().AddJsonOptions(jsonOptions =>
     {

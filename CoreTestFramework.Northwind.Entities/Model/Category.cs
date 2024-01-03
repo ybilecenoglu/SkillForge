@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CoreTestFramework.Core.Entities;
 
 namespace CoreTestFramework.Northwind.Entities.Model;
-public class Category
+public class Category : IEntity
 {
     public int CategoryID { get; set; }
     public string CategoryName { get; set; }

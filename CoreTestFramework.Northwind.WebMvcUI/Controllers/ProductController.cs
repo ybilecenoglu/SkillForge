@@ -12,10 +12,9 @@ using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using static CoreTestFramework.Northwind.WebMvcUI.Extension.QueryableExtension;
-using Microsoft.EntityFrameworkCore.Storage;
+
 
 namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
 {

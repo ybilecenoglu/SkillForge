@@ -2,6 +2,7 @@
 using CoreTestFramework.Core.Common;
 using CoreTestFramework.Northwind.Business.Abstract;
 using CoreTestFramework.Northwind.Business.ValidationRules.FluentValidation;
+using CoreTestFramework.Northwind.DataAccess.Abstract;
 using CoreTestFramework.Northwind.DataAccess.Concrate;
 using CoreTestFramework.Northwind.Entities.Model;
 using Microsoft.EntityFrameworkCore.Query;
@@ -11,13 +12,13 @@ namespace CoreTestFramework.Northwind.Business.Concrate
 {
     public class ProductManager : IProductService
     {
-        private ProductDAL _productDal;
+        private IProductDAL _productDal;
 
-        public ProductManager(ProductDAL productDAL)
+        public ProductManager(IProductDAL productDAL)
         {
               _productDal = productDAL;
         }
-        public async Task<Result<List<Product>>> GetProductListAsync(Expression<Func<Product, bool>> filter = null,params Expression<Func<Product, object>>[] includes)
+        public async Task<Result<List<Product>>> GetProductListAsync(Expression<Func<Product, bool>> filter = null)
         {
             var get_list_result = await _productDal.GetListAsync(filter);
             return get_list_result;
