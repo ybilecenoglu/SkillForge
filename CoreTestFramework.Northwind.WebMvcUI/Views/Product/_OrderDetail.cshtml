@@ -5,21 +5,21 @@
 <div class="row">
     <div class="col-md-12">
     <div class="card card-primary">
-    <!-- <div class="card-header">
-      <h3 class="card-title">@ViewBag.Title</h3>
-      </div> -->
+    <div class="card-header">
+      <h3 class="card-title">Sipariş Numarası: @Model.Order.OrderId</h3>
+      </div>
       <form>
         <div class="card-body">
             <div class="form-group">
-                <label>Sipariş Veren Müşteri</label>
+                <label>Müşteri</label>
                 <input class="form-control" disabled asp-for="@Model.Order.CustomerName" />
             </div>
             <div class="form-group">
-              <label>Sipariş Alan Çalışan</label>
+              <label>Çalışan</label>
               <input class="form-control" disabled asp-for="@Model.Order.EmployeeName" />
             </div>
             <div class="form-group">
-              <label>Sipariş Taşıyıcı Firma</label>
+              <label>Kargo Firması</label>
               <input class="form-control" disabled asp-for="@Model.Order.ShipperName" />
             </div>
             <div class="form-group">
@@ -27,12 +27,28 @@
               <input class="form-control" disabled asp-for="@Model.Order.OrderDate" />
             </div>
             <div class="form-group">
-              <label>Gönderilmesi Gereken Tarih</label>
+              <label>Talep Edilen Tarih</label>
               <input class="form-control" disabled asp-for="@Model.Order.RequiredDate" />
             </div>
             <div class="form-group">
               <label>Sevk Tarihi</label>
               <input class="form-control" disabled asp-for="@Model.Order.ShippedDate" />
+            </div>
+            <div class="form-group">
+              <label>Adres</label>
+              <input class="form-control" disabled asp-for="@Model.Order.ShipAddress" />
+            </div>
+            <div class="form-group">
+              <label>Şehir</label>
+              <input class="form-control" disabled asp-for="@Model.Order.ShipCity" />
+            </div>
+            <div class="form-group">
+              <label>Bölge</label>
+              <input class="form-control" disabled asp-for="@Model.Order.ShipRegion" />
+            </div>
+            <div class="form-group">
+              <label>Ülke</label>
+              <input class="form-control" disabled asp-for="@Model.Order.ShipCountry" />
             </div>
         </div>
       </form>

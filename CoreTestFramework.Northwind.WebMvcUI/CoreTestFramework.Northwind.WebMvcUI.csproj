@@ -9,12 +9,18 @@
   <ItemGroup>
     <ProjectReference Include="..\CoreTestFramework.Northwind.Business\CoreTestFramework.Northwind.Business.csproj" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="DataTables.AspNet.AspNetCore" Version="2.0.2" />
     <PackageReference Include="DataTables.AspNet.Mvc5" Version="2.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.TagHelpers" Version="2.2.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

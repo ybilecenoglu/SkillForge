@@ -4,7 +4,6 @@ using CoreTestFramework.Northwind.DataAccess.Concrate;
 using CoreTestFramework.Northwind.Entities.Model;
 using CoreTestFramework.Northwind.WebMvcUI.Common;
 using DataTables.AspNet.AspNetCore;
-using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 //Database Connection
@@ -18,7 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 //mvc, restapi, razorpages şablonları ile çalışabiliriz. Hangi şablon ile çalışacaksak belirtiyoruz.
 builder.Services.AddRazorPages();
 builder.Services.AddControllersWithViews();
-builder.Services.AddTransient<NorthwindContext>();
+builder.Services.AddScoped<NorthwindContext>();
 builder.Services.AddSingleton<ProductDAL>();
 builder.Services.AddSingleton<IProductService, ProductManager>();
 

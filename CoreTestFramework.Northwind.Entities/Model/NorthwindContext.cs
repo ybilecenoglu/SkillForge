@@ -1,7 +1,6 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using System.Security.AccessControl;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-
 namespace CoreTestFramework.Northwind.Entities.Model
 {
     public class NorthwindContext : DbContext
@@ -28,11 +27,13 @@ namespace CoreTestFramework.Northwind.Entities.Model
         {
             //Microsoft.Extensions.Configuration.Json sınıfı ile json dosyamızı okuttuk.
             IConfigurationRoot configuration = new ConfigurationBuilder()
-            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-            .AddJsonFile("appsettings.Development.json")
+            // .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+            .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(),"../CoreTestFramework.Northwind.WebMvcUI/"))
+            .AddJsonFile("appsettings.json")
             .Build();
-
-            optionsBuilder.UseSqlite(configuration.GetConnectionString("NorthwindContext"));
+            //Microsoft.EntityFrameworkCore.Proxies lazy loading işlemleri için ihtiyaç duyduğumuz sınıf.
+            // optionsBuilder.UseLazyLoadingProxies().UseSqlite(configuration.GetConnectionString("NorthwindContext"));
+             optionsBuilder.UseSqlite(configuration.GetConnectionString("NorthwindContext"));
         }
         // public override int SaveChanges()
         // {
@@ -51,17 +52,20 @@ namespace CoreTestFramework.Northwind.Entities.Model
         // }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
-            // modelBuilder.Entity<Order>().Navigation(o => o.Customer).AutoInclude();
-            // modelBuilder.Entity<Order>().Navigation(o => o.Employee).AutoInclude();
-            //modelBuilder.Entity<Order>().Navigation(o => o.Shipper).AutoInclude();
-            
+
+            modelBuilder.Entity<Category>().Navigation(p => p.Products).AutoInclude();
+
             modelBuilder.Entity<Product>()
             .HasKey(p => p.ProductID);
             modelBuilder.Entity<Product>()
             .HasMany(p => p.OrderDetails)
             .WithOne(p => p.Product)
             .HasForeignKey(p => p.ProductId);
+            // .OnDelete(DeleteBehavior.Restrict) ilişkili tablolarda veri silerken alınacak aksiyonu belirlediğimiz method
+
+            modelBuilder.Entity<Product>().Navigation(p => p.Category).AutoInclude();
+            modelBuilder.Entity<Product>().Navigation(p => p.Supplier).AutoInclude();
+            //modelBuilder.Entity<Product>().Navigation(p => p.OrderDetails).AutoInclude();
 
             modelBuilder.Entity<Category>()
             .HasKey(c => c.CategoryID);
@@ -90,6 +94,7 @@ namespace CoreTestFramework.Northwind.Entities.Model
             .HasMany(e => e.Orders)
             .WithOne(e => e.Employee)
             .HasForeignKey( e=> e.EmployeeId);
+           
            //Many-to-many RelationShip
            modelBuilder.Entity<Employee>()
            .HasMany(e => e.Territories)
@@ -107,7 +112,6 @@ namespace CoreTestFramework.Northwind.Entities.Model
             .WithOne(c => c.Customer)
             .HasForeignKey(c => c.CustomerId);
             
-
             modelBuilder.Entity<OrderDetail>(entity => {
                 entity.HasKey(x => new {x.OrderId, x.ProductId});
             });
@@ -115,14 +119,8 @@ namespace CoreTestFramework.Northwind.Entities.Model
             modelBuilder.Entity<Territory>()
             .HasKey(t => t.TerritoryID);
 
-            modelBuilder.Entity<Product>().Navigation(p => p.Supplier).AutoInclude();
-            modelBuilder.Entity<Product>().Navigation(p => p.Category).AutoInclude();
-            modelBuilder.Entity<Product>().Navigation(p => p.OrderDetails).AutoInclude();
-            modelBuilder.Entity<OrderDetail>().Navigation(od => od.Order).AutoInclude();
-            modelBuilder.Entity<Order>().Navigation(o => o.Employee).AutoInclude();
-            modelBuilder.Entity<Employee>().Navigation(e => e.Territories).AutoInclude();
-            
             base.OnModelCreating(modelBuilder);
         }
+        
     }
 }

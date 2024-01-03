@@ -1,5 +1,9 @@
+using System.Collections;
 using System.Linq.Expressions;
+using CoreTestFramework.Core.Entities;
+using CoreTestFramework.Northwind.Entities.Model;
 using DataTables.AspNet.Core;
+using Microsoft.EntityFrameworkCore;
 
 namespace CoreTestFramework.Northwind.WebMvcUI.Extension
 {

@@ -1,13 +1,9 @@
-﻿using CoreTestFramework.Core.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using CoreTestFramework.Core.Entities;
 
 namespace CoreTestFramework.Northwind.Entities.Model;
 public class Product : IEntity
 {
-    public Product()
-    {
-        OrderDetails = new HashSet<OrderDetail>();
-    }
-    
     public int ProductID { get; set; }
     public string ProductName { get; set;}
     public int SupplierId { get; set; }

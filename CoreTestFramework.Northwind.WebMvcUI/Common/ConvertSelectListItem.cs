@@ -11,7 +11,7 @@ namespace CoreTestFramework.WebMvcUI.Common
         //     return Instance ?? (Instance = new ConvertSelectListItem());
         // }
 
-        public static SelectList GetSelectList<T> (List<T> entities, string value, string textField, object selectedValue )
+        public static SelectList GetSelectList<T> (List<T> entities, string value, string textField, object selectedValue)
         {
             Type type = entities.GetType();
             PropertyInfo[] props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -33,6 +33,5 @@ namespace CoreTestFramework.WebMvcUI.Common
             //Gelen T tipinde obje nesnemizi gönderiyoruz
             return (T)obje;
         }
-
     }
 }
