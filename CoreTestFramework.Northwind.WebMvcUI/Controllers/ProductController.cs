@@ -1,5 +1,4 @@
-﻿using System.Web.Helpers;
-using AutoMapper;
+﻿using AutoMapper;
 using CoreTestFramework.Core.Common;
 using CoreTestFramework.Northwind.Business.Abstract;
 using CoreTestFramework.Northwind.Entities.Model;
@@ -14,31 +13,30 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using static CoreTestFramework.Northwind.WebMvcUI.Extension.QueryableExtension;
-
-
+using Azure;
 namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
 {
     public class ProductController : Controller
     {
         private IProductService _productService;
         private readonly IMapper _mapper;
-        public ProductController(IProductService productService, IMapper mapper)
+        private readonly NorthwindContext _northwindContext;
+        public ProductController(IProductService productService, IMapper mapper, NorthwindContext northwindContext)
         {
             _productService = productService;
             _mapper = mapper;
+            _northwindContext = northwindContext;
         }
         public async Task<IActionResult> Index(ProductViewModel vm = null)
         {
             var result = new Result { Success = false };
             try
             {
-                using (var _northwindContext = new NorthwindContext())
-                {
-                    var categories = await _northwindContext.Categories.ToListAsync();
-                    vm.Categories = new SelectList(categories, "CategoryID", "CategoryName", vm.CategoryID);
-                    var suppliers = await _northwindContext.Suppliers.ToListAsync();
-                    vm.Suppliers = new SelectList(suppliers, "SupplierID", "CompanyName", vm.SupplierID);
-                }
+                var categories = await _northwindContext.Categories.ToListAsync();
+                vm.Categories = new SelectList(categories, "category_id", "category_name", vm.CategoryID);
+                var suppliers = await _northwindContext.Suppliers.ToListAsync();
+                vm.Suppliers = new SelectList(suppliers, "supplier_id", "company_name", vm.SupplierID);
+
                 return View(vm);
             }
             catch (System.Exception ex)
@@ -50,6 +48,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 return View(vm);
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> PageData(IDataTablesRequest request, int categoryID, int supplierID)
         {
@@ -68,18 +67,19 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 }
                 if (supplierID > 0 && categoryID > 0)
                 {
-                    product_result = await _productService.GetProductListAsync(p => p.SupplierId == supplierID && p.CategoryId == categoryID);
+                    product_result = await _productService.GetProductListAsync(p => p.supplier_id == supplierID && p.category_id == categoryID, p => p.Category, p => p.Supplier);
                 }
                 else if (supplierID > 0)
                 {
-                    product_result = await _productService.GetProductListAsync(p => p.SupplierId == supplierID);
+                    product_result = await _productService.GetProductListAsync(p => p.supplier_id == supplierID, p => p.Category, p => p.Supplier);
                 }
                 else if (categoryID > 0)
                 {
-                    product_result = await _productService.GetProductListAsync(p => p.CategoryId == categoryID);
+                    product_result = await _productService.GetProductListAsync(p => p.category_id == categoryID, p => p.Category, p => p.Supplier);
                 }
                 else
-                    product_result = await _productService.GetProductListAsync();
+                    product_result = await _productService.GetProductListAsync(null, p => p.Category, p => p.Supplier);
+
 
                 if (product_result.Success == false)
                 {
@@ -91,15 +91,15 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
 
                 var mapped_list_product = _mapper.Map<List<ProductDTO>>(product_result.Data);
                 products = mapped_list_product.AsQueryable();
-
+                
                 if (!string.IsNullOrEmpty(request.Search.Value))
                 {
                     var searchToUpperValue = request.Search.Value.Trim().ToUpper();
                     var searchValue = request.Search.Value.Trim();
 
-                    products = products.Where(p => p.ProductName.ToUpper().Contains(searchToUpperValue) || p.ProductName.Contains(searchValue));
+                    products = products.Where(p => p.product_name.ToUpper().Contains(searchToUpperValue) || p.product_name.Contains(searchValue));
                 }
-
+                
                 var dataPage = products;
                 var orderColumns = request.Columns.Where(c => c.IsSortable == true && c.Sort != null);
                 var searchColumns = request.Columns.Where(c => c.IsSearchable);
@@ -127,29 +127,29 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 string message = ex.Message;
                 throw;
             }
-
         }
+
         public async Task<ActionResult> Delete(int id)
         {
             var result = new Result { Success = false };
             try
             {
-                if (id == null)
+                if (id == 0)
                 {
                     result.Success = false;
-                    result.Message = "Aranan ürün bulunamadı.";
+                    result.Message = "İstek elde edilemedi.";
                     TempData["result"] = JsonConvert.SerializeObject(result);
                     return Json(result);
                 }
 
-                var product = await _productService.GetProductAsync(id);
+                var product = await _productService.GetFindByIdAsync(id);
                 if (product != null)
                 {
                     var delete_product_result = await _productService.DeleteProductAsync(product.Data);
                     if (delete_product_result.Success == true)
                     {
                         result.Success = true;
-                        result.Message = $"{product.Data.ProductName} silme işlemi başarıyla gerçekleşti";
+                        result.Message = "Silme işlemi başarıyla gerçekleşti";
                         return Json(result);
                     }
                     else
@@ -162,7 +162,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 else
                 {
                     result.Success = false;
-                    result.Message = "Ürün bulunamadı.";
+                    result.Message = "Sistemde kayıtlı ürün bulunamadı.";
                     return Json(result);
                 }
 
@@ -170,48 +170,47 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
             catch (System.Exception)
             {
                 result.Success = false;
-                result.Message = "Ürün silme işlemi başarısız oldu";
+                result.Message = "Sistemde bir veya daha fazla hata oluştu";
             }
 
             return Json(result);
         }
+
         public async Task<IActionResult> Edit(int id)
         {
             var result = new Result { Success = false };
             var product_vm = new ProductViewModel();
             try
             {
-                if (id == null)
+                if (id == 0)
                 {
                     result.Success = false;
                     result.Message = "Seçili ürün bulunamadı.";
                     TempData["result"] = JsonConvert.SerializeObject(result);
                     return RedirectToAction("Index");
                 }
-                var product = await _productService.GetProductAsync(id);
+                var product = await _productService.GetFindByIdAsync(id);
                 if (product.Success == true && product.Data != null)
                 {
 
-                    product_vm.CategoryID = product.Data.CategoryId;
-                    product_vm.SupplierID = product.Data.SupplierId;
+                    product_vm.CategoryID = product.Data.category_id;
+                    product_vm.SupplierID = product.Data.supplier_id;
                     var mapped_product = _mapper.Map<ProductDTO>(product.Data);
                     product_vm.Product = mapped_product;
 
-                    using (var _northwindContext = new NorthwindContext())
-                    {
-                        var categories = await _northwindContext.Categories.ToListAsync();
-                        product_vm.Categories = new SelectList(categories, "CategoryID", "CategoryName", product_vm.CategoryID);
-                        var suppliers = await _northwindContext.Suppliers.ToListAsync();
-                        product_vm.Suppliers = new SelectList(suppliers, "SupplierID", "CompanyName", product_vm.SupplierID);
 
-                    }
+                    var categories = await _northwindContext.Categories.ToListAsync();
+                    product_vm.Categories = new SelectList(categories, "category_id", "category_name", product_vm.CategoryID);
+                    var suppliers = await _northwindContext.Suppliers.ToListAsync();
+                    product_vm.Suppliers = new SelectList(suppliers, "supplier_id", "company_name", product_vm.SupplierID);
+
                 }
             }
             catch (System.Exception ex)
             {
-                result.Success = false;
-                result.Message = ex.Message;
-                TempData["result"] = JsonConvert.SerializeObject(result);
+                
+                result.Message = "Sistemde bir veya daha fazla hata oluştu";
+                //TempData["result"] = JsonConvert.SerializeObject(result);
                 return RedirectToAction("Index");
             }
 
@@ -224,30 +223,32 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
             var result = new Result { Success = false };
             try
             {
-                var get_product_result = await _productService.GetProductAsync(vm.Product.ProductID);
+                var get_product_result = await _productService.GetFindByIdAsync(vm.Product.product_id);
 
                 if (get_product_result.Success && get_product_result.Data != null)
                 {
-                    get_product_result.Data.ProductName = vm.Product.ProductName;
-                    get_product_result.Data.SupplierId = vm.SupplierID;
-                    get_product_result.Data.CategoryId = vm.CategoryID;
-                    get_product_result.Data.QuantityPerUnit = vm.Product.QuantityPerUnit;
-                    get_product_result.Data.UnitPrice = vm.Product.UnitPrice;
-                    get_product_result.Data.UnitsInStock = vm.Product.UnitsInStock;
-                    get_product_result.Data.ReorderLevel = vm.Product.ReorderLevel;
-                    get_product_result.Data.UnitsOnOrder = vm.Product.UnitsOnOrder;
+                    get_product_result.Data.product_name = vm.Product.product_name;
+                    get_product_result.Data.supplier_id = vm.SupplierID;
+                    get_product_result.Data.category_id = vm.CategoryID;
+                    get_product_result.Data.quantity_per_unit = vm.Product.quantity_per_unit;
+                    get_product_result.Data.unit_price = vm.Product.unit_price;
+                    get_product_result.Data.units_in_stock = vm.Product.units_in_stock;
+                    get_product_result.Data.reorder_level = vm.Product.reorder_level;
+                    get_product_result.Data.units_on_order = vm.Product.units_on_order;
+
                     if (vm.Product.AktifMi == true)
                     {
-                        get_product_result.Data.Discontinued = "1";
+                        get_product_result.Data.discontinued = 1;
                     }
                     else
-                        get_product_result.Data.Discontinued = "0";
+                        get_product_result.Data.discontinued = 0;
 
                     var update_result = await _productService.UpdateProductAsync(get_product_result.Data);
+
                     if (update_result.Success == true)
                     {
                         result.Success = true;
-                        result.Message = $"{vm.Product.ProductName} güncelleme işlemi başarıyla gerçekleşti";
+                        result.Message = "Güncelleme işlemi başarıyla gerçekleşti";
                         return Json(result);
                     }
                     else
@@ -258,8 +259,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 }
                 else
                 {
-                    result.Message = "Güncellenecek ürün bulunamadı";
-                    TempData["result"] = JsonConvert.SerializeObject(result);
+                    result.Message = "Update edilecek ürün bulunamadı.";
                     return Json(result);
                 }
             }
@@ -273,31 +273,32 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
             }
             catch (System.Exception ex)
             {
-                result.Message = ex.Message;
-                TempData["result"] = JsonConvert.SerializeObject(result);
+                result.Message = "Sistemde bir veya daha fazla hata oluştu";
+                //TempData["result"] = JsonConvert.SerializeObject(result);
                 return Json(result);
             }
         }
+
         public async Task<IActionResult> Create()
         {
             var viewModel = new ProductViewModel();
             try
             {
-                using (var _northwindContext = new NorthwindContext())
-                {
-                    var categories = await _northwindContext.Categories.ToListAsync();
-                    viewModel.Categories = new SelectList(categories, "CategoryID", "CategoryName", viewModel.CategoryID);
-                    var suppliers = await _northwindContext.Suppliers.ToListAsync();
-                    viewModel.Suppliers = new SelectList(suppliers, "SupplierID", "CompanyName", viewModel.SupplierID);
-                }
+                var categories = await _northwindContext.Categories.ToListAsync();
+                viewModel.Categories = new SelectList(categories, "category_id", "category_name", viewModel.CategoryID);
+                var suppliers = await _northwindContext.Suppliers.ToListAsync();
+                viewModel.Suppliers = new SelectList(suppliers, "supplier_id", "company_name", viewModel.SupplierID);
             }
             catch (System.Exception)
             {
-                throw;
+                TempData["result"] = JsonConvert.SerializeObject("Sistemde bir veya daha fazla hata oluştu");
+                return RedirectToAction("Index");
             }
             return PartialView(viewModel);
         }
+
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductViewModel vm = null)
         {
             var result = new Result { Success = false };
@@ -305,15 +306,15 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
             {
                 var product = new Product
                 {
-                    ProductName = vm.Product.ProductName,
-                    CategoryId = vm.CategoryID,
-                    SupplierId = vm.SupplierID,
-                    QuantityPerUnit = vm.Product.QuantityPerUnit,
-                    UnitPrice = vm.Product.UnitPrice,
-                    UnitsInStock = vm.Product.UnitsInStock,
-                    UnitsOnOrder = vm.Product.UnitsOnOrder,
-                    ReorderLevel = vm.Product.ReorderLevel,
-                    Discontinued = vm.Product.AktifMi == true ? "1" : "0"
+                    product_name = vm.Product.product_name,
+                    category_id = vm.CategoryID,
+                    supplier_id = vm.SupplierID,
+                    quantity_per_unit = vm.Product.quantity_per_unit,
+                    unit_price = vm.Product.unit_price,
+                    units_in_stock = vm.Product.units_in_stock,
+                    units_on_order = vm.Product.units_on_order,
+                    reorder_level = vm.Product.reorder_level,
+                    discontinued = vm.Product.AktifMi == true ? 1 : 0
                 };
 
                 var add_product_result = await _productService.AddProductAsync(product);
@@ -321,105 +322,152 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 {
                     result.Success = false;
                     result.Message = add_product_result.Message;
-                    // TempData["result"] = JsonConvert.SerializeObject(result);
+                    
                     return Json(result);
                 }
             }
             catch (ValidationException validationEx)
             {
-
-                foreach (var error in validationEx.Errors)
+                validationEx.Errors.ToList().ForEach(error =>
                 {
                     result.Messages.Add(error.ErrorMessage);
-                }
-                return Json(result);
+                });
 
+                return Json(result);
             }
             catch (System.Exception ex)
             {
                 result.Success = false;
-                result.Message = ex.Message;
-                TempData["result"] = JsonConvert.SerializeObject(result);
+                result.Message = "Sistemde bir veya daha fazla hata oluştu";
+                
                 return Json(result);
             }
 
             result.Success = true;
-            result.Message = $"{vm.Product.ProductName} kaydı başarıyla eklendi.";
-            // TempData["result"] = JsonConvert.SerializeObject(result);
+            result.Message = "Ürün ekleme işlemi başarıyla gerçekleşti.";
             return Json(result);
         }
+
         public async Task<IActionResult> Detail(int id)
         {
             var result = new Result { Success = false };
             var product_vm = new ProductViewModel();
-            using (var _northwindContext = new NorthwindContext())
+            try
             {
-                try
+                if (id == 0)
                 {
-                    if (id == 0)
-                    {
-                        result.Message = "Aranan ürün bulunamadı.";
-                        TempData["result"] = JsonConvert.SerializeObject(result);
-                        return RedirectToAction("Index");
-                    }
-                    var product_result = await _productService.GetProductAsync(id);
-                    if (product_result != null)
-                    {
-                        var mapped_product = _mapper.Map<ProductDTO>(product_result.Data);
-                        product_vm.OrderDetails = await _northwindContext.OrderDetails.Where(od => od.ProductId == id).ToListAsync();
-                        product_vm.Product = mapped_product;
-                    }
-
-                    return PartialView(product_vm);
-
-                }
-                catch (System.Exception ex)
-                {
-                    result.Message = ex.Message;
-
+                    result.Message = "Aranan ürün bulunamadı.";
+                    TempData["result"] = JsonConvert.SerializeObject(result);
                     return RedirectToAction("Index");
                 }
+                var product_result = await _productService.GetProductAsync(p => p.product_id == id, p => p.OrderDetails, p => p.Supplier);
+                if (product_result != null)
+                {
+                    var mapped_product = _mapper.Map<ProductDTO>(product_result.Data);
+                    ViewBag.ProductID = product_result.Data.product_id;
+                    product_vm.Product = mapped_product;
+                }
+
+                return PartialView(product_vm);
+
+            }
+            catch (System.Exception ex)
+            {
+                result.Message = "Sistemde bir veya daha fazla hata oluştu";
+
+                return RedirectToAction("Index");
+            }
+        }
+        [HttpPost]
+        public IActionResult GetDataTableOrderDetail(IDataTablesRequest request, int id)
+        {
+            var result = new Result { Success = false };
+            IQueryable<OrderDetail> orderDetails;
+            DataTablesResponse response;
+            try
+            {
+                if (request == null)
+                {
+                    result.Message = "İstek elde edilemedi";
+                    return Json(result);
+                }
+                orderDetails = _northwindContext.OrderDetails.Where(od => od.product_id == id);
+                if (!string.IsNullOrEmpty(request.Search.Value))
+                {
+                    int searchValue = Convert.ToInt32(request.Search.Value);
+                    orderDetails = orderDetails.Where(od => od.order_id == searchValue);
+                }
+                var orderColumns = request.Columns.Where(c => c.IsSortable == true && c.Sort != null);
+                var searchColumns = request.Columns.Where(c => c.IsSearchable);
+                var dataPage = orderDetails;
+                if (dataPage.Count() == 0)
+                {
+                    dataPage = dataPage.Take(request.Length);
+                }
+                else
+                {
+                    if (request.Length > 0)
+                    {
+                        dataPage = dataPage.OrderBy(orderColumns).Skip(request.Start).Take(request.Length);
+                    }
+                    else
+                    {
+                        dataPage = dataPage.OrderBy(orderColumns);
+                    }
+                }
+                response = DataTablesResponse.Create(request, orderDetails.Count(), orderDetails.Count(), dataPage);
+                return new DataTablesJsonResult(response, true);
+                
+
+            }
+            catch (System.Exception ex)
+            {
+                result.Message = "Sistemde bir veya daha fazla hata oluştu";
+                response = DataTablesResponse.Create(request, 0, 0, null);
+                return new DataTablesJsonResult(response, true);
             }
         }
         public async Task<IActionResult> _OrderDetail(int id)
         {
             var result = new Result { Success = false };
             var product_vm = new ProductViewModel();
-            using (var _northwindContext = new NorthwindContext())
+            try
             {
-                try
+                if (id == 0)
                 {
-                    if (id == null)
-                    {
-                        result.Message = "Herhangi bir seçim yapılmadı.";
-                        return Json(result);
-                    }
-
-                    var order = await _northwindContext.Orders.Where(o => o.OrderID == id).FirstAsync();
-                    
-                    //Explict loading
-                    await _northwindContext.Entry(order).Reference(o=> o.Customer).LoadAsync();
-                    await _northwindContext.Entry(order).Reference(o => o.Employee).LoadAsync();
-                    await _northwindContext.Entry(order).Reference(o => o.Shipper).LoadAsync();
-
-                    if (order == null)
-                    {
-                        result.Message = "Seçili sipariş bulunamadı.";
-                        return Json(result);
-                    }
-                    var mapped_order_detail = _mapper.Map<OrderDTO>(order);
-                    product_vm.Order = mapped_order_detail;
-
-                    return PartialView(product_vm);
-
-                }
-                catch (System.Exception ex)
-                {
-                    result.Message = ex.Message;
+                    result.Message = "Sistemde bir veya daha fazla hata oluştu.";
                     return Json(result);
                 }
+                
+                //Eager loading
+                var order = await _northwindContext.Orders.Where(o => o.order_id == id)
+                .Include(o => o.Customer)
+                .Include(o => o.Employee)
+                .Include(o => o.Shipper)
+                .AsNoTracking()
+                .FirstAsync();
+
+                //Explict loading
+                // await _northwindContext.Entry(order).Reference(o => o.Customer).LoadAsync();
+                // await _northwindContext.Entry(order).Reference(o => o.Employee).LoadAsync();
+                // await _northwindContext.Entry(order).Reference(o => o.Shipper).LoadAsync();
+
+                if (order == null)
+                {
+                    result.Message = "Seçili siparişle ilgili sistemde kayıtlı detay bulunamadı.";
+                    return Json(result);
+                }
+                var mapped_order_detail = _mapper.Map<OrderDTO>(order);
+                product_vm.Order = mapped_order_detail;
+
+                return PartialView(product_vm);
+
+            }
+            catch (System.Exception ex)
+            {
+                result.Message = "Sistemde bir veya daha fazla hata oluştu.";
+                return Json(result);
             }
         }
     }
-
 }

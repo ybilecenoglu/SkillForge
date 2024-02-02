@@ -27,7 +27,7 @@ namespace CoreTestFramework.Northwind.Business
 
         public async Task<Result<Category>> GetCategoryAsync(int id)
         {
-            var get_category_result = await _categoryDAL.FindById(id);
+            var get_category_result = await _categoryDAL.FindByIdAsync(id);
             return get_category_result;
         }
 

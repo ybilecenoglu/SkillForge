@@ -60,7 +60,7 @@
             <div class="row"></div>
             <div class="row">
               <div class="col-sm-12">
-                <table id="data-table-product" class="table table-bordered table-striped dataTable dtr-inline">
+                <table id="data-table-product" class="table table-bordered table-striped dataTable dtr-inline" style="width:100%;">
                   <!-- <a asp-action="Create" asp-controller="Product" class="btn btn-default bg-success">
                     <i class="fas fa-plus"></i> Yeni Ürün Ekle
                     </a> -->
@@ -95,23 +95,18 @@
     <div class="overlay">
     <i class="fas fa-2x fa-sync fa-spin"></i>
     </div>
-        <div class="modal-header">
-          <h4 class="modal-title"></h4>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">×</span>
-            </button>
-        </div>
+    <div class="modal-header">
+      <h4 class="modal-title"></h4>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">×</span>
+      </button>
+      </div>
     <div class="modal-body">
     <!--Dinamik oluşturalacak-->
-    </div>
-    <div class="modal-footer justify-content-between">
-        <button type="button" class="btn btn-primary" id="submit-button">Kaydet</button>
-        <button type="button" class="btn btn-outline-light" data-dismiss="modal">Kapat</button>
     </div>
       </div>
     </div>
 </div>
-
 @section Scripts{
 <script src="~/adminlte/plugins/datatables/jquery.dataTables.min.js"></script>
 <script src="~/adminlte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
@@ -155,13 +150,13 @@
           url: '@Url.Action("PageData")', 
           type: 'POST',
           data: function(data)
-                  {
-                    data.categoryID= $('#CategoryID').val(), data.supplierID = $('#SupplierID').val();
-                  }
+              {
+                 data.categoryID= $('#CategoryID').val(), data.supplierID = $('#SupplierID').val();
+              }
         },
         pageLength: 10,
         lengthMenu: [[10, 30, 50, 100, -1], [10, 30, 50, 100, "Tümü"]],
-        order: [[1, 'asc']],
+        order: [[0, 'desc']],
         searchDelay: 350,
         responsive: true,
         dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>" +
@@ -196,23 +191,23 @@
                       }
                   ],
         columns: [
-          { data: "productID", name: "ProductID", sortable: false, searchable: false, render: function(data) {
+          { data: "product_id", name: "product_id", sortable: true, orderable:false, searchable: false, render: function(data) {
             var content = '';
             content += '<a class="btn btn-primary btn-sm btn-flat" id="edit-button" title="Düzenle" data-target="/Product/Edit/'+data+'"><i class="fa fa-edit"></i></a>';
             content +='<a class="btn btn-danger btn-sm btn-flat" id="delete-button" title="Sil" data-href="/Product/Delete/' + data + '"><i class="fa fa-trash"></i></a>';
             content += '<a class="btn btn-warning btn-sm btn-flat" id="detail-button" title="Görüntüle" data-target="/Product/Detail/' + data + '"><i class="fa fa-eye"></i></a>'
             return content;
           } },
-          { data: "productName", name: "ProductName", sortable: true, searchable: true },
-          { data: "companyName", name: "CompanyName", sortable: false, searchable: false },
-          { data: "categoryName", name: "CategoryName", sortable: false, searchable: false },
-          { data: "quantityPerUnit", name: "QuantityPerUnit", sortable: false, searchable: false },
-          { data: "unitPrice", name: "UnitPrice",sortable: true, searchable: false, render: $.fn.dataTable.render.number('.', ',', 2, '') },
-          { data: "unitsInStock", name: "UnitsInStock",sortable: true, searchable: false },
-          { data: "unitsOnOrder", name: "UnitsOnOrder", sortable: false, searchable: false },
-          { data: "reorderLevel", name: "ReorderLevel", sortable: false, searchable: false },
+          { data: "product_name", name: "product_name", sortable: true, searchable: true },
+          { data: "company_name", name: "company_name", sortable: false, searchable: false },
+          { data: "category_name", name: "category_name", sortable: false, searchable: false },
+          { data: "quantity_per_unit", name: "quantity_per_unit", sortable: false, searchable: false },
+          { data: "unit_price", name: "unit_price",sortable: true, searchable: false, render: $.fn.dataTable.render.number('.', ',', 2, '') },
+          { data: "units_in_stock", name: "units_in_stock",sortable: true, searchable: false },
+          { data: "units_on_order", name: "units_on_order", sortable: false, searchable: false },
+          { data: "reorder_level", name: "reorder_level", sortable: false, searchable: false },
           {
-            data: "discontinued", name: "Discontinued", sortable: false, searchable: false, render: function (data) {
+            data: "discontinued", name: "discontinued", sortable: false, searchable: false, render: function (data) {
               if (data != null && data == 1) {
                 return '<input type="checkbox"  checked disabled/>'
               }
@@ -222,7 +217,6 @@
             }
           }
         ],
-
         // "initComplete": function (settings, json) {
         //   var input = $('.dataTables_filter input').unbind(),
         //     self = this.api(),
@@ -267,90 +261,85 @@
                         })
                   e.preventDefault();
         });
-     
-    function EditAction(e) {
-      var that = $(this);
-      $(".overlay").fadeIn();
-                $.ajax ({
-                  type: 'GET',
-                  url: that.data('target')
-                }).done(function(data){
-                  modal.find('.modal-body').html(data);
-                  modal.find('.modal-title').html("Ürün Düzenle");
-                  modal.modal('show');
-                }).fail(function(jqXHR, textStatus) {
-                  ShowModal("Hata!", "Form yüklenemedi");
-                  console.log("Request failed: " + textStatus);
-                }).always(function() {
-                  $(".overlay").fadeOut();
-                })
-                e.preventDefault();
-              }
-    
-
-    $('#data-table-product tbody').on('click', 'td #edit-button', EditAction);
-
-    function DetailAction(e) {
-      var that = $(this);
-      $(".overlay").fadeIn();
-                $.ajax ({
-                  type: 'GET',
-                  url: that.data('target')
-                }).done(function(data){
-                  modal.find('.modal-body').html(data);
-                  modal.find('.modal-title').html("Ürün Detay");
-                  $('#submit-button').prop('disabled', true);
-                  modal.modal('show');
-                }).fail(function(jqXHR, textStatus) {
-                  ShowModal("Hata!", "Form yüklenemedi");
-                  console.log("Request failed: " + textStatus);
-                }).always(function() {
-                  $(".overlay").fadeOut();
-                })
-                e.preventDefault();
-              }
-    
-    $('#data-table-product tbody').on('click', 'td #detail-button', DetailAction);
-
-  function DeleteAction(e) {
-          if (confirm('Silmek istediğinizen emin misiniz ?') == true) {
-              $('#overlay-process').fadeIn();
-              var that = $(this);
-              $.ajax({
-              type: 'POST',
-              url: that.data('href'),
-          }).done(function (result) {
-              if (result.Success == true) {
-                    $("#modal-overlay .modal-content").addClass("bg-success");
-                    ShowModal('Başarılı', result.Message, function (e) {
-                    $("#data-table-product").DataTable().ajax.reload(null,false);
-                    $("#modal-overlay .modal-content").removeClass("bg-success");
-                  });
-              } else {
-                $("#modal-overlay .modal-content").addClass("bg-danger");
-                ShowModal('Hata', result.Message, function(e){
-                  $("#modal-overlay .modal-content").removeClass("bg-danger");
-                });
-              }
-          }).fail(function (jqXHR, textStatus) {
-              ShowModal('Hata', 'Hata oluştu.');
-              console.log("Request failed: " + textStatus);
-          }).always(function () {
-              $('#overlay-process').fadeOut();
-          });
-          e.preventDefault();
-          }
-      }
-      $('#data-table-product tbody').on('click', 'td #delete-button', DeleteAction);
-
-      $('#form-filtre').submit(function(e){
-        $('#submit-filtre').prop('disabled', true);
-        table.ajax.reload();
-        e.preventDefault();
-        $('#submit-filtre').prop('disabled', false);
-      });
       
-  });
+      function EditAction(e) {
+        var that = $(this);
+        $(".overlay").fadeIn();
+                  $.ajax ({
+                    type: 'GET',
+                    url: that.data('target')
+                  }).done(function(data){
+                    modal.find('.modal-body').html(data);
+                    modal.find('.modal-title').html("Ürün Düzenle");
+                    modal.modal('show');
+                  }).fail(function(jqXHR, textStatus) {
+                    ShowModal("Hata!", "Form yüklenemedi");
+                    console.log("Request failed: " + textStatus);
+                  }).always(function() {
+                    $(".overlay").fadeOut();
+                  })
+                  e.preventDefault();
+                }
+        $('#data-table-product tbody').on('click', 'td #edit-button', EditAction);
 
+      function DetailAction(e) {
+        var that = $(this);
+        $(".overlay").fadeIn();
+                  $.ajax ({
+                    type: 'GET',
+                    url: that.data('target')
+                  }).done(function(data){
+                    modal.find('.modal-body').html(data);
+                    modal.find('.modal-title').html("Ürün Detay");
+                    $('#submit-button').prop('disabled', true);
+                    modal.modal('show');
+                  }).fail(function(jqXHR, textStatus) {
+                    ShowModal("Hata!", "Form yüklenemedi");
+                    console.log("Request failed: " + textStatus);
+                  }).always(function() {
+                    $(".overlay").fadeOut();
+                  })
+                  e.preventDefault();
+                }
+      $('#data-table-product tbody').on('click', 'td #detail-button', DetailAction);
+
+    function DeleteAction(e) {
+            if (confirm('Silmek istediğinizen emin misiniz ?') == true) {
+                $('#overlay-process').fadeIn();
+                var that = $(this);
+                $.ajax({
+                type: 'POST',
+                url: that.data('href'),
+            }).done(function (result) {
+                if (result.Success == true) {
+                      $("#modal-overlay .modal-content").addClass("bg-success");
+                      ShowModal('Başarılı', result.Message, function (e) {
+                      $("#data-table-product").DataTable().ajax.reload(null,false);
+                      $("#modal-overlay .modal-content").removeClass("bg-success");
+                    });
+                } else {
+                  $("#modal-overlay .modal-content").addClass("bg-danger");
+                  ShowModal('Hata', result.Message, function(e){
+                    $("#modal-overlay .modal-content").removeClass("bg-danger");
+                  });
+                }
+            }).fail(function (jqXHR, textStatus) {
+                ShowModal('Hata', 'Hata oluştu.');
+                console.log("Request failed: " + textStatus);
+            }).always(function () {
+                $('#overlay-process').fadeOut();
+            });
+            e.preventDefault();
+            }
+        }
+        $('#data-table-product tbody').on('click', 'td #delete-button', DeleteAction);
+
+        $('#form-filtre').submit(function(e){
+          $('#submit-filtre').prop('disabled', true);
+          table.ajax.reload();
+          e.preventDefault();
+          $('#submit-filtre').prop('disabled', false);
+        });
+    });
 </script>
 }

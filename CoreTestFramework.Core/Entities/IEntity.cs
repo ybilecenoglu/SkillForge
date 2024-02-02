@@ -8,5 +8,6 @@ namespace CoreTestFramework.Core.Entities
 {
     public interface IEntity
     {
+        
     }
 }

@@ -9,13 +9,13 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Common
         public MappingProfile()
         {
             CreateMap<Product, ProductDTO>()
-            .ForMember(dto => dto.CompanyName, entity => entity.MapFrom(p => p.Supplier.CompanyName))
-            .ForMember(dto => dto.CategoryName, entity => entity.MapFrom(p => p.Category.CategoryName));
+            .ForMember(dto => dto.company_name, entity => entity.MapFrom(p => p.Supplier.company_name))
+            .ForMember(dto => dto.category_name, entity => entity.MapFrom(p => p.Category.category_name));
 
             CreateMap<Order, OrderDTO>()
-            .ForMember(dto => dto.CustomerName, entity => entity.MapFrom(o => o.Customer.ContactName))
-            .ForMember(dto => dto.EmployeeName, entity => entity.MapFrom(o => o.Employee.FirstName + " " + o.Employee.LastName))
-            .ForMember(dto => dto.ShipperName, entity => entity.MapFrom(o => o.Shipper.CompanyName));
+            .ForMember(dto => dto.customer_name, entity => entity.MapFrom(o => o.Customer.contact_name))
+            .ForMember(dto => dto.employee_name, entity => entity.MapFrom(o => o.Employee.first_name + " " + o.Employee.last_name))
+            .ForMember(dto => dto.shipper_name, entity => entity.MapFrom(o => o.Shipper.company_name));
         }
     }
 }

@@ -14,7 +14,7 @@
     <!--Dinamik oluşturalacak-->
     </div>
     <div class="modal-footer justify-content-between">
-    <button type="button" class="btn btn-outline-light" id="modal-kapat">Kapat</button>
+    <button type="button" class="btn btn-outline-light" data-dismiss="modal">Kapat</button>
     </div>
     </div>
     </div>
@@ -35,9 +35,5 @@
 				modal.on('hide.bs.modal', hideEvent);
 			}
 		}
-
-        $('#modal-kapat').on('click', function(){
-            $('#modal-overlay').modal("hide");
-        })
 	});
 </script>

@@ -1,19 +1,30 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using CoreTestFramework.Core.Entities;
 
 namespace CoreTestFramework.Northwind.Entities.Model;
 public class Product : IEntity
 {
-    public int ProductID { get; set; }
-    public string ProductName { get; set;}
-    public int SupplierId { get; set; }
-    public int CategoryId { get; set; }
-    public string QuantityPerUnit { get; set; }
-    public double UnitPrice { get; set; }
-    public int UnitsInStock {get; set;}
-    public int UnitsOnOrder {get; set;}
-    public int ReorderLevel {get; set;}
-    public string Discontinued {get; set;}
+   
+    public int product_id { get; set; }
+    
+    public string product_name { get; set;}
+    
+    public int supplier_id { get; set; }
+    
+    public int category_id { get; set; }
+    
+    public string quantity_per_unit { get; set; }
+    
+    public double unit_price { get; set; }
+    
+    public int units_in_stock {get; set;}
+    
+    public int units_on_order {get; set;}
+    
+    public int reorder_level {get; set;}
+    
+    public int discontinued {get; set;}
     public virtual Supplier Supplier {get; set;}
     public virtual Category Category {get; set;}
     public virtual ICollection<OrderDetail> OrderDetails { get; set; }

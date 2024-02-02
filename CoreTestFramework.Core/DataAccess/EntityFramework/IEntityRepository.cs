@@ -7,9 +7,10 @@ namespace CoreTestFramework.Core.DataAccess
     //Database CRUD işlemlerini gerçekleştireceğimiz soyut katman T için IEntitiy interface türetilmeli ve newlenebilir olmalıdır.
     public interface IEntityRepository<T>  where T : IEntity, new()
     {
-        Task<Result<List<T>>> GetListAsync(Expression<Func<T, bool>> filter = null);
-        Result<IQueryable<T>> GetQueryable(Expression<Func<T, bool>> filter = null);
-        Task<Result<T>> FindById(int id);
+        Task<Result<List<T>>> GetListAsync(Expression<Func<T, bool>> filter = null, params Expression<Func<T, object>>[] includes);
+        Result<IQueryable<T>> GetQueryable(Expression<Func<T, bool>> filter = null,params Expression<Func<T, object>>[] includes);
+        Task<Result<T>> GetAsync(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes);
+        Task<Result<T>> FindByIdAsync(int id);
         Task<Result<T>> AddAsync(T entity);
         Task<Result<int>> AddRangeAsync(List<T> entity);
         Task<Result> DeleteAsync(T entity);

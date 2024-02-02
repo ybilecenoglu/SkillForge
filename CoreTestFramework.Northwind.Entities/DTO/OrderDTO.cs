@@ -1,28 +1,29 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace CoreTestFramework.Northwind.Entities.DTO
 {
     public class OrderDTO 
     {
-        public int OrderId { get; set; }
-        public string CustomerName {get; set;}
-        public string EmployeeName {get; set;}
-        public string ShipperName {get; set;}
+        public int order_id { get; set; }
+        public string customer_name {get; set;}
+        public string employee_name {get; set;}
+        public string shipper_name {get; set;}
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString ="{0:dd/MM/yyyy}")]
-        public DateTime OrderDate { get; set; }
+        public DateTime order_date { get; set; }
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString ="{0:dd/MM/yyyy}")]
-        public DateTime RequiredDate { get; set; }
+        public DateTime required_date { get; set; }
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString ="{0:dd/MM/yyyy}")]
-        public DateTime ShippedDate { get; set; }
-        public decimal Freight { get; set; }
-        public string ShipName { get; set; }
-        public string ShipAddress { get; set; }
-        public string ShipCity { get; set; }
-        public string ShipRegion { get; set; }
-        public string ShipPostalCode { get; set; }
-        public string ShipCountry { get; set; }
+        public DateTime shipped_date { get; set; }
+        public decimal freight { get; set; }
+        public string ship_name { get; set; }
+        public string ship_address { get; set; }
+        public string ship_city { get; set; }
+        public string ship_region { get; set; }
+        public string ship_postal_code { get; set; }
+        public string ship_country { get; set; }
     }
 }

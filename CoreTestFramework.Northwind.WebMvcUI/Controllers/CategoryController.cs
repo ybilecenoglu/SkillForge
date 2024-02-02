@@ -4,6 +4,6 @@ namespace CoreTestFramework.WebMvcUI.Controllers
 {
     public class CategoryController: Controller
     {
-
+        
     }
 }

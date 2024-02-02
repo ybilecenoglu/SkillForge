@@ -21,6 +21,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<NorthwindContext>();
 builder.Services.AddSingleton<IProductDAL, ProductDAL>();
 builder.Services.AddSingleton<IProductService, ProductManager>();
+
 //JSON serileştirmesini yapılandırmaası lowercase için
 builder.Services.AddControllers().AddJsonOptions(jsonOptions =>
     {

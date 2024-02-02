@@ -14,11 +14,8 @@ namespace CoreTestFramework.Core.Common
             Messages = new List<string>();
         }
         public bool Success { get; set; }
-
         public List<string> Messages { get; set; }
-
         public string Message { get; set; }
-
     }
     public class Result<T> : Result
     {

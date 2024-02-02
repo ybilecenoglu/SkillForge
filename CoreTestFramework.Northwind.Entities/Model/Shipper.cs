@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using SQLiteNetExtensions.Attributes;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CoreTestFramework.Northwind.Entities.Model;
 
 public partial class Shipper
 {
     
-    public int ShipperID { get; set; }
-
-    public string CompanyName { get; set; } = null!;
-
-    public string Phone { get; set; }
+    public int shipper_id { get; set; }
+    
+    public string company_name { get; set; } = null!;
+    
+    public string phone { get; set; }
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 }

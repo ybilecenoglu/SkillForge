@@ -2,6 +2,7 @@
 @{
   ViewBag.Title = "Ürün Detay";
 }
+
 <div class="row">
   <div class="col-md-12">
   <div class="card card-primary">
@@ -13,39 +14,39 @@
         <div asp-validation-summary="All" class="text-danger"></div>
         <div class="form-group">
           <label>Ürün Adı</label>
-          <input asp-for="@Model.Product.ProductName" class="form-control" disabled />
+          <input asp-for="@Model.Product.product_name" class="form-control" disabled />
       </div>
     <!-- <div class="form-group">
     <label>Kategori</label>
-    <input asp-for="@Model.Product.CategoryName"  class="form-control" disabled />
+    <input asp-for="@Model.Product.category_name"  class="form-control" disabled />
     </div> -->
     <div class="form-group">
       <label >Tedarikçi Firma</label>
-      <input asp-for="@Model.Product.CompanyName" class="form-control" disabled />
+      <input asp-for="@Model.Product.company_name" class="form-control" disabled />
       </div>
       <div class="form-group">
           <label>Birim Miktarı</label>
-          <input asp-for="@Model.Product.QuantityPerUnit" class="form-control" disabled />
+          <input asp-for="@Model.Product.quantity_per_unit" class="form-control" disabled />
       </div>
       <div class="form-group">
         <label>Fiyat</label>
-        <input asp-for="@Model.Product.UnitPrice" class="form-control" disabled/>
+        <input asp-for="@Model.Product.unit_price" class="form-control" disabled/>
     </div>
     <div class="form-group">
       <label>Adet</label>
-      <input asp-for="@Model.Product.UnitsInStock" class="form-control" disabled/>
+      <input asp-for="@Model.Product.units_in_stock" class="form-control" disabled/>
     </div>
     <div class="form-group">
       <label>Sipariş Miktarı</label>
-      <input asp-for="@Model.Product.UnitsOnOrder" class="form-control" disabled/>
+      <input asp-for="@Model.Product.units_on_order" class="form-control" disabled/>
     </div>
     <div class="form-group">
       <label>Yeni Sipariş</label>
-      <input asp-for="@Model.Product.ReorderLevel" class="form-control" disabled/>
+      <input asp-for="@Model.Product.reorder_level" class="form-control" disabled/>
     </div>
     <div class="form-group">
       <div class="icheck-success d-inline">
-      @if(Model.Product.Discontinued == "0"){
+      @if(Model.Product.discontinued == 0){
         <input type="checkbox" asp-for="@Model.Product.AktifMi" disabled>
       }
       else {
@@ -63,7 +64,7 @@
             <h3>Siparişler</h3>
           </div>
           <div class="card-body">
-            <table class="table table-bordered" id="orders-table">
+            <table class="table table-bordered table-striped dataTable dtr-inline" id="orders-table" style="width:100%;">
               <thead>
                 <tr>
                   <th style="width: 10px;">#</th>
@@ -74,95 +75,98 @@
                 </tr>
               </thead>
               <tbody>
-                @{
-                  decimal sumUnitPrice = 0;
-                  decimal sumQuantity = 0;
-                  float sumDiscount= 0;
-                }
-                @foreach (var order in Model.OrderDetails)
-                {
-                   sumUnitPrice += order.UnitPrice;
-                   sumQuantity += order.Quantity;
-                   sumDiscount += order.Discount;
-                  <tr>
-                    <td>
-                      <a class="btn btn-secondary btn-sm btn-flat" id="button-order-detail" title="Sipariş Ayrıntıları" data-target="/Product/_OrderDetail/@order.OrderId"><i class="fa fa-bars"></i></a>
-                    </td>
-                    <td>@order.OrderId</td>
-                    <td>@order.UnitPrice</td>
-                    <td>@order.Quantity</td>
-                    <td>@order.Discount</td>
-                  </tr>
-                }
+                <!--Server Side-->
               </tbody>
-              <!-- <tfoot>
-                <tr>
-                  <th>Toplam:</th>
-                  <th></th>
-                  <th>@string.Format("{0:#,0.00}", sumUnitPrice)</th>
-                  <th>@sumQuantity</th>
-                  <th>@string.Format("{0:P0}", sumDiscount)</th>
-                </tr>
-              </tfoot> -->
             </table>
           </div>
         </div>
       </div>
+    </div>
+    <div class="card-footer">
+        <button type="button" class="btn btn-outline-light" data-dismiss="modal">Kapat</button>
     </div>
   </form>
       </div>
     </div>
 </div>
 <div class="modal fade" id="modal-order" role="dialog">
-  <div class="modal-dialog modal-lg">
-  <div class="modal-content">
-  <div class="overlay" id="order-modal-overlay">
-  <i class="fas fa-2x fa-sync fa-spin"></i>
-  </div>
-  <div class="modal-header">
-  <h4 class="modal-title"></h4>
-  </div>
-  <div class="modal-body">
-  <!--Dinamik oluşturalacak-->
-  </div>
-  <div class="modal-footer justify-content-between">
-  <button type="button" class="btn btn-outline-light" id="close-order-detail">Kapat</button>
-  </div>
-  </div>
-  </div>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="overlay">
+                <i class="fas fa-2x fa-sync fa-spin"></i>
+            </div>
+            <div class="modal-header">
+              <h4 class="modal-title"></h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+              </button>
+              </div>
+            <div class="modal-body">
+                <!--Dinamik oluşturalacak-->
+            </div>
+        </div>
+    </div>
 </div>
   <script>
     $(document).ready(function(){
+
+      var productID = '@ViewBag.ProductID';
+      var modal = $('#modal-order');
       var table = $('#orders-table').DataTable({
-        searchDelay: 1000,
+        destroy: true,
+        serverSide: true,
+        processing: true,
+        language: {
+          processing: '<i class="fa fa-spinner fa-spin fa-2x fa-fw"></i>'
+        },
+
+        ajax: 
+        { 
+          url: '@Url.Action("GetDataTableOrderDetail")', 
+          type: 'POST',
+          data: function(data)
+                  {
+                    data.id = productID;
+                  }
+        },
         pageLength: 5,
-        lengthMenu: [[5, 10, 20, 50, -1], [5, 10, 20, 50, "Tümü"]],
+        lengthMenu: [[5, 10, 20, 30, -1], [5, 10, 20, 30, "Tümü"]],
+        order: [[1, 'asc']],
+        searchDelay: 350,
+        responsive: true,
+        columns: [
+          { data: "order_id", name: "order_id", sortable: false, searchable: false, render: function(data) {
+            var content = '';
+            content += '<a class="btn btn-primary btn-sm btn-flat" id="button-order-detail" title="Detay" data-target="/Product/_OrderDetail/'+data+'"><i class="fa fa-bars"></i></a>';
+            return content;
+          } },
+          { data: "order_id", name: "order_id", sortable: true, searchable: true },
+          { data: "unit_price", name: "unit_price",sortable: true, searchable: false, render: $.fn.dataTable.render.number('.', ',', 2, '') },
+          { data: "quantity", name: "quantity",sortable: true, searchable: false },
+          { data: "discount", name: "discount", sortable: false, searchable: false, render: function(data){
+            return (data * 100).toFixed(2)+'%';
+          }}
+        ],
       });
       
       function OrderDetailAction(e){
+          $(".overlay").fadeIn();
           var that = $(this);
-          $('#order-modal-overlay').fadeIn();
           $.ajax({
             type: 'GET',
             url: that.data('target')
           }).done(function(data){
-            $("#modal-order .modal-body").html(data);
-            $("#modal-order .modal-title").html("Sipariş Detay");
-            $("#modal-order").modal("show");
+            modal.find(".modal-body").html(data);
+            modal.find(".modal-title").html("Sipariş Detay");
+            modal.modal('show');
           }).fail(function(jqXHR, textStatus) {
                   ShowModal("Hata!", "Form yüklenemedi");
                   console.log("Request failed: " + textStatus);
           }).always(function(){
-            $('#order-modal-overlay').fadeOut();
+                $(".overlay").fadeOut();
           });
           e.preventDefault();
       }
-      
-      $('#close-order-detail').on('click', function(e){
-       $('#modal-order').modal('hide');
-       e.preventDefault();
-      });
-      
       $('#orders-table tbody').on('click', 'td #button-order-detail', OrderDetailAction);
     });
 </script>

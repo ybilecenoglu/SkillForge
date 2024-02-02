@@ -18,20 +18,25 @@ namespace CoreTestFramework.Northwind.Business.Concrate
         {
               _productDal = productDAL;
         }
-        public async Task<Result<List<Product>>> GetProductListAsync(Expression<Func<Product, bool>> filter = null)
+        public async Task<Result<List<Product>>> GetProductListAsync(Expression<Func<Product, bool>> filter = null,params Expression<Func<Product, object>>[] includes)
         {
-            var get_list_result = await _productDal.GetListAsync(filter);
+            var get_list_result = await _productDal.GetListAsync(filter, includes);
             return get_list_result;
         }
-        public  Result<IQueryable<Product>> GetQueryable(Expression<Func<Product, bool>> filter = null)
+        public  Result<IQueryable<Product>> GetProductQueryable(Expression<Func<Product, bool>> filter = null,params Expression<Func<Product, object>>[] includes)
         {
-            var get_queryable_result = _productDal.GetQueryable(filter);
+            var get_queryable_result = _productDal.GetQueryable(filter, includes);
             return get_queryable_result;
         }
-        public async Task<Result<Product>> GetProductAsync(int id)
+        public async Task<Result<Product>> GetFindByIdAsync(int id)
         {
-            var product_result = await _productDal.FindById(id);
+            var product_result = await _productDal.FindByIdAsync(id);
             return product_result;
+        }
+        public async Task<Result<Product>> GetProductAsync(Expression<Func<Product, bool>> filter = null, params Expression<Func<Product, object>>[] includes)
+        {
+           var product_result = await _productDal.GetAsync(filter,includes);
+           return product_result;
         }
         public async Task<Result> DeleteProductAsync(Product product)
         {
