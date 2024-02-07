@@ -48,6 +48,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
+//Npgsql için UTC time configurasyonu
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true); 
 #region Default Routing Yapısı
 app.MapControllerRoute(
     name: "default",

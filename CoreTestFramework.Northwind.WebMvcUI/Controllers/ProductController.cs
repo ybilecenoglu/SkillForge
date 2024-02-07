@@ -145,7 +145,8 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 var product = await _productService.GetFindByIdAsync(id);
                 if (product != null)
                 {
-                    var delete_product_result = await _productService.DeleteProductAsync(product.Data);
+                    product.Data.is_deleted = true;
+                    var delete_product_result = await _productService.UpdateProductAsync(product.Data);
                     if (delete_product_result.Success == true)
                     {
                         result.Success = true;

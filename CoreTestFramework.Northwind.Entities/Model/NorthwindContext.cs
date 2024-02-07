@@ -35,21 +35,21 @@ namespace CoreTestFramework.Northwind.Entities.Model
             // optionsBuilder.UseLazyLoadingProxies().UseSqlite(configuration.GetConnectionString("NorthwindContext"));
              optionsBuilder.UseNpgsql(configuration.GetConnectionString("NorthwindContext"));
         }
-        // public override int SaveChanges()
-        // {
-        //     //Product Sınıfı için ef taraflı tracking state göre kaydetmeden önce yapılacaklar
-        //     ChangeTracker.Entries().ToList().ForEach(e =>
-        //     {
-        //         if (e.Entity is Product product)
-        //         {
-        //             if (e.State == EntityState.Modified)
-        //             {
-        //                 product.Discontinued = "0";
-        //             }
-        //         }
-        //     });
-        //     return base.SaveChanges();
-        // }
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+             //Product Sınıfı için ef taraflı tracking state göre kaydetmeden önce yapılacaklar
+            ChangeTracker.Entries().ToList().ForEach(e =>
+            {
+                if (e.Entity is Product product)
+                {
+                    var dateTime =DateTime.Now;
+                    var utcTime = new DateTime(dateTime.Year,dateTime.Month,dateTime.Day,dateTime.Hour,dateTime.Minute,dateTime.Second, DateTimeKind.Utc);
+                    if (e.State == EntityState.Added) product.created_time = utcTime;
+                    else if(e.State == EntityState.Modified) product.modified_time = utcTime;
+                }
+            });
+            return base.SaveChangesAsync(cancellationToken);
+        }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //TPT Yaklaşımı
@@ -103,7 +103,6 @@ namespace CoreTestFramework.Northwind.Entities.Model
             x => x.HasOne<Territory>().WithMany().HasForeignKey("employee_id"),
             x => x.HasOne<Employee>().WithMany().HasForeignKey("territory_id")
            );
-           
            modelBuilder.Entity<Employee>()
            .HasKey(e => e.employee_id);
             modelBuilder.Entity<Customer>()
@@ -118,7 +117,9 @@ namespace CoreTestFramework.Northwind.Entities.Model
             modelBuilder.Entity<Order>(entity => entity.HasKey(o => o.order_id));
             modelBuilder.Entity<Territory>()
             .HasKey(t => t.TerritoryID);
-
+            
+            //GLOBAL FILTER
+            modelBuilder.Entity<Product>().HasQueryFilter(p => !p.is_deleted);
             base.OnModelCreating(modelBuilder);
         }
         

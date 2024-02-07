@@ -40,7 +40,7 @@ namespace CoreTestFramework.Northwind.Business.Concrate
         }
         public async Task<Result> DeleteProductAsync(Product product)
         {
-           var product_delete_result = await _productDal.DeleteAsync(product);
+           var product_delete_result = await _productDal.UpdateAsync(product);
            return product_delete_result;
         }
         [FluentValidationAspect(typeof(ProductValidation))]
