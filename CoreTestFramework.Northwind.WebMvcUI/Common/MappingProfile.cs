@@ -1,6 +1,7 @@
 using AutoMapper;
 using CoreTestFramework.Northwind.Entities.Model;
 using CoreTestFramework.Northwind.Entities.DTO;
+using CoreTestFramework.Northwind.Entities;
 
 namespace CoreTestFramework.Northwind.WebMvcUI.Common
 {
@@ -16,6 +17,8 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Common
             .ForMember(dto => dto.customer_name, entity => entity.MapFrom(o => o.Customer.contact_name))
             .ForMember(dto => dto.employee_name, entity => entity.MapFrom(o => o.Employee.first_name + " " + o.Employee.last_name))
             .ForMember(dto => dto.shipper_name, entity => entity.MapFrom(o => o.Shipper.company_name));
+
+            CreateMap<Category, CategoryDTO>();
         }
     }
 }

@@ -168,6 +168,7 @@
                         text: '<i class="fas fa-plus" title="Ekle"></i>&nbsp; Yeni Ürün Ekle',
                         attr: {
                           id: 'create-button',
+                          class: 'btn btn-success'
                         }
                       },
                       {
@@ -195,7 +196,7 @@
             var content = '';
             content += '<a class="btn btn-primary btn-sm btn-flat" id="edit-button" title="Düzenle" data-target="/Product/Edit/'+data+'"><i class="fa fa-edit"></i></a>';
             content +='<a class="btn btn-danger btn-sm btn-flat" id="delete-button" title="Sil" data-href="/Product/Delete/' + data + '"><i class="fa fa-trash"></i></a>';
-            content += '<a class="btn btn-warning btn-sm btn-flat" id="detail-button" title="Görüntüle" data-target="/Product/Detail/' + data + '"><i class="fa fa-eye"></i></a>'
+            content += '<a class="btn btn-warning btn-sm btn-flat" id="detail-button" title="Görüntüle" data-target="/Product/Detail/' + data + '"><i class="fa fa-eye"></i></a>';
             return content;
           } },
           { data: "product_name", name: "product_name", sortable: true, searchable: true },

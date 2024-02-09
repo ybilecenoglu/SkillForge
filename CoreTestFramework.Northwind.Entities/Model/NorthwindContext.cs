@@ -38,14 +38,19 @@ namespace CoreTestFramework.Northwind.Entities.Model
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
              //Product Sınıfı için ef taraflı tracking state göre kaydetmeden önce yapılacaklar
+             var dateTime =DateTime.Now;
+             var utcTime = new DateTime(dateTime.Year,dateTime.Month,dateTime.Day,dateTime.Hour,dateTime.Minute,dateTime.Second, DateTimeKind.Utc);
             ChangeTracker.Entries().ToList().ForEach(e =>
             {
                 if (e.Entity is Product product)
                 {
-                    var dateTime =DateTime.Now;
-                    var utcTime = new DateTime(dateTime.Year,dateTime.Month,dateTime.Day,dateTime.Hour,dateTime.Minute,dateTime.Second, DateTimeKind.Utc);
+                    
                     if (e.State == EntityState.Added) product.created_time = utcTime;
                     else if(e.State == EntityState.Modified) product.modified_time = utcTime;
+                }
+                else if(e.Entity is Category category){
+                    if (e.State == EntityState.Added) category.created_time = utcTime;
+                    else if(e.State == EntityState.Modified) category.modified_time = utcTime;
                 }
             });
             return base.SaveChangesAsync(cancellationToken);
@@ -120,6 +125,7 @@ namespace CoreTestFramework.Northwind.Entities.Model
             
             //GLOBAL FILTER
             modelBuilder.Entity<Product>().HasQueryFilter(p => !p.is_deleted);
+            modelBuilder.Entity<Category>().HasQueryFilter(c => !c.is_deleted);
             base.OnModelCreating(modelBuilder);
         }
         
