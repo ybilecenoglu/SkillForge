@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 
 namespace CoreTestFramework.Core.DataAccess.EntityFramework
 {
-    //CRUD işlemlerini gerçekleştireceğimiz somut sınıf, IEntityRepository interface türetilmiştir TEntity için class olmalı IEntity interfaceden türetilmeli ve newlenebilir olmalıdır.
+    //IEntitiyRepositoryBase interface'den miras alarak CRUD işlemlerini gerçekleştireceğimiz somut sınıf, TEntity için class olmalı IEntity interfaceden türetilmeli ve newlenebilir olmalıdır.
     //Standart CRUD işlemlerini gerçekleştirdiğimiz sınıf
     public class EntityRepositoryBase<TEntity, TContext> : IEntityRepository<TEntity> where TEntity : class, IEntity, new()
      where TContext : DbContext, new()
@@ -17,12 +17,12 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
         {
             //_dbContext = new TContext();
         }
-        public async Task<Result<TEntity>> AddAsync(TEntity entity)
+        public async Task<Result<TEntity>> AddAsync(TEntity entity) //Create operasyonları gerçekleştirdiğim asenktron method
         {
             var add_result = new Result<TEntity> { Success = false };
             using (var _dbContext = new TContext())
             {
-                using (var _transaction = await _dbContext.Database.BeginTransactionAsync())
+                using (var _transaction = await _dbContext.Database.BeginTransactionAsync()) //Context sınıfından türetilen transaction property
                 {
                     try
                     {
@@ -42,12 +42,12 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
             }
             return add_result;
         }
-        public async Task<Result<int>> AddRangeAsync(List<TEntity> entity)
+        public async Task<Result<int>> AddRangeAsync(List<TEntity> entity)//Bir veya daha fazla ekleme operasyonları gerçekleştirdiğim asenktron method
         {
             var add_range_result = new Result<int> { Success = false };
             using (var _dbContext = new TContext())
             {
-                using (var _transaction = await _dbContext.Database.BeginTransactionAsync())
+                using (var _transaction = await _dbContext.Database.BeginTransactionAsync()) //Context sınıfından türetilen transaction 
                 {
                     try
                     {
@@ -74,7 +74,7 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
             var delete_result = new Result { Success = false };
             using (var _dbContext = new TContext())
             {
-                using (var _transaction = await _dbContext.Database.BeginTransactionAsync())
+                using (var _transaction = await _dbContext.Database.BeginTransactionAsync()) //Context sınıfından türetilen transaction 
                 {
                     try
                     {
@@ -101,7 +101,7 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
             var delete_range_result = new Result<int> { Success = false };
             using (var _dbContext = new TContext())
             {
-                using (var _transaction = await _dbContext.Database.BeginTransactionAsync())
+                using (var _transaction = await _dbContext.Database.BeginTransactionAsync()) //Context sınıfından türetilen transaction 
                 {
                     try
                     {
@@ -128,7 +128,7 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
             var update_result = new Result<TEntity> { Success = false };
             using (var _dbContext = new TContext())
             {
-                using (var transaction = await _dbContext.Database.BeginTransactionAsync())
+                using (var transaction = await _dbContext.Database.BeginTransactionAsync()) //Context sınıfından türetilen transaction 
                 {
                     try
                     {
@@ -179,7 +179,7 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
             {
                 try
                 {
-                    var query = filter != null ? _dbContext.Set<TEntity>().Where(filter) : _dbContext.Set<TEntity>();
+                    var query = filter != null ? _dbContext.Set<TEntity>().Where(filter) : _dbContext.Set<TEntity>(); //AsNoTracking() methodu ile sorgudan gelen verilerin ef core tarafından takip edilmesini devre dışı bırakıldı.
                     if (includes != null)
                     {
                         query = includes.Aggregate(query, (current, include) => current.Include(include));
@@ -207,7 +207,7 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
             {
                 try
                 {
-                    queryable_result.Data = filter != null ? _dbContext.Set<TEntity>().Where(filter) : _dbContext.Set<TEntity>();
+                    queryable_result.Data = filter != null ? _dbContext.Set<TEntity>().Where(filter).AsNoTracking() : _dbContext.Set<TEntity>().AsNoTracking();
                     queryable_result.Success = true;
                     queryable_result.Message = "Success";
                 }

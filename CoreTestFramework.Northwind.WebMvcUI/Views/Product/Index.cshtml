@@ -305,7 +305,7 @@
       $('#data-table-product tbody').on('click', 'td #detail-button', DetailAction);
 
     function DeleteAction(e) {
-            if (confirm('Silmek istediğinizen emin misiniz ?') == true) {
+            if (confirm('Seçili ürünü silmek istediğinize emin misiniz ?') == true) {
                 $('#overlay-process').fadeIn();
                 var that = $(this);
                 $.ajax({
@@ -317,6 +317,7 @@
                       ShowModal('Başarılı', result.Message, function (e) {
                       $("#data-table-product").DataTable().ajax.reload(null,false);
                       $("#modal-overlay .modal-content").removeClass("bg-success");
+                      
                     });
                 } else {
                   $("#modal-overlay .modal-content").addClass("bg-danger");

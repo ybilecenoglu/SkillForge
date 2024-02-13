@@ -7,6 +7,7 @@ using CoreTestFramework.Northwind.DataAccess.Concrate;
 using CoreTestFramework.Northwind.Entities.Model;
 using CoreTestFramework.Northwind.WebMvcUI.Common;
 using DataTables.AspNet.AspNetCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 // builder.Services.AddDbContext<NorthwindContext>(options => {
 //     var config = builder.Configuration;
 //     var connectionString =config.GetConnectionString("NorthwindContext");
-//     options.UseSqlite(connectionString);
+//     options.UseNpgsql(connectionString);
 // });
 
 //mvc, restapi, razorpages şablonları ile çalışabiliriz. Hangi şablon ile çalışacaksak belirtiyoruz.
