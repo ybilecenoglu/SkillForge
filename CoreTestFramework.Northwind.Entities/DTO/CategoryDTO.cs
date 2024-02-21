@@ -1,5 +1,8 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace CoreTestFramework.Northwind.Entities.DTO
 {
+    [Keyless]
     public class CategoryDTO
     {
         public int category_id {get; set;}

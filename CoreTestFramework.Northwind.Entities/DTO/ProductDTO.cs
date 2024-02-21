@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CoreTestFramework.Northwind.Entities.DTO
 {
+    [Keyless] //PK içermeyen ef core tarafından track (insert,update,delete) edilmeyen tablolar için kullanılan attribute.
     public class ProductDTO
     {
        

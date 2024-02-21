@@ -193,12 +193,10 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 var product = await _productService.GetFindByIdAsync(id);
                 if (product.Success == true && product.Data != null)
                 {
-
                     product_vm.CategoryID = product.Data.category_id;
                     product_vm.SupplierID = product.Data.supplier_id;
                     var mapped_product = _mapper.Map<ProductDTO>(product.Data);
                     product_vm.Product = mapped_product;
-
 
                     var categories = await _northwindContext.Categories.ToListAsync();
                     product_vm.Categories = new SelectList(categories, "category_id", "category_name", product_vm.CategoryID);
@@ -207,7 +205,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
 
                 }
             }
-            catch (System.Exception ex)
+            catch (System.Exception)
             {
                 
                 result.Message = "Sistemde bir veya daha fazla hata oluştu";
@@ -272,7 +270,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 }
                 return Json(result);
             }
-            catch (System.Exception ex)
+            catch (System.Exception)
             {
                 result.Message = "Sistemde bir veya daha fazla hata oluştu";
                 //TempData["result"] = JsonConvert.SerializeObject(result);
@@ -336,7 +334,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
 
                 return Json(result);
             }
-            catch (System.Exception ex)
+            catch (System.Exception)
             {
                 result.Success = false;
                 result.Message = "Sistemde bir veya daha fazla hata oluştu";
@@ -372,7 +370,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 return PartialView(product_vm);
 
             }
-            catch (System.Exception ex)
+            catch (System.Exception)
             {
                 result.Message = "Sistemde bir veya daha fazla hata oluştu";
 
@@ -392,7 +390,9 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                     result.Message = "İstek elde edilemedi";
                     return Json(result);
                 }
-                orderDetails = _northwindContext.OrderDetails.Where(od => od.product_id == id);
+                
+                //DbContext üzerinden oluşturduğumuz function çağırıyoruz.
+                orderDetails = _northwindContext.GetOrdersWithProductId(id);
                 if (!string.IsNullOrEmpty(request.Search.Value))
                 {
                     int searchValue = Convert.ToInt32(request.Search.Value);
@@ -421,7 +421,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 
 
             }
-            catch (System.Exception ex)
+            catch (System.Exception)
             {
                 result.Message = "Sistemde bir veya daha fazla hata oluştu";
                 response = DataTablesResponse.Create(request, 0, 0, null);
@@ -440,13 +440,17 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                     return Json(result);
                 }
                 
+                //Order tablosundan order_id ye göre ilgili order getiren db function çağırıyoruz.
+                var order = await _northwindContext.GetOrderWithOrderId(id).FirstOrDefaultAsync();
+
                 //Eager loading
-                var order = await _northwindContext.Orders.Where(o => o.order_id == id)
-                .Include(o => o.Customer)
-                .Include(o => o.Employee)
-                .Include(o => o.Shipper)
-                .AsNoTracking()
-                .FirstAsync();
+                //Call postgresql function fromsqlinterpolated
+                // var order = await _northwindContext.Orders.FromSqlInterpolated($"select * from fc_get_orderdetails_with_productId({id})")
+                // .Include(o => o.Customer)
+                // .Include(o => o.Employee)
+                // .Include(o => o.Shipper)
+                // .AsNoTracking()
+                // .FirstAsync();
 
                 //Explict loading
                 // await _northwindContext.Entry(order).Reference(o => o.Customer).LoadAsync();
@@ -458,13 +462,13 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                     result.Message = "Seçili siparişle ilgili sistemde kayıtlı detay bulunamadı.";
                     return Json(result);
                 }
-                var mapped_order_detail = _mapper.Map<OrderDTO>(order);
-                product_vm.Order = mapped_order_detail;
+                
+                product_vm.Order = order;
 
                 return PartialView(product_vm);
 
             }
-            catch (System.Exception ex)
+            catch (System.Exception)
             {
                 result.Message = "Sistemde bir veya daha fazla hata oluştu.";
                 return Json(result);

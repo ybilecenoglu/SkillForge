@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CoreTestFramework.Northwind.Entities.DTO;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 namespace CoreTestFramework.Northwind.Entities.Model
 {
@@ -33,7 +34,10 @@ namespace CoreTestFramework.Northwind.Entities.Model
             
             //Microsoft.EntityFrameworkCore.Proxies lazy loading işlemleri için ihtiyaç duyduğumuz sınıf.
             // optionsBuilder.UseLazyLoadingProxies().UseSqlite(configuration.GetConnectionString("NorthwindContext"));
-             optionsBuilder.UseNpgsql(configuration.GetConnectionString("NorthwindContext"));
+            
+            //LogTo methodu ile ef core tarafından gönderilen sorguları logluyoruz.
+             optionsBuilder.LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Information).UseNpgsql(configuration.GetConnectionString("NorthwindContext")).UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking); //Global olarak tracking tanımı her seferinde AsNoTracking() methodunu kullanmamıza gerek kalmadı.
+             
         }
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
@@ -55,6 +59,14 @@ namespace CoreTestFramework.Northwind.Entities.Model
             });
             return base.SaveChangesAsync(cancellationToken);
         }
+        
+        //Parametre alan function için kullanacağım IQueryable döndüren method
+        //FromExpression verilen sorgu ifadesi için sorgulanabilir bir nesne oluştur.
+        public IQueryable<OrderDetail> GetOrdersWithProductId(int productId) => FromExpression(() => GetOrdersWithProductId(productId));
+        public IQueryable<OrderDTO> GetOrderWithOrderId(int orderId) 
+        {
+            return FromExpression(() => GetOrderWithOrderId(orderId));
+        }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //TPT Yaklaşımı
@@ -66,8 +78,8 @@ namespace CoreTestFramework.Northwind.Entities.Model
             modelBuilder.Entity<Employee>().ToTable("employees","public");
             modelBuilder.Entity<Customer>().ToTable("customers","public");
             modelBuilder.Entity<Shipper>().ToTable("shippers","public");
-            // modelBuilder.Entity<Product>().HasIndex(p => p.ProductName).IncludeProperties(p => p.CategoryId);
-            // modelBuilder.Entity<Product>().HasCheckConstraint("ProductNameCheck","[product_name]==[categoryid]");
+            // modelBuilder.Entity<Product>().HasIndex(p => p.ProductName).IncludeProperties(p => p.CategoryId) Database tarafında index oluşturma;
+            // modelBuilder.Entity<Product>().HasCheckConstraint("PriceDiscountCheck","[Price]>[DiscountPrice]") Database taraflı kural belirleme Fiyat her zaman indirimli fiyattan büyük olmalıdır;
             modelBuilder.Entity<Product>()
             .HasKey(p => p.product_id);
             modelBuilder.Entity<Product>()
@@ -122,6 +134,16 @@ namespace CoreTestFramework.Northwind.Entities.Model
             modelBuilder.Entity<Order>(entity => entity.HasKey(o => o.order_id));
             modelBuilder.Entity<Territory>()
             .HasKey(t => t.TerritoryID);
+            
+            //Function Execute
+            //Parametre almayan function model builder execute
+            // modelBuilder.Entity<OrderDTO>().ToFunction("fc_get_order_details_with_order_id");
+            
+            //Parametre Alan
+            //Oluşturduğumuz function modelbuilder üzerinden execute ediyoruz.
+            modelBuilder.HasDbFunction(typeof(NorthwindContext).GetMethod(nameof(GetOrdersWithProductId), new [] {typeof(int)})).HasName("fc_get_orderdetails_with_productid");
+            modelBuilder.HasDbFunction(typeof(NorthwindContext).GetMethod(nameof(GetOrderWithOrderId), new [] {typeof(int)  
+            })).HasName("fc_get_order_details_with_order_id");
             
             //GLOBAL FILTER
             modelBuilder.Entity<Product>().HasQueryFilter(p => !p.is_deleted);

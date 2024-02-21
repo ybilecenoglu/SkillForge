@@ -22,47 +22,40 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
             var add_result = new Result<TEntity> { Success = false };
             using (var _dbContext = new TContext())
             {
-                using (var _transaction = await _dbContext.Database.BeginTransactionAsync()) //Context sınıfından türetilen transaction property
+
+                try
                 {
-                    try
-                    {
-                        var added_entry = _dbContext.Entry(entity);
-                        added_entry.State = EntityState.Added;
-                        await _dbContext.SaveChangesAsync();
-                        await _transaction.CommitAsync();
-                        add_result.Success = true;
-                        add_result.Message = "Success";
-                    }
-                    catch (Exception ex)
-                    {
-                        add_result.Message = ex.Message;
-                        await _transaction.RollbackAsync();
-                    }
+                    var added_entry = _dbContext.Entry(entity);
+                    added_entry.State = EntityState.Added;
+                    await _dbContext.SaveChangesAsync();
+                    add_result.Success = true;
+                    add_result.Message = "Success";
+                }
+                catch (Exception ex)
+                {
+                    add_result.Message = ex.Message;
+
                 }
             }
             return add_result;
         }
-        public async Task<Result<int>> AddRangeAsync(List<TEntity> entity)//Bir veya daha fazla ekleme operasyonları gerçekleştirdiğim asenktron method
+        public async Task<Result<int>> AddRangeAsync(List<TEntity> entities)//Bir veya daha fazla insert operasyonları gerçekleştirdiğim asenktron method
         {
             var add_range_result = new Result<int> { Success = false };
             using (var _dbContext = new TContext())
             {
-                using (var _transaction = await _dbContext.Database.BeginTransactionAsync()) //Context sınıfından türetilen transaction 
+
+                try
                 {
-                    try
-                    {
-                        var added_entry = _dbContext.Entry(entity);
-                        added_entry.State = EntityState.Added;
-                        await _dbContext.SaveChangesAsync();
-                        await _transaction.CommitAsync();
-                        add_range_result.Success = true;
-                        add_range_result.Message = "Success";
-                    }
-                    catch (Exception ex)
-                    {
-                        add_range_result.Message = ex.Message;
-                        await _transaction.RollbackAsync();
-                    }
+                    var added_entry = _dbContext.Entry(entities);
+                    added_entry.State = EntityState.Added;
+                    await _dbContext.SaveChangesAsync();
+                    add_range_result.Success = true;
+                    add_range_result.Message = "Success";
+                }
+                catch (Exception ex)
+                {
+                    add_range_result.Message = ex.Message;
                 }
             }
 
@@ -74,49 +67,43 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
             var delete_result = new Result { Success = false };
             using (var _dbContext = new TContext())
             {
-                using (var _transaction = await _dbContext.Database.BeginTransactionAsync()) //Context sınıfından türetilen transaction 
+
+                try
                 {
-                    try
-                    {
-                        var delete_entry = _dbContext.Entry(entity);
-                        delete_entry.State = EntityState.Deleted;
-                        await _dbContext.SaveChangesAsync();
-                        await _transaction.CommitAsync();
-                        delete_result.Success = true;
-                        delete_result.Message = "Success";
-                    }
-                    catch (Exception ex)
-                    {
-                        delete_result.Message = ex.Message;
-                        await _transaction.RollbackAsync();
-                    }
+                    var delete_entry = _dbContext.Entry(entity);
+                    delete_entry.State = EntityState.Deleted;
+                    await _dbContext.SaveChangesAsync();
+                    delete_result.Success = true;
+                    delete_result.Message = "Success";
+                }
+                catch (Exception ex)
+                {
+                    delete_result.Message = ex.Message;
+
                 }
             }
 
 
             return delete_result;
         }
-        public async Task<Result<int>> DeleteRangeAsync(List<TEntity> entity)
+        public async Task<Result<int>> DeleteRangeAsync(List<TEntity> entities)
         {
             var delete_range_result = new Result<int> { Success = false };
             using (var _dbContext = new TContext())
             {
-                using (var _transaction = await _dbContext.Database.BeginTransactionAsync()) //Context sınıfından türetilen transaction 
+
+                try
                 {
-                    try
-                    {
-                        var delete_entry = _dbContext.Entry(entity);
-                        delete_entry.State = EntityState.Deleted;
-                        await _dbContext.SaveChangesAsync();
-                        await _transaction.CommitAsync();
-                        delete_range_result.Success = true;
-                        delete_range_result.Message = "Success";
-                    }
-                    catch (Exception ex)
-                    {
-                        delete_range_result.Message = ex.Message;
-                        await _transaction.RollbackAsync();
-                    }
+                    var delete_entry = _dbContext.Entry(entities);
+                    delete_entry.State = EntityState.Deleted;
+                    await _dbContext.SaveChangesAsync();
+                    delete_range_result.Success = true;
+                    delete_range_result.Message = "Success";
+                }
+                catch (Exception ex)
+                {
+                    delete_range_result.Message = ex.Message;
+
                 }
             }
 
@@ -128,24 +115,18 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
             var update_result = new Result<TEntity> { Success = false };
             using (var _dbContext = new TContext())
             {
-                using (var transaction = await _dbContext.Database.BeginTransactionAsync()) //Context sınıfından türetilen transaction 
+
+                try
                 {
-                    try
-                    {
-                        var update_entry = _dbContext.Entry(entity);
-                        update_entry.State = EntityState.Modified;
-                        await _dbContext.SaveChangesAsync();
-                        await transaction.CommitAsync();
-                        update_result.Success = true;
-                        update_result.Message = "Success";
-
-
-                    }
-                    catch (Exception ex)
-                    {
-                        update_result.Message = ex.Message;
-                        await transaction.RollbackAsync();
-                    }
+                    var update_entry = _dbContext.Entry(entity);
+                    update_entry.State = EntityState.Modified;
+                    await _dbContext.SaveChangesAsync();
+                    update_result.Success = true;
+                    update_result.Message = "Success";
+                }
+                catch (Exception ex)
+                {
+                    update_result.Message = ex.Message;
                 }
             }
 
@@ -179,7 +160,7 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
             {
                 try
                 {
-                    var query = filter != null ? _dbContext.Set<TEntity>().Where(filter) : _dbContext.Set<TEntity>(); //AsNoTracking() methodu ile sorgudan gelen verilerin ef core tarafından takip edilmesini devre dışı bırakıldı.
+                    var query = filter != null ? _dbContext.Set<TEntity>().Where(filter) : _dbContext.Set<TEntity>();
                     if (includes != null)
                     {
                         query = includes.Aggregate(query, (current, include) => current.Include(include));
@@ -207,7 +188,7 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
             {
                 try
                 {
-                    queryable_result.Data = filter != null ? _dbContext.Set<TEntity>().Where(filter).AsNoTracking() : _dbContext.Set<TEntity>().AsNoTracking();
+                    queryable_result.Data = filter != null ? _dbContext.Set<TEntity>().Where(filter) : _dbContext.Set<TEntity>();
                     queryable_result.Success = true;
                     queryable_result.Message = "Success";
                 }

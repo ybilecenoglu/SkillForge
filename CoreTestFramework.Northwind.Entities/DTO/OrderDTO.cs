@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CoreTestFramework.Northwind.Entities.DTO
 {
+    [Keyless]
     public class OrderDTO 
     {
         public int order_id { get; set; }
@@ -18,7 +19,7 @@ namespace CoreTestFramework.Northwind.Entities.DTO
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString ="{0:dd/MM/yyyy}")]
         public DateTime shipped_date { get; set; }
-        public decimal freight { get; set; }
+        public double freight { get; set; }
         public string ship_name { get; set; }
         public string ship_address { get; set; }
         public string ship_city { get; set; }

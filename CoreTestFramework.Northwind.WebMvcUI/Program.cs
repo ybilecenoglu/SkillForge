@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 var builder = WebApplication.CreateBuilder(args);
 
-//Database Connection
+// Database Connection
 // builder.Services.AddDbContext<NorthwindContext>(options => {
 //     var config = builder.Configuration;
 //     var connectionString =config.GetConnectionString("NorthwindContext");

@@ -1,0 +1,29 @@
+Owned Entity Types
+EF Core ortak propertyleri tekrar tanımlamamak yerine owned entity type kullanarak miras almadan kullanabiliriz.
+modelBuilder.Entity<Manager>().OwsOne(x => x.Person); Fluent API
+Keyless Entitiy Types
+EF Core primary key içermeyen context tarafından track edilemeyen entityler için kullanılan typedir.
+modelBuilder.Entity<Product>().HasNoKey(); Fluent API
+Entitiy Properties
+[NotMapping] Attribute
+EF core veritabanı tarafından mapplemeden code tarafında dolduralacak propertyler için kullanılır.Fluent Api karşılığı "ignore()" methodudur.
+modelBuilder.Entity<Product>().Ignore(x => x.Name); Fluent API
+
+[Column("Name)]:[Column(TypeName="Nvarchar(200)")] Attribute
+Veritabanında oluşucak propertyler için isimlendirme ve type bilgisin default olarak değil kendi belirlediğimiz şekilde kullanabiliriz.
+modelBuilder.Entity<Product>().Property(x => x.Name).HasColumnName("Ad").HasColumnType("nvarchar200"); Fluent API
+
+[Unicode(false)]:varchar Attribute
+Default olarak string ifadeler nvarchar içerisinde UTF-8 formatını barındırırken unicode false attribute ile varchar ASCII karakterleride kullanmabiliriz.
+modelBuilder.Entity<Product>().Property(x => x.Name).IsUnicode(false); Fluent API
+
+Transaction (İşlem birimidir)
+İlişkisel veritabanlarında verinin bütünlüğünü sağlamamıza imkan veren bir özelliktir. Yap hep ya hiç kuralı ile veritabanında ki tutarsızlığı engeller. EF core default transaction yapısı bulunmaktadır açık açık transaction belirtmemize gerek olan yerlerde kullanmamız gerekmektedir.
+using(var transaction = _context.Database.BeginTransaction())
+{
+    transaction.Commit() Tüm işlemler başarılı şekilde tamamlanırsa veritabanına yansıt.
+    transaction.RollBack() İşlemlerin herhangi birinde bir hata oluşursa veritabanındaki tüm değişiklikleri geri al.
+}
+
+
+
