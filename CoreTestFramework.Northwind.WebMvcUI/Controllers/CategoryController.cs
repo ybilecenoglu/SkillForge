@@ -138,9 +138,10 @@ namespace CoreTestFramework.WebMvcUI.Controllers
                 category.Data.description = categoryViewModel.Category.description;
                 if (categoryViewModel.uploadFiles != null)
                 {
-                    if (System.IO.File.Exists(Path.Combine(fileBasePath, uploadYil, uploadAy, categoryViewModel.uploadFiles[0].originalName)))
+                    string folderName ="Uploads/";
+                    if (System.IO.File.Exists(Path.Combine(fileBasePath, folderName, uploadYil, uploadAy, categoryViewModel.uploadFiles[0].originalName)))
                     {
-                        category.Data.picture = Path.Combine(fileBasePath, uploadYil, uploadAy, categoryViewModel.uploadFiles[0].originalName);
+                        category.Data.picture = Path.Combine(folderName, uploadYil, uploadAy, categoryViewModel.uploadFiles[0].originalName);
                     }
                 }
                 var add_category_result = await _categoryService.UpdateCategoryAsync(category.Data);
@@ -185,9 +186,10 @@ namespace CoreTestFramework.WebMvcUI.Controllers
                 };
                 if (viewModel.uploadFiles != null)
                 {
-                    if (System.IO.File.Exists(Path.Combine(fileBasePath,uploadYil,uploadAy,viewModel.uploadFiles[0].originalName)))
+                    string folderName ="Uploads/";
+                    if (System.IO.File.Exists(Path.Combine(fileBasePath,folderName,uploadYil,uploadAy,viewModel.uploadFiles[0].originalName)))
                     {
-                        category.picture = Path.Combine(fileBasePath,uploadYil,uploadAy,viewModel.uploadFiles[0].originalName);
+                        category.picture = Path.Combine(folderName,uploadYil,uploadAy,viewModel.uploadFiles[0].originalName);
                     }
                 }
                 var add_category_result = await _categoryService.AddCategoryAsync(category);
@@ -251,6 +253,30 @@ namespace CoreTestFramework.WebMvcUI.Controllers
                 return Json(result);
             }
         }
+        public async Task<IActionResult> Detail(int id)
+        {
+            var result = new Result {Success = false};
+            var vm = new CategoryViewModel();
+            try
+            {
+                if(id == 0)
+                {
+                    result.Message = "Seçili bir kategori bulunamadı.";
+                    TempData["result"] = JsonConvert.SerializeObject(result);
+                    return View("Index");
+                }
+                var category_result = await _categoryService.FindByIdAsync(id);
+                vm.Category = _mapper.Map<CategoryDTO>(category_result.Data);
+
+                return PartialView("Detail", vm);
+            }
+            catch
+            {
+                result.Message = "İstek elde edilemedi.";
+                TempData["result"] = JsonConvert.SerializeObject(result);
+                return View("Index");
+            }
+        }
         [HttpPost]
         public async Task<IActionResult> UploadFile()
         {
@@ -267,10 +293,15 @@ namespace CoreTestFramework.WebMvcUI.Controllers
                         {
 
                             string uploadFileName = httpPostFile.FileName;
-
-                            if (!Directory.Exists(Path.Combine(fileBasePath, uploadYil))) Directory.CreateDirectory(Path.Combine(fileBasePath, uploadYil)); //O yıla ait klasor var mı yoksa oluşturuyoruz
-                            if (!Directory.Exists(Path.Combine(fileBasePath, uploadYil, uploadAy))) Directory.CreateDirectory(Path.Combine(fileBasePath, uploadYil, uploadAy));//Yıl/Ay formatında ay ait klasor var mı yoksa oluşturuyoruz.
-                            string filePath = Path.Combine(fileBasePath, uploadYil, uploadAy, uploadFileName); //Upload/Yıl/Ay/FileName formatında oluşturduğum klasor yolu
+                            string folderName = "Uploads";
+                            if (!Directory.Exists(Path.Combine(fileBasePath, folderName, uploadYil))) 
+                                Directory.CreateDirectory(Path.Combine(fileBasePath,folderName, uploadYil)); //O yıla ait klasor var mı yoksa oluşturuyoruz
+                            if (!Directory.Exists(Path.Combine(fileBasePath, folderName, uploadYil, uploadAy))) 
+                                Directory.CreateDirectory(Path.Combine(fileBasePath, folderName, uploadYil, uploadAy));//Yıl/Ay formatında ay ait klasor var mı yoksa oluşturuyoruz.
+                            
+                            string filePath = Path.Combine(fileBasePath, folderName, uploadYil, uploadAy, uploadFileName); //Upload/Yıl/Ay/FileName formatında oluşturduğum klasor yolu
+                            
+                            ViewBag.FilePath = filePath; // Resmi picturebox değiştirebilmek için viewbag nesnesiyle sayfaya taşıyorum.
 
                             var fileInfo = new FileInfo(filePath);
                             var dosyaUzantisi = fileInfo.Extension; //Yüklenen dosyanın uzantısı FileInfo sınıfı ile aldık.
@@ -301,9 +332,10 @@ namespace CoreTestFramework.WebMvcUI.Controllers
             try
             {
                 string fileBasePath = _configuration["UploadPath"];
+                string folderName = "Uploads";
                 string uploadYil = DateTime.Now.ToString("yyyy");
                 string uploadAy = DateTime.Now.ToString("MM");
-                string filePath = Path.Combine(fileBasePath, uploadYil, uploadAy, fileName);
+                string filePath = Path.Combine(fileBasePath,folderName, uploadYil, uploadAy, fileName);
                 if (System.IO.File.Exists(filePath))
                 {
                     System.IO.File.Delete(filePath);

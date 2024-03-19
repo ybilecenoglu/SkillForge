@@ -21,4 +21,5 @@ namespace CoreTestFramework.Core.Common
     {
         public T Data { get; set; }
     }
+   
 }

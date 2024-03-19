@@ -22,7 +22,14 @@
     </div>
     <div class="form-group">
         <label>Kategori Resmi: </label><br/>
-        <img src="@Model.Category.picture" style="max-width:200px" class="img-fluid img-thumbnail" />
+        @if(Model.Category.picture != null)
+        {
+            <img src="@Model.Category.picture" id="category_img" style="max-width:200px" class="img-fluid img-thumbnail" />
+        }
+        else{
+            <img src="/adminlte/dist/img/default-150x150.png" style="max-width:200px" class="img-fluid img-thumbnail" />
+        }
+            
     </div>
     <div class="form-group">
         <label>Resim Ekle: </label>
@@ -80,6 +87,7 @@
                     onStatusChange: function (id, oldStatus, newStatus) {
                         // This will check to see if a file that has been cancelled
                         // would equate to all uploads being 'completed'.
+                        
                         if (newStatus === qq.status.CANCELLED) {
                             if (window.FU.allUploadsCompleted(this) === true) {
                                 $('#kaydet-kayit').prop('disabled', false);
@@ -178,6 +186,7 @@
                     // ... and none have failed
                     if (failedUploads.length === 0) {
                         // They all have completed.
+                        document.getElementById('category_img').src = "@ViewBag.FilePath";
                         return true;
                     }
                 }

@@ -7,15 +7,13 @@ using CoreTestFramework.Northwind.DataAccess.Concrate;
 using CoreTestFramework.Northwind.Entities.Model;
 using CoreTestFramework.Northwind.WebMvcUI.Common;
 using DataTables.AspNet.AspNetCore;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
-var builder = WebApplication.CreateBuilder(args);
 
+var builder = WebApplication.CreateBuilder(args);
 // Database Connection
 // builder.Services.AddDbContext<NorthwindContext>(options => {
 //     var config = builder.Configuration;
 //     var connectionString =config.GetConnectionString("NorthwindContext");
-//     options.UseNpgsql(connectionString);
+//     options.UseNpgsql(builder.Configuration["ConnectionStrings:NorthwindContext]);
 // });
 
 //mvc, restapi, razorpages şablonları ile çalışabiliriz. Hangi şablon ile çalışacaksak belirtiyoruz.
@@ -51,9 +49,10 @@ app.UseHttpsRedirection();
 //css
 //js
 //lib
-app.UseStaticFiles(new StaticFileOptions(){
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(),"wwwroot")), RequestPath="/CoreTestFramework.Northwind.WebMvcUI/wwwroot"
-}); //wwwroot klasöründe dışarıdan erişmek için staticfile configürasyonu.
+// app.UseStaticFiles(new StaticFileOptions(){
+//     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(),"wwwroot")), RequestPath="/CoreTestFramework.Northwind.WebMvcUI/wwwroot"
+// }); //wwwroot klasöründe dışarıdan erişmek için staticfile configürasyonu.
+app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
 
@@ -63,6 +62,14 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=home}/{action=index}/{id?}");
+    //app.MapDefaultControllerRoute(); Default roting yapısı için bu methodu kullanabiliriz.
+#endregion
+#region Custom Routing
+// app.MapControllerRoute(
+//     name: "customize_name",
+//     pattern: "product/{url}",
+//     defaults: new {controller = "Product", action="Details"}
+// );
 #endregion
 
 app.UseSession();

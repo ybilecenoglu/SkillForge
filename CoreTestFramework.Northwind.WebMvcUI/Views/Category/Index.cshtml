@@ -160,7 +160,7 @@ ViewBag.Title = "Kategori Listesi";
             var content = '';
             content += '<a class="btn btn-primary btn-sm btn-flat" id="edit-button" title="Düzenle" data-target="/Category/Edit/' + data + '"><i class="fa fa-edit"></i></a>';
             content += '<a class="btn btn-danger btn-sm btn-flat" id="delete-button" title="Sil" data-href="/Category/Delete/' + data + '"><i class="fa fa-trash"></i></a>';
-            content += '<a class="btn btn-warning btn-sm btn-flat" id="detail-button" title="Görüntüle" data-target="/Product/Detail/' + data + '"><i class="fa fa-eye"></i></a>';
+            content += '<a class="btn btn-warning btn-sm btn-flat" id="detail-button" title="Görüntüle" data-target="/Category/Detail/' + data + '"><i class="fa fa-eye"></i></a>';
             return content;
           }
         },
@@ -172,7 +172,7 @@ ViewBag.Title = "Kategori Listesi";
               return '<img style="max-width:200px" class="img-fluid img-thumbnail" src="' + data + '">';
             }
             else
-              return '<img style="max-width:200px" class="img-fluid img-thumbnail" src="../CoreTestFramework.Northwind.WebMvcUI/wwwroot/adminlte/dist/img/default-150x150.png">';
+              return '<img style="max-width:200px" class="img-fluid img-thumbnail" src="/adminlte/dist/img/default-150x150.png">';
 
           }
         },
@@ -230,6 +230,25 @@ ViewBag.Title = "Kategori Listesi";
       }).done(function (data) {
         modal.find('.modal-body').html(data);
         modal.find('.modal-title').html("Kategori Düzenle");
+        modal.modal('show');
+      }).fail(function (jqXHR, textStatus) {
+        ShowModal("Hata!", "Form yüklenemedi");
+        console.log("Request failed: " + textStatus);
+      }).always(function () {
+        $(".overlay").fadeOut();
+      })
+      e.preventDefault();
+    });
+    
+    $('#data-table-category tbody').on('click', 'td #detail-button', function (e) {
+      var that = $(this);
+      $(".overlay").fadeIn();
+      $.ajax({
+        type: 'GET',
+        url: that.data('target')
+      }).done(function (data) {
+        modal.find('.modal-body').html(data);
+        modal.find('.modal-title').html("Kategori Detayları");
         modal.modal('show');
       }).fail(function (jqXHR, textStatus) {
         ShowModal("Hata!", "Form yüklenemedi");

@@ -176,7 +176,7 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
                 catch (Exception ex)
                 {
                     get_list_result.Message = ex.Message;
-
+ 
                 }
             }
             return get_list_result;

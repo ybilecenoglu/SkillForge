@@ -11,7 +11,6 @@ namespace CoreTestFramework.Northwind.Entities.Model
         // {
             
         // }
-
         public virtual DbSet<Product> Products => Set<Product>();
         public virtual DbSet<Shipper> Shippers => Set<Shipper>();
         public virtual DbSet<Supplier> Suppliers => Set<Supplier>();
@@ -36,8 +35,7 @@ namespace CoreTestFramework.Northwind.Entities.Model
             // optionsBuilder.UseLazyLoadingProxies().UseSqlite(configuration.GetConnectionString("NorthwindContext"));
             
             //LogTo methodu ile ef core tarafından gönderilen sorguları logluyoruz.
-             optionsBuilder.LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Information).UseNpgsql(configuration.GetConnectionString("NorthwindContext")).UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking); //Global olarak tracking tanımı her seferinde AsNoTracking() methodunu kullanmamıza gerek kalmadı.
-             
+             optionsBuilder.LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Information).UseNpgsql(configuration.GetConnectionString("NorthwindContext")).UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking); //Global olarak tracking tanımı her seferinde AsNoTracking() methodunu kullanmamıza gerek kalmadı. 
         }
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
@@ -86,7 +84,7 @@ namespace CoreTestFramework.Northwind.Entities.Model
             .HasMany(p => p.OrderDetails)
             .WithOne(p => p.Product)
             .HasForeignKey(p => p.product_id);
-            // .OnDelete(DeleteBehavior.Restrict) ilişkili tablolarda veri silerken alınacak aksiyonu belirlediğimiz method
+            //.OnDelete(DeleteBehavior.Restrict) ilişkili tablolarda veri silerken alınacak aksiyonu belirlediğimiz method
             modelBuilder.Entity<Product>()
             .HasOne(p => p.Category)
             .WithMany(p => p.Products)
