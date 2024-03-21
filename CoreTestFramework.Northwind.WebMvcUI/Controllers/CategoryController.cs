@@ -9,6 +9,7 @@ using DataTables.AspNet.AspNetCore;
 using DataTables.AspNet.Core;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 
 namespace CoreTestFramework.WebMvcUI.Controllers
@@ -26,7 +27,6 @@ namespace CoreTestFramework.WebMvcUI.Controllers
             _categoryService = categoryService;
             _mapper = mapper;
             _configuration = configuration;
-
             fileBasePath = _configuration["UploadPath"];
             uploadYil = DateTime.Now.ToString("yyyy");
             uploadAy = DateTime.Now.ToString("MM");

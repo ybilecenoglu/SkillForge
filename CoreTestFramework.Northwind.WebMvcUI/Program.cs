@@ -1,3 +1,8 @@
+using CoreTestFramework.Core.CrossCuttingConcern.Caching;
+using CoreTestFramework.Core.CrossCuttingConcern.Caching.Microsoft;
+using CoreTestFramework.Core.DependencyResolvers;
+using CoreTestFramework.Core.Extensions;
+using CoreTestFramework.Core.Utilities.IoC;
 using CoreTestFramework.Northwind.Business;
 using CoreTestFramework.Northwind.Business.Abstract;
 using CoreTestFramework.Northwind.Business.Concrate;
@@ -25,6 +30,7 @@ builder.Services.AddSingleton<IProductService, ProductManager>();
 
 builder.Services.AddSingleton<ICategoryDAL, CategoryDAL>();
 builder.Services.AddSingleton<ICategoryService, CategoryManager>();
+builder.Services.AddSingleton<ICacheManager, MemoryCacheManager>();
 
 //JSON serileştirmesini yapılandırmaası lowercase için
 builder.Services.AddControllers().AddJsonOptions(jsonOptions =>
@@ -37,13 +43,11 @@ builder.Services.AddControllers().AddJsonOptions(jsonOptions =>
 builder.Services.RegisterDataTables();
 builder.Services.AddSession();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
-
-// builder.Services.AddDbContext<NorthwindContext>(option => option.UseNpgsql(
-//     builder.Configuration.GetConnectionString("NorthwindContext")
-// ));
+builder.Services.AddDependencyResolvers(new ICoreModule[] {
+    new CoreModule()
+});
 
 var app = builder.Build();
-
 app.UseHttpsRedirection();
 //wwwroot klasörü altında 
 //css
@@ -55,7 +59,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
-
 //Npgsql Cannot write DateTime with Kind=Unspecified to PostgreSQL type 'timestamp with time zone', only UTC is supported hatası düzeltmek için kullanılan configurasyon.
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true); 
 #region Default Routing Yapısı
