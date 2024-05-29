@@ -43,7 +43,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
             {
                 result.Success = true;
                 result.Message = ex.Message;
-                TempData["result"] = result;
+                TempData["result"] = JsonConvert.SerializeObject(result);
 
                 return View(vm);
             }
@@ -61,7 +61,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 if (request == null)
                 {
                     result.Message = "İstek elde edilemedi.";
-                    TempData["result"] = result;
+                    TempData["result"] = JsonConvert.SerializeObject(result);
                     response = DataTablesResponse.Create(request, 0, 0, new List<Product>());
                     return new DataTablesJsonResult(response, true);
                 }
@@ -84,7 +84,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 if (product_result.Success == false)
                 {
                     result.Message = "İstek elde edilemedi.";
-                    TempData["result"] = result;
+                    TempData["result"] = JsonConvert.SerializeObject(result);
                     response = DataTablesResponse.Create(request, 0, 0, new List<Product>());
                     return new DataTablesJsonResult(response, true);
                 }

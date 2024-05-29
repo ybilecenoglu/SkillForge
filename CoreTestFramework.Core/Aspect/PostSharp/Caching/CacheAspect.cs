@@ -19,21 +19,19 @@ namespace CoreTestFramework.Core.Aspect.PostSharp.Caching
         }
         public override void OnInvoke(MethodInterceptionArgs args)
         {
-            var a = ServiceTool.ServiceProvider.GetService<ICacheManager>();
+            _cacheManager = ServiceTool.ServiceProvider.GetService<ICacheManager>();
             var methodName = $"{args.Method.ReflectedType.FullName}.{args.Method.Name}";
             var arguments = args.Arguments.ToList();
             var key =$"{methodName}({string.Join(",", arguments.Select(x => x?.ToString()??"<Null>"))})";
 
-            if (a.IsAdd(key))
+            if (_cacheManager.IsAdd(key))
             {
-                args.ReturnValue = a.Get(key);
+                args.ReturnValue = _cacheManager.Get(key);
                 return;
             }
-
             args.Proceed();
-            a.Add(key,args.ReturnValue, _durationTime);
+            _cacheManager.Add(key,args.ReturnValue, _durationTime);
 
         }
-
     }
 }

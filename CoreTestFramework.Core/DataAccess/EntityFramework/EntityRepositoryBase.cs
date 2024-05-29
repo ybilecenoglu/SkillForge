@@ -211,7 +211,7 @@ namespace CoreTestFramework.Core.DataAccess.EntityFramework
                     var query = filter != null ? _dbContext.Set<TEntity>().Where(filter) : _dbContext.Set<TEntity>();
                     if (includes != null)
                     {
-                        query = includes.Aggregate(query, (current, include) => current.Include(include));
+                        query = includes.Aggregate(query, (current, include) => current.Include(include));//Aggreagate bir dizi üzerinde biriktirici işlevi uygular
                         get_result.Data = await query.FirstAsync();
                     }
                     else
