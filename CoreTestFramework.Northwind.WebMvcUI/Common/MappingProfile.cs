@@ -1,7 +1,6 @@
 using AutoMapper;
 using CoreTestFramework.Northwind.Entities.Model;
 using CoreTestFramework.Northwind.Entities.DTO;
-using CoreTestFramework.Northwind.Entities;
 
 namespace CoreTestFramework.Northwind.WebMvcUI.Common
 {

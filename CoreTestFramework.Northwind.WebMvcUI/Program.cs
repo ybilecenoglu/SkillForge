@@ -42,7 +42,7 @@ builder.Services.AddControllers().AddJsonOptions(jsonOptions =>
 
 builder.Services.RegisterDataTables();
 builder.Services.AddSession();
-builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
 //.Net core tarafındaki framework seviyesinde bütün merkezi servis injectionlarını burada eklemiş olduk.
 builder.Services.AddDependencyResolvers(new ICoreModule[] {
     new CoreModule()
