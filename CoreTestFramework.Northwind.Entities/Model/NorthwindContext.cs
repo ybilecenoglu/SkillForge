@@ -46,7 +46,6 @@ namespace CoreTestFramework.Northwind.Entities.Model
             {
                 if (e.Entity is Product product)
                 {
-                    
                     if (e.State == EntityState.Added) product.created_time = utcTime;
                     else if(e.State == EntityState.Modified) product.modified_time = utcTime;
                 }
@@ -109,6 +108,7 @@ namespace CoreTestFramework.Northwind.Entities.Model
             .HasMany(e => e.Orders)
             .WithOne(e => e.Employee)
             .HasForeignKey( e=> e.employee_id);
+          
            //Many-to-many RelationShip
            modelBuilder.Entity<Employee>()
            .HasMany(e => e.Territories)
@@ -118,6 +118,7 @@ namespace CoreTestFramework.Northwind.Entities.Model
             x => x.HasOne<Territory>().WithMany().HasForeignKey("employee_id"),
             x => x.HasOne<Employee>().WithMany().HasForeignKey("territory_id")
            );
+           
            modelBuilder.Entity<Employee>()
            .HasKey(e => e.employee_id);
             modelBuilder.Entity<Customer>()
@@ -139,9 +140,9 @@ namespace CoreTestFramework.Northwind.Entities.Model
             
             //Parametre Alan
             //Oluşturduğumuz function modelbuilder üzerinden execute ediyoruz.
-            modelBuilder.HasDbFunction(typeof(NorthwindContext).GetMethod(nameof(GetOrdersWithProductId), new [] {typeof(int)})).HasName("fc_get_orderdetails_with_productid");
-            modelBuilder.HasDbFunction(typeof(NorthwindContext).GetMethod(nameof(GetOrderWithOrderId), new [] {typeof(int)  
-            })).HasName("fc_get_order_details_with_order_id");
+            // modelBuilder.HasDbFunction(typeof(NorthwindContext).GetMethod(nameof(GetOrdersWithProductId), new [] {typeof(int)})).HasName("fc_get_orderdetails_with_productid");
+            // modelBuilder.HasDbFunction(typeof(NorthwindContext).GetMethod(nameof(GetOrderWithOrderId), new [] {typeof(int)  
+            // })).HasName("fc_get_order_details_with_order_id");
             
             //GLOBAL FILTER
             modelBuilder.Entity<Product>().HasQueryFilter(p => !p.is_deleted);

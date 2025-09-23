@@ -49,7 +49,7 @@ builder.Services.AddDependencyResolvers(new ICoreModule[] {
 });
 
 var app = builder.Build();
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 //wwwroot klasörü altında 
 //css
 //js

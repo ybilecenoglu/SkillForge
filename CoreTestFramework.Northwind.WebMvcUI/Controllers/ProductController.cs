@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using static CoreTestFramework.Northwind.WebMvcUI.Extension.QueryableExtension;
 using Azure;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
 {
     public class ProductController : Controller
@@ -91,7 +92,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
 
                 var mapped_list_product = _mapper.Map<List<ProductDTO>>(product_result.Data);
                 products = mapped_list_product.AsQueryable();
-                
+
                 if (!string.IsNullOrEmpty(request.Search.Value))
                 {
                     var searchToUpperValue = request.Search.Value.Trim().ToUpper();
@@ -99,7 +100,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
 
                     products = products.Where(p => p.product_name.ToUpper().Contains(searchToUpperValue) || p.product_name.Contains(searchValue));
                 }
-                
+
                 var dataPage = products;
                 var orderColumns = request.Columns.Where(c => c.IsSortable == true && c.Sort != null);
                 var searchColumns = request.Columns.Where(c => c.IsSearchable);
@@ -207,7 +208,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
             }
             catch (System.Exception)
             {
-                
+
                 result.Message = "Sistemde bir veya daha fazla hata oluştu";
                 //TempData["result"] = JsonConvert.SerializeObject(result);
                 return RedirectToAction("Index");
@@ -303,27 +304,41 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
             var result = new Result { Success = false };
             try
             {
-                var product = new Product
+                if (ModelState.IsValid)
                 {
-                    product_name = vm.Product.product_name,
-                    category_id = vm.CategoryID,
-                    supplier_id = vm.SupplierID,
-                    quantity_per_unit = vm.Product.quantity_per_unit,
-                    unit_price = vm.Product.unit_price,
-                    units_in_stock = vm.Product.units_in_stock,
-                    units_on_order = vm.Product.units_on_order,
-                    reorder_level = vm.Product.reorder_level,
-                    discontinued = vm.Product.AktifMi == true ? 1 : 0
-                };
+                    var product = new Product
+                    {
+                        product_name = vm.Product.product_name,
+                        category_id = vm.CategoryID,
+                        supplier_id = vm.SupplierID,
+                        quantity_per_unit = vm.Product.quantity_per_unit,
+                        unit_price = vm.Product.unit_price,
+                        units_in_stock = vm.Product.units_in_stock,
+                        units_on_order = vm.Product.units_on_order,
+                        reorder_level = vm.Product.reorder_level,
+                        discontinued = vm.Product.AktifMi == true ? 1 : 0
+                    };
 
-                var add_product_result = await _productService.AddProductAsync(product);
-                if (add_product_result.Success == false)
-                {
-                    result.Success = false;
-                    result.Message = add_product_result.Message;
-                    
-                    return Json(result);
+                    var add_product_result = await _productService.AddProductAsync(product);
+                    if (add_product_result.Success == false)
+                    {
+                        result.Success = false;
+                        result.Message = add_product_result.Message;
+
+                        return Json(result);
+                    }
                 }
+                else
+                {
+                    ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList().ForEach(x =>
+                    {
+                        result.Messages.Add(x);
+                    });
+
+                    return Json(result);
+                    
+                }
+
             }
             catch (ValidationException validationEx)
             {
@@ -338,7 +353,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
             {
                 result.Success = false;
                 result.Message = "Sistemde bir veya daha fazla hata oluştu";
-                
+
                 return Json(result);
             }
 
@@ -390,7 +405,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                     result.Message = "İstek elde edilemedi";
                     return Json(result);
                 }
-                
+
                 //DbContext üzerinden oluşturduğumuz function çağırıyoruz.
                 orderDetails = _northwindContext.GetOrdersWithProductId(id);
                 if (!string.IsNullOrEmpty(request.Search.Value))
@@ -418,7 +433,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 }
                 response = DataTablesResponse.Create(request, orderDetails.Count(), orderDetails.Count(), dataPage);
                 return new DataTablesJsonResult(response, true);
-                
+
 
             }
             catch (System.Exception)
@@ -439,7 +454,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                     result.Message = "Sistemde bir veya daha fazla hata oluştu.";
                     return Json(result);
                 }
-                
+
                 //Order tablosundan order_id ye göre ilgili order getiren db function çağırıyoruz.
                 var order = await _northwindContext.GetOrderWithOrderId(id).FirstOrDefaultAsync();
 
@@ -462,7 +477,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                     result.Message = "Seçili siparişle ilgili sistemde kayıtlı detay bulunamadı.";
                     return Json(result);
                 }
-                
+
                 product_vm.Order = order;
 
                 return PartialView(product_vm);
