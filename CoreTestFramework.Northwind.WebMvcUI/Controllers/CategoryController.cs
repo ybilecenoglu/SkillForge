@@ -4,7 +4,7 @@ using CoreTestFramework.Northwind.Business;
 using CoreTestFramework.Northwind.Entities.DTO;
 using CoreTestFramework.Northwind.Entities.Model;
 using CoreTestFramework.Northwind.WebMvcUI.Extension;
-using CoreTestFramework.Northwind.WebMvcUI.ViewModels;
+using CoreTestFramework.Northwind.Entities.ViewModels;
 using DataTables.AspNet.AspNetCore;
 using DataTables.AspNet.Core;
 using FluentValidation;

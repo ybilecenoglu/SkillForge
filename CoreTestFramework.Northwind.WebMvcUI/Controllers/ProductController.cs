@@ -4,7 +4,7 @@ using CoreTestFramework.Northwind.Business.Abstract;
 using CoreTestFramework.Northwind.Entities.Model;
 using CoreTestFramework.Northwind.Entities.DTO;
 using CoreTestFramework.Northwind.WebMvcUI.Extension;
-using CoreTestFramework.Northwind.WebMvcUI.ViewModels;
+using CoreTestFramework.Northwind.Entities.ViewModels;
 using DataTables.AspNet.AspNetCore;
 using DataTables.AspNet.Core;
 using FluentValidation;
@@ -13,8 +13,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using static CoreTestFramework.Northwind.WebMvcUI.Extension.QueryableExtension;
-using Azure;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using CoreTestFramework.Core.Aspect.PostSharp;
+using CoreTestFramework.Northwind.Business.ValidationRules.FluentValidation;
 namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
 {
     public class ProductController : Controller
@@ -299,45 +299,34 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [FluentValidationAspect(typeof(ProductValidation))]
         public async Task<IActionResult> Create(ProductViewModel vm = null)
         {
             var result = new Result { Success = false };
             try
             {
-                if (ModelState.IsValid)
+                var product = new Product
                 {
-                    var product = new Product
-                    {
-                        product_name = vm.Product.product_name,
-                        category_id = vm.CategoryID,
-                        supplier_id = vm.SupplierID,
-                        quantity_per_unit = vm.Product.quantity_per_unit,
-                        unit_price = vm.Product.unit_price,
-                        units_in_stock = vm.Product.units_in_stock,
-                        units_on_order = vm.Product.units_on_order,
-                        reorder_level = vm.Product.reorder_level,
-                        discontinued = vm.Product.AktifMi == true ? 1 : 0
-                    };
+                    product_name = vm.Product.product_name,
+                    category_id = vm.CategoryID,
+                    supplier_id = vm.SupplierID,
+                    quantity_per_unit = vm.Product.quantity_per_unit,
+                    unit_price = vm.Product.unit_price,
+                    units_in_stock = vm.Product.units_in_stock,
+                    units_on_order = vm.Product.units_on_order,
+                    reorder_level = vm.Product.reorder_level,
+                    discontinued = vm.Product.AktifMi == true ? 1 : 0
+                };
 
-                    var add_product_result = await _productService.AddProductAsync(product);
-                    if (add_product_result.Success == false)
-                    {
-                        result.Success = false;
-                        result.Message = add_product_result.Message;
-
-                        return Json(result);
-                    }
-                }
-                else
+                var add_product_result = await _productService.AddProductAsync(product);
+                if (add_product_result.Success == false)
                 {
-                    ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList().ForEach(x =>
-                    {
-                        result.Messages.Add(x);
-                    });
+                    result.Success = false;
+                    result.Message = add_product_result.Message;
 
                     return Json(result);
-                    
                 }
+
 
             }
             catch (ValidationException validationEx)
@@ -393,7 +382,7 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
             }
         }
         [HttpPost]
-        public IActionResult GetDataTableOrderDetail(IDataTablesRequest request, int id)
+        public async Task<IActionResult> GetDataTableOrderDetail(IDataTablesRequest request, int id)
         {
             var result = new Result { Success = false };
             IQueryable<OrderDetail> orderDetails;
@@ -407,7 +396,8 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
                 }
 
                 //DbContext üzerinden oluşturduğumuz function çağırıyoruz.
-                orderDetails = _northwindContext.GetOrdersWithProductId(id);
+
+                orderDetails = _northwindContext.OrderDetails.Where(x => x.product_id == id);
                 if (!string.IsNullOrEmpty(request.Search.Value))
                 {
                     int searchValue = Convert.ToInt32(request.Search.Value);

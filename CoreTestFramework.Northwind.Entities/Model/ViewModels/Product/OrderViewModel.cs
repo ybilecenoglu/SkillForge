@@ -1,6 +1,6 @@
 using CoreTestFramework.Northwind.Entities.DTO;
 
-namespace CoreTestFramework.Northwind.WebMvcUI.ViewModels
+namespace CoreTestFramework.Northwind.Entities.ViewModels
 {
     public class OrderViewModel 
     {

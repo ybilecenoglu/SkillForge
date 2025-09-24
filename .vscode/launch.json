@@ -8,7 +8,8 @@
             "name": "C#: <project-name> Debug",
             "type": "dotnet",
             "request": "launch",
-            "projectPath": "${workspaceFolder}/CoreTestFramework.Northwind.WebMvcUI/CoreTestFramework.Northwind.WebMvcUI.csproj"
+            "projectPath": "${workspaceFolder}/CoreTestFramework.Northwind.WebMvcUI/CoreTestFramework.Northwind.WebMvcUI.csproj",
+            
         }
     ]
 }

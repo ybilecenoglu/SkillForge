@@ -5,26 +5,43 @@ using PostSharp.Serialization;
 
 namespace CoreTestFramework.Core.Aspect.PostSharp
 {
-    [PSerializable]//Bir türe uygulandığında PostSharp'ın PortableFormatter tarafından kullanılmak üzere bir serileştirici oluşturmasına neden olan özel öznitelik.
-    //PostSharp kütüphanesinden gelen OnMethodBoundaryAspect İmplementasyonu yapıldı.
-    public class FluentValidationAspect : OnMethodBoundaryAspect //PostSharp OnMethodBoundryAspect'i sınıfımıza miras vererek sınıfımızın runtime öncesinde yada sonrasında bir kod parçası ekleme özelliği kazandı.
+    /*
+     Bir türe uygulandığında PostSharp'ın PortableFormatter tarafından kullanılmak üzere bir serileştirici oluşturmasına neden olur. 
+     Aspect sınıflarında zorunludur.
+    */
+    [PSerializable]
+    public class FluentValidationAspect : OnMethodBoundaryAspect // PostSharp'ın OnMethodBoundaryAspect sınıfından türettik. 
+    // Bu sayede "methodun öncesine ve sonrasına" kod enjekte etme yeteneği kazandık.
     {
         private Type _validatiorType;
-        public FluentValidationAspect(Type validatorType) //Validasyon işlemini postsharp araclığıyla gerçekleştirirken parametre olarak validasyon hangi tipte yapılacak gönderiyorum.
+        public FluentValidationAspect(Type validatorType) //Aspect kullanılırken parametre olarak hangi validator kullanılacaksa (örn: [FluentValidationAspect(typeof(ProductValidator))]) constructor üzerinden veriliyor.
         {
             _validatiorType = validatorType;
         }
-        
-        public override void OnEntry(MethodExecutionArgs args) // Verilen methoda girildiği anda çalışan aspect metodudur.
+
+        //// Methoda giriş anında devreye giriyor. 
+        // Yani iş metodu daha başlamadan önce validasyon çalışıyor.
+        public override void OnEntry(MethodExecutionArgs args)
         {
-            
-            var validator = (IValidator)Activator.CreateInstance(_validatiorType); //Validasyona gelen _validatorType(ProductValidator gibi.) ile IValidator tipinde bir instance oluşturduk.
-            var entityType =_validatiorType.BaseType.GetGenericArguments()[0]; //Daha sonra gelen _validatorType BaseType ına giderek GetGenericArguments()[0] ile ilgili entity tipini (Product gibi.) aldık.
-            var entities = args.Arguments.Where(t => t.GetType() == entityType); //Daha sonra bu tipte oluşan neleri alıp entities içersine koyduk.
+            // Gelen validator tipinden (örn: ProductValidator) 
+            // reflection kullanarak bir instance oluşturuyoruz.
+            // IValidator arayüzünden cast ediyoruz.
+            var validator = (IValidator)Activator.CreateInstance(_validatiorType); 
+
+            // Validator’ın base tipinden generic argümanı (entity tipini) alıyoruz.
+            // Örn: ProductValidator : AbstractValidator<Product>
+            // Buradan Product tipini çıkarmış oluyoruz.
+            var entityType = _validatiorType.BaseType.GetGenericArguments()[0];
+
+            // Methoda gönderilen parametrelerden sadece 
+            // bizim validasyon yapmak istediğimiz entity tipinde olanları filtreliyoruz.
+            var entities = args.Arguments.Where(t => t.GetType() == entityType);
 
             foreach (var entity in entities)
             {
-                ValidatorTool.FluentValidate(validator,entity); //Daha sonra ValidatorTool sınıfında static oluşturduğumuz FluentValidate methodunu IValidator sınıfından oluşturduğumuz instance ve entity (Product, Category vs.) çalıştırdık.
+                // Her bir entity üzerinde FluentValidation kurallarını çalıştırıyoruz.
+                // Eğer validasyon başarısız olursa exception fırlatılacak.
+                ValidatorTool.FluentValidate(validator, entity);
             }
         }
     }
