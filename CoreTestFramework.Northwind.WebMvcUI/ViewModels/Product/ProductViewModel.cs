@@ -1,7 +1,7 @@
 using CoreTestFramework.Northwind.Entities.DTO;
 using CoreTestFramework.Northwind.Entities.Model;
 using Microsoft.AspNetCore.Mvc.Rendering;
-namespace CoreTestFramework.Northwind.Entities.ViewModels
+namespace CoreTestFramework.Northwind.WebMvcUI.ViewModels
 {
     public class ProductViewModel
     {

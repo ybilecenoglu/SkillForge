@@ -1,8 +1,6 @@
 ﻿using CoreTestFramework.Core.Common;
 using CoreTestFramework.Core.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-using PostSharp.Aspects.Advices;
 using System.Linq.Expressions;
 
 namespace CoreTestFramework.Core.DataAccess.EntityFramework

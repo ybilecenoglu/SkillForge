@@ -7,13 +7,20 @@ namespace CoreTestFramework.Core.CrossCuttingConcern.Caching.Microsoft
     public class MemoryCacheManager : ICacheManager //ICache manager interface implement ediyor. İleride Redis Cache Manager yazarsam aynı interface'i implemente ederek sadece DI tarafında değiştirebiliriz.
     {
         private IMemoryCache MemoryCache;
+        private readonly List<string> _cacheKeys = new List<string>(); //cache key taşıyacak listemiz
         public MemoryCacheManager(IMemoryCache memoryCache)
         {
             MemoryCache = memoryCache; //.Net Core DI container yönettiği IMemoryCache geliyor.
         }
         public void Add(string key, object data, int durationTime)
         {
-            MemoryCache.Set(key, data, TimeSpan.FromMinutes(durationTime));
+            if (durationTime > 0)
+                MemoryCache.Set(key, data, TimeSpan.FromMinutes(durationTime));
+            else
+                MemoryCache.Set(key, data);
+                
+            if (!_cacheKeys.Contains(key))
+                _cacheKeys.Add(key);
         }
 
         public T Get<T>(string key)
@@ -37,41 +44,13 @@ namespace CoreTestFramework.Core.CrossCuttingConcern.Caching.Microsoft
         }
         public void RemoveByPattern(string pattern)
         {
-            var field = typeof(MemoryCache).GetField("_coherentState", BindingFlags.NonPublic | BindingFlags.Instance); //MemoryCache’in private field bilgisi alınıyoruz.
-
-            var choerentStateValue = field.GetValue(MemoryCache); //MemoryCache nesnesi üzerinden bu field’ın değerini alıyoruz.
-
-            var entriesCollection = choerentStateValue.GetType().GetProperty("EntriesCollection", BindingFlags.NonPublic | BindingFlags.Instance); //Private instance property’si olduğu için Reflection ile ulaşıyoruz. Bu, cache’de tutulan tüm entry’lerin saklandığı koleksiyon.
+            var regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+            var keysToRemove = _cacheKeys.Where(k => regex.IsMatch(k)).ToList();
             
-            var entriesCollectionValue = entriesCollection.GetValue(choerentStateValue) as dynamic; //entriesCollection.GetValue(choerentStateValue) → choerentStateValue (yani _coherentState) üzerinden EntriesCollection property’sinin değerini alıyoruz.as dynamic → Tipi normalde internal/private olduğu için C# derleyicisi bilmez. dynamic diyerek “runtime’da çöz” diyoruz.
-
-
-            /*
-            Burada Reflection + Regex kullanılarak cache içindeki tüm key’ler taranıyor:
-
-            _coherentState → MemoryCache’in private alanı.
-
-            EntriesCollection → İçindeki tüm cache kayıtları.
-
-            Hepsi listeye alınıyor.
-
-            Regex ile eşleşenler bulunuyor.
-
-            Remove(key) ile tek tek siliniyor.
-            */
-            var cacheCollectionValues = new List<ICacheEntry>();
-
-            foreach (var cacheItem in entriesCollectionValue)
-            {
-                ICacheEntry cacheItemValue = cacheItem.GetType().GetProperty("Value").GetValue(cacheItem, null);
-                cacheCollectionValues.Add(cacheItemValue);
-            }
-            var regex = new Regex(pattern, RegexOptions.Singleline | RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            var keysToRemove = cacheCollectionValues.Where(d => regex.IsMatch(d.Key.ToString())).Select(d => d.Key).ToList();
-
             keysToRemove.ForEach(key =>
             {
                 Remove(key);
+                _cacheKeys.Remove(key);
             });
         }
     }

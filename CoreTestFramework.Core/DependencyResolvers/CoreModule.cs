@@ -12,6 +12,7 @@ namespace CoreTestFramework.Core.DependencyResolvers
         {
             services.AddMemoryCache(); //.Net Core default memory cache aktif ediyoruz.
             services.AddSingleton<ICacheManager, MemoryCacheManager>();
+            
         
         }
     }

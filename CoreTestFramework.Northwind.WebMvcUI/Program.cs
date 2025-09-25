@@ -1,17 +1,22 @@
+using Autofac;
+using Autofac.Extras.DynamicProxy;
+using Autofac.Extensions.DependencyInjection;
+using CoreTestFramework.Core.Aspect.Autofac;
 using CoreTestFramework.Core.CrossCuttingConcern.Caching;
 using CoreTestFramework.Core.CrossCuttingConcern.Caching.Microsoft;
 using CoreTestFramework.Core.DependencyResolvers;
 using CoreTestFramework.Core.Extensions;
 using CoreTestFramework.Core.Utilities.IoC;
 using CoreTestFramework.Northwind.Business;
-using CoreTestFramework.Northwind.Business.Abstract;
 using CoreTestFramework.Northwind.Business.Concrate;
+using CoreTestFramework.Northwind.Entities.ValidationRules.FluentValidation;
 using CoreTestFramework.Northwind.DataAccess;
 using CoreTestFramework.Northwind.DataAccess.Abstract;
 using CoreTestFramework.Northwind.DataAccess.Concrate;
 using CoreTestFramework.Northwind.Entities.Model;
 using CoreTestFramework.Northwind.WebMvcUI.Common;
 using DataTables.AspNet.AspNetCore;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 // Database Connection
@@ -48,6 +53,42 @@ builder.Services.AddDependencyResolvers(new ICoreModule[] {
     new CoreModule()
 });
 
+// Use Autofac
+builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
+{
+
+    ;   // MemoryCacheManager register
+    containerBuilder.RegisterType<MemoryCacheManager>()
+        .As<ICacheManager>()
+        .SingleInstance();
+
+    // CacheInterceptor register
+    containerBuilder.RegisterType<CacheInterceptor>()
+        .AsSelf();
+
+    // CacheRemoveInterceptor register
+    containerBuilder.RegisterType<CacheRemoveInterceptorAspect>()
+        .AsSelf();
+
+    // Validator register
+    containerBuilder.RegisterType<ProductValidation>()
+        .As<IValidator<Product>>() // DI container için IValidator<Product>
+        .SingleInstance();
+
+    // Generic interceptor register
+    containerBuilder.RegisterGeneric(typeof(FluentValidationInterceptor<,>)).AsSelf();
+
+    // Service register ve interceptor bağla
+    containerBuilder.RegisterType<ProductManager>()
+        .As<IProductService>()
+        .EnableInterfaceInterceptors()
+        .InterceptedBy(typeof(FluentValidationInterceptor<IValidator<Product>, Product>))
+        .InterceptedBy(typeof(CacheInterceptor))
+        .InterceptedBy(typeof(CacheRemoveInterceptorAspect));
+});
+
+
 var app = builder.Build();
 // app.UseHttpsRedirection();
 //wwwroot klasörü altında 
@@ -61,12 +102,12 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
 //Npgsql Cannot write DateTime with Kind=Unspecified to PostgreSQL type 'timestamp with time zone', only UTC is supported hatası düzeltmek için kullanılan configurasyon.
-AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true); 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 #region Default Routing Yapısı
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=home}/{action=index}/{id?}");
-    //app.MapDefaultControllerRoute(); Default roting yapısı için bu methodu kullanabiliriz.
+//app.MapDefaultControllerRoute(); Default roting yapısı için bu methodu kullanabiliriz.
 #endregion
 #region Custom Routing
 // app.MapControllerRoute(

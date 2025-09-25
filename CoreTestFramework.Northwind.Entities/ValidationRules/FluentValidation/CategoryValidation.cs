@@ -1,7 +1,7 @@
 using CoreTestFramework.Northwind.Entities.Model;
 using FluentValidation;
 
-namespace  CoreTestFramework.Northwind.Business.ValidationRules.FluentValidation
+namespace  CoreTestFramework.Northwind.Entities.ValidationRules.FluentValidation
 {
     public class CategoryValidation : AbstractValidator<Category> 
     {

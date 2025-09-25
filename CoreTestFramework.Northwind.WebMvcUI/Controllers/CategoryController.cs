@@ -4,12 +4,11 @@ using CoreTestFramework.Northwind.Business;
 using CoreTestFramework.Northwind.Entities.DTO;
 using CoreTestFramework.Northwind.Entities.Model;
 using CoreTestFramework.Northwind.WebMvcUI.Extension;
-using CoreTestFramework.Northwind.Entities.ViewModels;
+using CoreTestFramework.Northwind.WebMvcUI.ViewModels;
 using DataTables.AspNet.AspNetCore;
 using DataTables.AspNet.Core;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 
 namespace CoreTestFramework.WebMvcUI.Controllers

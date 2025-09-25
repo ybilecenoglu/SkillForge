@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
-using CoreTestFramework.Core.Aspect.PostSharp;
+using CoreTestFramework.Core.Aspect.Autofac;
 using CoreTestFramework.Core.Common;
-using CoreTestFramework.Northwind.Business.ValidationRules.FluentValidation;
+using CoreTestFramework.Northwind.Entities.ValidationRules;
 using CoreTestFramework.Northwind.DataAccess;
 using CoreTestFramework.Northwind.Entities.Model;
 
@@ -15,7 +15,6 @@ namespace CoreTestFramework.Northwind.Business
         {
             _categoryDAL = categoryDAL;
         }
-        [FluentValidationAspect(typeof(CategoryValidation))]
         public async Task<Result> AddCategoryAsync(Category category)
         {
             var add_result = await _categoryDAL.AddAsync(category);
@@ -45,7 +44,6 @@ namespace CoreTestFramework.Northwind.Business
             var get_category_list_result = await _categoryDAL.GetListAsync(filter);
             return get_category_list_result;
         }
-        [FluentValidationAspect(typeof(CategoryValidation))]
         public async Task<Result> UpdateCategoryAsync(Category category)
         {
             var get_update_result = await _categoryDAL.UpdateAsync(category);

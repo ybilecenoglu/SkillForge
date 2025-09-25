@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
 using CoreTestFramework.Core.Common;
-using CoreTestFramework.Northwind.Business.Abstract;
 using CoreTestFramework.Northwind.Entities.Model;
 using CoreTestFramework.Northwind.Entities.DTO;
 using CoreTestFramework.Northwind.WebMvcUI.Extension;
-using CoreTestFramework.Northwind.Entities.ViewModels;
+using CoreTestFramework.Northwind.WebMvcUI.ViewModels;
 using DataTables.AspNet.AspNetCore;
 using DataTables.AspNet.Core;
 using FluentValidation;
@@ -13,13 +12,16 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using static CoreTestFramework.Northwind.WebMvcUI.Extension.QueryableExtension;
-using CoreTestFramework.Core.Aspect.PostSharp;
-using CoreTestFramework.Northwind.Business.ValidationRules.FluentValidation;
+using CoreTestFramework.Northwind.Business;
+using CoreTestFramework.Core;
+using CoreTestFramework.Northwind.Entities.ValidationRules.FluentValidation;
+
 namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
 {
     public class ProductController : Controller
     {
         private IProductService _productService;
+        
         private readonly IMapper _mapper;
         private readonly NorthwindContext _northwindContext;
         public ProductController(IProductService productService, IMapper mapper, NorthwindContext northwindContext)
@@ -299,7 +301,6 @@ namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [FluentValidationAspect(typeof(ProductValidation))]
         public async Task<IActionResult> Create(ProductViewModel vm = null)
         {
             var result = new Result { Success = false };

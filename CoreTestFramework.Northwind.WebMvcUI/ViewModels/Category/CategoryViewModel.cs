@@ -1,7 +1,7 @@
 using CoreTestFramework.Northwind.Entities.DTO;
 using CoreTestFramework.Northwind.Entities.DTO.Common;
 
-namespace CoreTestFramework.Northwind.Entities.ViewModels
+namespace CoreTestFramework.Northwind.WebMvcUI.ViewModels
 {
     public class CategoryViewModel 
     {

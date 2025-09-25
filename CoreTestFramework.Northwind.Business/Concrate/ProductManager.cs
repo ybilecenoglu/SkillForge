@@ -1,9 +1,4 @@
-﻿using CoreTestFramework.Core.Aspect.PostSharp;
-using CoreTestFramework.Core.Aspect.PostSharp.Caching;
-using CoreTestFramework.Core.Common;
-using CoreTestFramework.Core.CrossCuttingConcern.Caching.Microsoft;
-using CoreTestFramework.Northwind.Business.Abstract;
-using CoreTestFramework.Northwind.Business.ValidationRules.FluentValidation;
+﻿using CoreTestFramework.Core.Common;
 using CoreTestFramework.Northwind.DataAccess.Abstract;
 using CoreTestFramework.Northwind.Entities.Model;
 using System.Linq.Expressions;
@@ -18,7 +13,7 @@ namespace CoreTestFramework.Northwind.Business.Concrate
         {
               _productDal = productDAL;
         }
-        [CacheAspect()]
+        
         public async Task<Result<List<Product>>> GetProductListAsync(Expression<Func<Product, bool>> filter = null,params Expression<Func<Product, object>>[] includes)
         {
             var get_list_result = await _productDal.GetListAsync(filter, includes);
@@ -44,15 +39,14 @@ namespace CoreTestFramework.Northwind.Business.Concrate
            var product_delete_result = await _productDal.UpdateAsync(product);
            return product_delete_result;
         }
-        [FluentValidationAspect(typeof(ProductValidation))]
-        [CacheRemoveAspect("ProductManager.GetProductListAsync")]
         public async Task<Result> UpdateProductAsync(Product product)
         {
             var product_update_result = await _productDal.UpdateAsync(product);
             return product_update_result;
         }
-        [FluentValidationAspect(typeof(ProductValidation))]
-        public async Task<Result> AddProductAsync(Product product){
+        
+        public async Task<Result> AddProductAsync(Product product)
+        {
             var product_create_result = await _productDal.AddAsync(product);
             return product_create_result;
         }
