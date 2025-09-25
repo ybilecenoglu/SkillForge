@@ -13,32 +13,32 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using static CoreTestFramework.Northwind.WebMvcUI.Extension.QueryableExtension;
 using CoreTestFramework.Northwind.Business;
-using CoreTestFramework.Core;
-using CoreTestFramework.Northwind.Entities.ValidationRules.FluentValidation;
 
 namespace CoreTestFramework.Northwind.WebMvcUI.Controllers
 {
     public class ProductController : Controller
     {
         private IProductService _productService;
+        private readonly ILookupService _lookupService;
         
         private readonly IMapper _mapper;
         private readonly NorthwindContext _northwindContext;
-        public ProductController(IProductService productService, IMapper mapper, NorthwindContext northwindContext)
+        public ProductController(IProductService productService, IMapper mapper, NorthwindContext northwindContext, ILookupService lookupService)
         {
             _productService = productService;
             _mapper = mapper;
             _northwindContext = northwindContext;
+            _lookupService = lookupService;
         }
         public async Task<IActionResult> Index(ProductViewModel vm = null)
         {
             var result = new Result { Success = false };
             try
             {
-                var categories = await _northwindContext.Categories.ToListAsync();
-                vm.Categories = new SelectList(categories, "category_id", "category_name", vm.CategoryID);
-                var suppliers = await _northwindContext.Suppliers.ToListAsync();
-                vm.Suppliers = new SelectList(suppliers, "supplier_id", "company_name", vm.SupplierID);
+                var categories = await _lookupService.GetLookupCategoriesAsync(null);
+                vm.Categories = new SelectList(categories.Data, "category_id", "category_name", vm.CategoryID);
+                var suppliers = await _lookupService.GetLookupSuppliersAsync(null);
+                vm.Suppliers = new SelectList(suppliers.Data, "supplier_id", "company_name", vm.SupplierID);
 
                 return View(vm);
             }

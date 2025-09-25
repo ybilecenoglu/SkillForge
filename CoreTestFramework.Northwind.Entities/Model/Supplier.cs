@@ -1,7 +1,7 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿
+using CoreTestFramework.Core.Entities;
 namespace CoreTestFramework.Northwind.Entities.Model;
-public class Supplier
+public class Supplier : IEntity
 {
     
     public int supplier_id { get; set; }

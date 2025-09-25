@@ -3,7 +3,6 @@ using Autofac.Extras.DynamicProxy;
 using Autofac.Extensions.DependencyInjection;
 using CoreTestFramework.Core.Aspect.Autofac;
 using CoreTestFramework.Core.CrossCuttingConcern.Caching;
-using CoreTestFramework.Core.CrossCuttingConcern.Caching.Microsoft;
 using CoreTestFramework.Core.DependencyResolvers;
 using CoreTestFramework.Core.Extensions;
 using CoreTestFramework.Core.Utilities.IoC;
@@ -17,6 +16,7 @@ using CoreTestFramework.Northwind.Entities.Model;
 using CoreTestFramework.Northwind.WebMvcUI.Common;
 using DataTables.AspNet.AspNetCore;
 using FluentValidation;
+using CoreTestFramework.Core.CrossCuttingConcern.Caching.Microsoft;
 
 var builder = WebApplication.CreateBuilder(args);
 // Database Connection
@@ -29,10 +29,13 @@ var builder = WebApplication.CreateBuilder(args);
 //mvc, restapi, razorpages şablonları ile çalışabiliriz. Hangi şablon ile çalışacaksak belirtiyoruz.
 builder.Services.AddRazorPages();
 builder.Services.AddControllersWithViews();
+
 builder.Services.AddDbContext<NorthwindContext>();
 builder.Services.AddSingleton<IProductDAL, ProductDAL>();
 builder.Services.AddSingleton<IProductService, ProductManager>();
-
+builder.Services.AddSingleton<ILookupService, LookupManager>();
+builder.Services.AddSingleton<ISupplierDAL, SupplierDAL>();
+builder.Services.AddSingleton<ISupplierService, SupplierManager>();
 builder.Services.AddSingleton<ICategoryDAL, CategoryDAL>();
 builder.Services.AddSingleton<ICategoryService, CategoryManager>();
 builder.Services.AddSingleton<ICacheManager, MemoryCacheManager>();
@@ -57,8 +60,8 @@ builder.Services.AddDependencyResolvers(new ICoreModule[] {
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 {
-
-    ;   // MemoryCacheManager register
+    
+    // MemoryCacheManager register
     containerBuilder.RegisterType<MemoryCacheManager>()
         .As<ICacheManager>()
         .SingleInstance();
@@ -68,7 +71,7 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
         .AsSelf();
 
     // CacheRemoveInterceptor register
-    containerBuilder.RegisterType<CacheRemoveInterceptorAspect>()
+    containerBuilder.RegisterType<CacheRemoveInterceptor>()
         .AsSelf();
 
     // Validator register
@@ -79,15 +82,21 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
     // Generic interceptor register
     containerBuilder.RegisterGeneric(typeof(FluentValidationInterceptor<,>)).AsSelf();
 
+    
     // Service register ve interceptor bağla
     containerBuilder.RegisterType<ProductManager>()
         .As<IProductService>()
         .EnableInterfaceInterceptors()
         .InterceptedBy(typeof(FluentValidationInterceptor<IValidator<Product>, Product>))
         .InterceptedBy(typeof(CacheInterceptor))
-        .InterceptedBy(typeof(CacheRemoveInterceptorAspect));
-});
+        .InterceptedBy(typeof(CacheRemoveInterceptor));
 
+    containerBuilder.RegisterType<LookupManager>()
+        .As<ILookupService>()
+        .EnableInterfaceInterceptors()
+        .InterceptedBy(typeof(CacheInterceptor))
+        .InterceptedBy(typeof(CacheRemoveInterceptor));
+});
 
 var app = builder.Build();
 // app.UseHttpsRedirection();

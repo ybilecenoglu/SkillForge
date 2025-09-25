@@ -4,11 +4,11 @@ using CoreTestFramework.Core.CrossCuttingConcern.Caching;
 namespace CoreTestFramework.Core.Aspect.Autofac
 {
     
-    public class CacheRemoveInterceptorAspect : IInterceptor
+    public class CacheRemoveInterceptor : IInterceptor
     {
         private ICacheManager _cacheManager;
 
-        public CacheRemoveInterceptorAspect(ICacheManager cacheManager)
+        public CacheRemoveInterceptor(ICacheManager cacheManager)
         {
             _cacheManager = cacheManager;
         }
