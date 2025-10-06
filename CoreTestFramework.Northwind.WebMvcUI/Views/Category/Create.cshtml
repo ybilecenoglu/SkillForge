@@ -21,6 +21,11 @@ ViewBag.Title = "Kategori Ekle";
                         <input asp-for="@Model.Category.description" class="form-control" />
                     </div>
                     <div class="form-group">
+                        <label>Kategori Resmi:</label><br />
+                        <img src="/adminlte/dist/img/default-150x150.png" id="category_img" style="max-width:200px; max-height:200px;"
+                            class="img-fluid img-thumbnail" />
+                    </div>
+                    <div class="form-group">
                         <label>Resim Ekle: </label>
                         <div id="upload-files" name="uploadFiles[]"></div>
                     </div>
@@ -36,13 +41,14 @@ ViewBag.Title = "Kategori Ekle";
 <script>
     $(document).ready(function () {
         window.FU = {};
+        var modal = $('#modal-category');
         var endPoint = '/Category/UploadFile';
         var requestParams = {
             plugin: "FineUploader"// Send a plugin param or set Fine Uploader in Web.Backload.config as the default client plugin
         };
         var options = {
             debug: false,
-            multiple: true,
+            multiple: false,
             template: 'qq-template',
             showPrompt: function (message, defaultValue) { window.prompt(message, defaultValue); },
             request: {
@@ -91,6 +97,11 @@ ViewBag.Title = "Kategori Ekle";
                     // Set the deleteFileEndpoint adress
                     if ((responseJSON) && (responseJSON.success)) {
                         this.setDeleteFileEndpoint(responseJSON.deleteFileEndpoint, id);
+
+                        var imgInput = document.getElementById('category_img'); // <img> elementi
+                        imgInput.src = responseJSON.fileUrl; // yeni resmi göster
+                        document.getElementsByClassName("qq-upload-file").text = responseJSON.fileName;
+                        this.setName(id, responseJSON.fileName);
                     }
                 },
                 onAllComplete: function (succeeded, failed) {
@@ -190,44 +201,43 @@ ViewBag.Title = "Kategori Ekle";
             return false;
         }
 
-        $('#submit-button').on('click', function(e)
-        {
-            var form_data =$('#create-category').serializeArray();
-                $('#overlay-process').fadeIn();
-                $('#submit-button').prop('disabled', true);
-                var uploads_file = window.FU.uploader_files.getUploads({ status: qq.status.UPLOAD_SUCCESSFUL });
-                form_data.push({ name: "uploadFiles", value: uploads_file });
+        $('#submit-button').on('click', function (e) {
+            var form_data = $('#create-category').serializeArray();
+            $('#overlay-process').fadeIn();
+            $('#submit-button').prop('disabled', true);
+            var uploads_file = window.FU.uploader_files.getUploads({ status: qq.status.UPLOAD_SUCCESSFUL });
+            form_data.push({ name: "uploadFiles", value: uploads_file });
 
-                var json = {};
-                    jQuery.each(form_data, function () {
-                        json[this.name] = this.value || '';
-                    });
-
-                    $.ajax({
-                    type: 'POST',
-                    url: '@Url.Action("Create","Category")',
-                    data: json,
-                    traditional: false
-                    }).done(function(result){
-                        if (result.Success == true) {
-                            $('#modal-overlay .modal-content').addClass("bg-success");
-                            ShowModal('Başarılı', result.Message, function () {
-                                $('#modal-category').modal('hide');
-                                $("#data-table-category").DataTable().ajax.reload(null,false);
-                                $('#modal-overlay .modal-content').removeClass("bg-success");
-                            });
-                        }
-                        else {
-                        $('#modal-overlay .modal-content').addClass("bg-danger");
-                            ShowModal('Hata', result.Messages, function(){
-                                $('#modal-overlay .modal-content').removeClass("bg-danger");
-                            });
-                        }
-                    }).always(function(){
-                        $('#overlay-process').fadeOut();
-                        $('#submit-button').prop('disabled', false);
-                    });
-                    e.preventDefault();
+            var json = {};
+            jQuery.each(form_data, function () {
+                json[this.name] = this.value || '';
             });
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Create","Category")',
+                data: json,
+                traditional: false
+            }).done(function (result) {
+                if (result.Success == true) {
+                    $('#modal-overlay .modal-content').addClass("bg-success");
+                    ShowModal('Başarılı', result.Message, function () {
+                        $("#data-table-category").DataTable().ajax.reload(null, false);
+                        $('#modal-overlay .modal-content').removeClass("bg-success");
+                    });
+                }
+                else {
+                    $('#modal-overlay .modal-content').addClass("bg-danger");
+                    ShowModal('Hata', result.Messages, function () {
+                        $('#modal-overlay .modal-content').removeClass("bg-danger");
+                    });
+                }
+            }).always(function () {
+                $('#overlay-process').fadeOut();
+                $('#submit-button').prop('disabled', false);
+                modal.modal('hide');
+            });
+            e.preventDefault();
         });
+    });
 </script>

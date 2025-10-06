@@ -17,6 +17,7 @@ using CoreTestFramework.Northwind.WebMvcUI.Common;
 using DataTables.AspNet.AspNetCore;
 using FluentValidation;
 using CoreTestFramework.Core.CrossCuttingConcern.Caching.Microsoft;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 var builder = WebApplication.CreateBuilder(args);
 // Database Connection
@@ -39,6 +40,7 @@ builder.Services.AddSingleton<ISupplierService, SupplierManager>();
 builder.Services.AddSingleton<ICategoryDAL, CategoryDAL>();
 builder.Services.AddSingleton<ICategoryService, CategoryManager>();
 builder.Services.AddSingleton<ICacheManager, MemoryCacheManager>();
+builder.Services.AddSingleton<IFileService, FileManager>();
 
 //JSON serileştirmesini yapılandırmaası lowercase için
 builder.Services.AddControllers().AddJsonOptions(jsonOptions =>
@@ -60,7 +62,7 @@ builder.Services.AddDependencyResolvers(new ICoreModule[] {
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 {
-    
+
     // MemoryCacheManager register
     containerBuilder.RegisterType<MemoryCacheManager>()
         .As<ICacheManager>()
@@ -82,7 +84,7 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
     // Generic interceptor register
     containerBuilder.RegisterGeneric(typeof(FluentValidationInterceptor<,>)).AsSelf();
 
-    
+
     // Service register ve interceptor bağla
     containerBuilder.RegisterType<ProductManager>()
         .As<IProductService>()
@@ -96,6 +98,12 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
         .EnableInterfaceInterceptors()
         .InterceptedBy(typeof(CacheInterceptor))
         .InterceptedBy(typeof(CacheRemoveInterceptor));
+
+    containerBuilder.RegisterType<CategoryManager>()
+    .As<ICategoryService>()
+    .EnableInterfaceInterceptors()
+    .InterceptedBy(typeof(CacheInterceptor))
+    .InterceptedBy(typeof(CacheRemoveInterceptor));
 });
 
 var app = builder.Build();

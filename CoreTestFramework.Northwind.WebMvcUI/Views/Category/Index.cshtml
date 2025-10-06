@@ -169,10 +169,10 @@ ViewBag.Title = "Kategori Listesi";
         {
           data: "picture", name: "picture", sortable: false, searchable: false, render: function (data) {
             if (data != null) {
-              return '<img style="max-width:200px" class="img-fluid img-thumbnail" src="' + data + '">';
+              return '<img style="max-width:200px; max-height:200px" class="img-fluid img-thumbnail" src="' + data + '">';
             }
             else
-              return '<img style="max-width:200px" class="img-fluid img-thumbnail" src="/adminlte/dist/img/default-150x150.png">';
+              return '<img style="max-width:200px; max-height:200px" class="img-fluid img-thumbnail" src="/adminlte/dist/img/default-150x150.png">';
 
           }
         },

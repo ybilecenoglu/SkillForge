@@ -1,3 +1,5 @@
+using System.Reflection;
+using System.Threading.Tasks;
 using AutoMapper;
 using CoreTestFramework.Core.Common;
 using CoreTestFramework.Northwind.Business;
@@ -18,17 +20,13 @@ namespace CoreTestFramework.WebMvcUI.Controllers
         private readonly ICategoryService _categoryService;
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration; //AppSettingJson üzerinden path okumak için configuration sınıfı enjekte ediyoruz.
-        private readonly string fileBasePath;
-        private readonly string uploadYil;
-        private readonly string uploadAy;
-        public CategoryController(ICategoryService categoryService, IMapper mapper, IConfiguration configuration)
+        private readonly IFileService _fileService;
+        public CategoryController(ICategoryService categoryService, IMapper mapper, IConfiguration configuration, IFileService fileService)
         {
             _categoryService = categoryService;
             _mapper = mapper;
             _configuration = configuration;
-            fileBasePath = _configuration["UploadPath"];
-            uploadYil = DateTime.Now.ToString("yyyy");
-            uploadAy = DateTime.Now.ToString("MM");
+            _fileService = fileService;
         }
         public ActionResult Index()
         {
@@ -137,11 +135,9 @@ namespace CoreTestFramework.WebMvcUI.Controllers
                 category.Data.description = categoryViewModel.Category.description;
                 if (categoryViewModel.uploadFiles != null)
                 {
-                    string folderName ="Uploads/";
-                    if (System.IO.File.Exists(Path.Combine(fileBasePath, folderName, uploadYil, uploadAy, categoryViewModel.uploadFiles[0].originalName)))
-                    {
-                        category.Data.picture = Path.Combine(folderName, uploadYil, uploadAy, categoryViewModel.uploadFiles[0].originalName);
-                    }
+                    var path = await _fileService.GetFileAsync(categoryViewModel.uploadFiles[0].name, ControllerContext.ActionDescriptor.ControllerName);
+                    if (path != null)
+                        category.Data.picture = path;
                 }
                 var add_category_result = await _categoryService.UpdateCategoryAsync(category.Data);
                 if (add_category_result.Success)
@@ -173,53 +169,51 @@ namespace CoreTestFramework.WebMvcUI.Controllers
             return PartialView();
         }
         [HttpPost]
-        public async Task<IActionResult> Create(CategoryViewModel viewModel) 
+        public async Task<IActionResult> Create(CategoryViewModel viewModel)
         {
-            var result = new Result {Success = false};
+            var result = new Result { Success = false };
             try
             {
-                var category = new Category() 
+                var category = new Category()
                 {
                     category_name = viewModel.Category.category_name,
                     description = viewModel.Category.description,
                 };
                 if (viewModel.uploadFiles != null)
                 {
-                    string folderName ="Uploads/";
-                    if (System.IO.File.Exists(Path.Combine(fileBasePath,folderName,uploadYil,uploadAy,viewModel.uploadFiles[0].originalName)))
-                    {
-                        category.picture = Path.Combine(folderName,uploadYil,uploadAy,viewModel.uploadFiles[0].originalName);
-                    }
+                    var path = await _fileService.GetFileAsync(viewModel.uploadFiles[0].name, ControllerContext.ActionDescriptor.ControllerName);
+                    if (path != null)
+                        category.picture = path;
                 }
                 var add_category_result = await _categoryService.AddCategoryAsync(category);
-                if(add_category_result.Success == true)
+                if (add_category_result.Success == true)
                 {
                     result.Success = true;
                     result.Message = "Kategori ekleme işlemi başarıyla gerçekleşti";
                     return Json(result);
                 }
             }
-            catch(ValidationException validationException)
+            catch (ValidationException validationException)
             {
                 if (validationException.Errors != null)
                 {
-                    validationException.Errors.ToList().ForEach(exp => 
+                    validationException.Errors.ToList().ForEach(exp =>
                     {
                         result.Messages.Add(exp.ErrorMessage);
                     });
                 }
-               
+
             }
             catch (System.Exception ex)
             {
-                
-               
+
+
             }
             return Json(result);
         }
         public async Task<IActionResult> Delete(int id)
         {
-            var result = new Result{Success = false};
+            var result = new Result { Success = false };
             try
             {
                 if (id == 0)
@@ -254,11 +248,11 @@ namespace CoreTestFramework.WebMvcUI.Controllers
         }
         public async Task<IActionResult> Detail(int id)
         {
-            var result = new Result {Success = false};
+            var result = new Result { Success = false };
             var vm = new CategoryViewModel();
             try
             {
-                if(id == 0)
+                if (id == 0)
                 {
                     result.Message = "Seçili bir kategori bulunamadı.";
                     TempData["result"] = JsonConvert.SerializeObject(result);
@@ -282,63 +276,45 @@ namespace CoreTestFramework.WebMvcUI.Controllers
             var fileExist = Request.Form.Files.Count > 0; //Request içerisinde gelen dosya/dosyalar var mı ona bakıyoruz.
             try
             {
-
                 if (fileExist)
                 {
+                    if (Request.Form.Files.Count > 1)
+                        return BadRequest(new {success = false, message = "En fazla 1 dosya yükleyebilirsin"});
+
                     for (int i = 0; i < Request.Form.Files.Count; i++) //Request
                     {
                         var httpPostFile = Request.Form.Files[i];
                         if (httpPostFile != null)
                         {
 
-                            string uploadFileName = httpPostFile.FileName;
-                            string folderName = "Uploads";
-                            if (!Directory.Exists(Path.Combine(fileBasePath, folderName, uploadYil))) 
-                                Directory.CreateDirectory(Path.Combine(fileBasePath,folderName, uploadYil)); //O yıla ait klasor var mı yoksa oluşturuyoruz
-                            if (!Directory.Exists(Path.Combine(fileBasePath, folderName, uploadYil, uploadAy))) 
-                                Directory.CreateDirectory(Path.Combine(fileBasePath, folderName, uploadYil, uploadAy));//Yıl/Ay formatında ay ait klasor var mı yoksa oluşturuyoruz.
-                            
-                            string filePath = Path.Combine(fileBasePath, folderName, uploadYil, uploadAy, uploadFileName); //Upload/Yıl/Ay/FileName formatında oluşturduğum klasor yolu
-                            
-                            ViewBag.FilePath = filePath; // Resmi picturebox değiştirebilmek için viewbag nesnesiyle sayfaya taşıyorum.
-
-                            var fileInfo = new FileInfo(filePath);
+                            var fileInfo = new FileInfo(httpPostFile.FileName);
                             var dosyaUzantisi = fileInfo.Extension; //Yüklenen dosyanın uzantısı FileInfo sınıfı ile aldık.
 
                             if (dosyaUzantisi == ".jpg" || dosyaUzantisi == ".jpeg" || dosyaUzantisi == ".png") //Dosya uzantısı istediğimiz tipte mi?
                             {
-                                using (var stream = System.IO.File.Create(filePath))
-                                {
-                                    await httpPostFile.CopyToAsync(stream); // Stream sınıfını kullanarak IFormFile interface dosyayı kaydediyoruz.
-                                }
+                                var _filePath = await _fileService.UploadFileAsync(httpPostFile, ControllerContext.ActionDescriptor.ControllerName);
+                                return Json(new { success = "true", fileUrl = _filePath[0], fileName = _filePath[1] });
                             }
                             else
-                                return Json(new { success = "false" });
+                                return BadRequest(new {success = false, message = "Dosya yüklenemedi. Hatalı formatta dosya yüklediniz."});
+
                         }
                     }
                 }
+                
                 return Json(new { success = "true" });
             }
             catch (System.Exception)
             {
                 return Json(new { success = "false" });
             }
-
         }
         [HttpPost]
-        public IActionResult DeleteFile(string fileName)
+        public async Task<IActionResult> DeleteFile(string fileName)
         {
             try
             {
-                string fileBasePath = _configuration["UploadPath"];
-                string folderName = "Uploads";
-                string uploadYil = DateTime.Now.ToString("yyyy");
-                string uploadAy = DateTime.Now.ToString("MM");
-                string filePath = Path.Combine(fileBasePath,folderName, uploadYil, uploadAy, fileName);
-                if (System.IO.File.Exists(filePath))
-                {
-                    System.IO.File.Delete(filePath);
-                }
+                await _fileService.DeleteFileAsync(fileName, ControllerContext.ActionDescriptor.ControllerName);
                 return Json(new { success = "true" });
             }
             catch (System.Exception)
