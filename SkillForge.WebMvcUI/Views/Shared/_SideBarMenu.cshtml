@@ -1,0 +1,30 @@
+<!-- Sidebar Menu -->
+<nav class="mt-2">
+    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+      <!-- Add icons to the links using the .nav-icon class
+           with font-awesome or any other icon font library -->
+           
+            <li class="nav-item">
+              <!--Tag Helper kullanımı-->
+              <a asp-controller = "Home" asp-action ="Index" class="nav-link">
+                <i class="nav-icon fas fa-tachometer-alt"></i>
+                <p>Home</p>
+            </a>
+          </li>
+      
+    <li class="nav-item">
+       <!--Tag Helper kullanımı-->
+      <a asp-controller = "Product" asp-action ="Index" class="nav-link">
+          <i class="nav-icon fas fa-book"></i>
+          <p>Ürünler</p>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a asp-controller="Category" asp-action="Index" class="nav-link">
+        <i class="nav-icon fas fa-list"></i>
+        <p>Kategoriler</p>
+      </a>
+    </li>
+    </ul>
+  </nav>
+  <!-- /.sidebar-menu -->

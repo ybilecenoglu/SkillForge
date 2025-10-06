@@ -1,0 +1,66 @@
+Owned Entity Types
+EF Core ortak propertyleri tekrar tanımlamamak yerine owned entity type kullanarak miras almadan kullanabiliriz.
+modelBuilder.Entity<Manager>().OwsOne(x => x.Person); Fluent API
+Keyless Entitiy Types
+EF Core primary key içermeyen context tarafından track edilemeyen(update, delete, insert) entityler için kullanılan typedir.
+modelBuilder.Entity<Product>().HasNoKey(); Fluent API
+Entitiy Properties
+[NotMapping] Attribute
+EF core veritabanı tarafından mapplemeden code tarafında dolduralacak propertyler için kullanılır.Fluent Api karşılığı "ignore()" methodudur.
+modelBuilder.Entity<Product>().Ignore(x => x.Name); Fluent API
+
+[Column("Name)]:[Column(TypeName="Nvarchar(200)")] Attribute
+Veritabanında oluşucak propertyler için isimlendirme ve type bilgisin default olarak değil kendi belirlediğimiz şekilde kullanabiliriz.
+modelBuilder.Entity<Product>().Property(x => x.Name).HasColumnName("Ad").HasColumnType("nvarchar200"); Fluent API
+
+[Unicode(false)]:varchar Attribute
+Default olarak string ifadeler nvarchar içerisinde UTF-8 formatını barındırırken unicode false attribute ile varchar ASCII karakterleride kullanabiliriz.
+modelBuilder.Entity<Product>().Property(x => x.Name).IsUnicode(false); Fluent API
+
+Transaction (İşlem birimidir)
+İlişkisel veritabanlarında verinin bütünlüğünü sağlamamıza imkan veren bir özelliktir. Yap hep ya hiç kuralı ile veritabanında ki tutarsızlığı engeller. EF core default transaction yapısı bulunmaktadır açık açık transaction belirtmemize gerek olan yerlerde kullanmamız gerekmektedir.
+using(var transaction = _context.Database.BeginTransaction())
+{
+    transaction.Commit() Tüm işlemler başarılı şekilde tamamlanırsa veritabanına yansıt.
+    transaction.RollBack() İşlemlerin herhangi birinde bir hata oluşursa veritabanındaki tüm değişiklikleri geri al.
+}
+
+ISOLATION
+Transaction arası ilişkiyi yönetmemize sağlayan yapıdır.Transaction seviyesi arttıkça;
+    Tutarlılık artar.
+    Kaynak tüketimi artar.
+    Bir transactionın diğer transactina blocklaması artar.
+    Eş zamanlı okuma sayısı azalır.
+    Concurrency effect azalır.
+
+1-Read Committed
+SQL serverin Default davranışıdır ve son commit edilmiş datayı okur. Update,delete, insert işlemi gerçekleştirilebilir.
+2-Read UnCommitted
+Runtime da değişiklik yapılmış fakat commit edilmemiş datayı okur. Dirty Read data yani güncellenmiş fakat commit edilmemiş datayı okur. Uncomitted transaction read işlemlerinde update,delete gerçekleştirebilir fakat bir transaction tamamlanmadan diğer transaction aynı data üzerine update, delete yapamaz.
+3-Repetable Read
+Son commit edilmiş datayı okur. Repatable read seviyesinde bir datayı okumaya çalıştığımız da bu data blocklanır ve farklı bir transaction bu data üzerinde update yada delete gerçekleştiremez(non repatable problemi oluşmaz).Insert işlemi yapabilir (Phantom problemi oluşur).
+4- Serializable
+Son commit edilmiş datayı okur.Serializable seviyesinde bir datayı okuma çalışıtğımız bu data blocklanır ve farklı bir transaction tarafından insert, update, delete işlemleri gerçekleştirelemez.(non repatable ve phantom problemi oluşmaz.)
+5-Snapshot
+Transaction boyunca datayı tutarlı bir seviyede tutar. Transaction başladıktan sonra, başka bir transaction update,delete,insert yapar ise güncel transaction içerisinde bu değişiklik gözükmez. Snapshot uygulanmak istenen veritabanında bu özelliğin açılması gerekmektedir.
+SQL :
+ALTER DATABASE "DB NAME" SET ALLOW_SNAPSHOT_ISOLATION ON
+
+Concurrency
+Birden fazla kullanıcı aynı datayı güncellemeye çalışmasında meydana gelir.EF Core optimistic currency control kullanır.
+Store wins
+DbUpdateCuncurrencyException ele almak için ilgili tabloya rowversion alanını eklemek gerekmektedir. Böylelikle kullanıcıya rowversion üzerinden DbUpdateCuncurrencyException fırlatılabilmektedir. Ef core tarafında rowversion belirtmek için byte[] tipinde bir property oluşturulur.
+fluent api tarafında modelBuilder.Entity<Product>().Property(x => x.RowVersion).IsRowVersion(); belirtilir.
+
+
+//Dotnet araçlarını görmek için console üzerinden kullanabileceğimiz komutumuz
+dotnet tool list -g
+
+//Dışarıdan boostrap kurulumunu yapmak için libman kurulumunu console üzerinden
+dotnet tool install microsoft.web.librarymanager.cli -g //global alana kurulumunu yaptık
+libman install boostrap-icons@1.10.5 -d wwwroot/lib/boostrap-icons //Komutu ile boostrap kütüphanelerini libman aracılığı ile projeye dahil edebiliriz.
+
+//ViewComponent Nedir?
+ViewComponent'ler parçalı görünümler veya kullanıcı arabirimindeki belirli bileşenleri oluşturmamıza yardımcı olan bağımsız ve yeniden kullanılabilir bileşenlerdir.
+
+ViewComponent sınıfından kalıtım alır. <vc:'companentName'></vc:'companentName> tag halper kullanılarak oluşturulabilir. ViewCompanent sınıfılarında bir Invoke methoudu olur ve IViewCompanentResult sonucu döndürür.

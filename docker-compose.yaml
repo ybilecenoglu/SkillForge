@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  aspnetcoretest:
+    build: .
+    ports: 
+      - "80:80"
+    networks:
+    - aspnetcoretestnet
+
+  # netcoreruntime:
+  #   image: mcr.microsoft.com/dotnet/aspnet:6.0
+  
+
+networks:
+  aspnetcoretestnet:
+    driver: bridge
