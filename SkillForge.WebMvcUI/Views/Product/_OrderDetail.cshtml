@@ -1,0 +1,66 @@
+@model ProductViewModel
+@{
+    ViewBag.Title= "Sipariş Detay";
+}
+<div class="row">
+    <div class="col-md-12">
+    <div class="card card-primary">
+    <div class="card-header">
+      <h3 class="card-title">Sipariş Numarası: @Model.Order.order_id</h3>
+      </div>
+      <form>
+        <div class="card-body">
+            <div class="form-group">
+                <label>Müşteri</label>
+                <input class="form-control" disabled asp-for="@Model.Order.customer_name" />
+            </div>
+            <div class="form-group">
+              <label>Çalışan</label>
+              <input class="form-control" disabled asp-for="@Model.Order.employee_name" />
+            </div>
+            <div class="form-group">
+              <label>Kargo Firması</label>
+              <input class="form-control" disabled asp-for="@Model.Order.shipper_name" />
+            </div>
+            <div class="form-group">
+              <label>Sipariş Tarihi</label>
+              <input class="form-control" disabled asp-for="@Model.Order.order_date" />
+            </div>
+            <div class="form-group">
+              <label>Talep Edilen Tarih</label>
+              <input class="form-control" disabled asp-for="@Model.Order.required_date" />
+            </div>
+            <div class="form-group">
+              <label>Sevk Tarihi</label>
+              <input class="form-control" disabled asp-for="@Model.Order.shipped_date" />
+            </div>
+            <div class="form-group">
+              <label>Adres</label>
+              <input class="form-control" disabled asp-for="@Model.Order.ship_address" />
+            </div>
+            <div class="form-group">
+              <label>Şehir</label>
+              <input class="form-control" disabled asp-for="@Model.Order.ship_city" />
+            </div>
+            <div class="form-group">
+              <label>Bölge</label>
+              <input class="form-control" disabled asp-for="@Model.Order.ship_region" />
+            </div>
+            <div class="form-group">
+              <label>Ülke</label>
+              <input class="form-control" disabled asp-for="@Model.Order.ship_country" />
+            </div>
+        </div>
+        <div class="card-footer">
+             <button type="button" class="btn btn-outline-light" id="close-modal">Kapat</button>
+        </div>
+      </form>
+    </div>
+    </div>
+</div>
+<script>
+    $('#close-modal').on('click', function (e) {
+        $('#modal-order').modal('hide');
+        e.preventDefault();
+    });
+</script>

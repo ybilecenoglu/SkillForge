@@ -7,26 +7,26 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["CoreTestFramework.Northwind.WebMvcUI/CoreTestFramework.Northwind.WebMvcUI.csproj", "CoreTestFramework.Northwind.WebMvcUI/"]
-COPY ["CoreTestFramework.Northwind.Business/CoreTestFramework.Northwind.Business.csproj", "CoreTestFramework.Northwind.Business/"]
-COPY ["CoreTestFramework.Northwind.DataAccess/CoreTestFramework.Northwind.DataAccess.csproj", "CoreTestFramework.Northwind.DataAccess/"]
-COPY ["CoreTestFramework.Northwind.Entities/CoreTestFramework.Northwind.Entities.csproj", "CoreTestFramework.Northwind.Entities/"]
-COPY ["CoreTestFramework.Core/CoreTestFramework.Core.csproj", "CoreTestFramework.Core/"]
-RUN dotnet restore "CoreTestFramework.Northwind.WebMvcUI/CoreTestFramework.Northwind.WebMvcUI.csproj"
+COPY ["SkillForge.WebMvcUI/SkillForge.WebMvcUI.csproj", "SkillForge.WebMvcUI/"]
+COPY ["SkillForge.Business/SkillForge.Business.csproj", "SkillForge.Business/"]
+COPY ["SkillForge.DataAccess/SkillForge.DataAccess.csproj", "SkillForge.DataAccess/"]
+COPY ["SkillForge.Entities/SkillForge.Entities.csproj", "SkillForge.Entities/"]
+COPY ["SkillForge.Core/SkillForge.Core.csproj", "SkillForge.Core/"]
+RUN dotnet restore "SkillForge.WebMvcUI/SkillForge.WebMvcUI.csproj"
 COPY . .
 WORKDIR /src/.
-RUN dotnet build "CoreTestFramework.Northwind.WebMvcUI/CoreTestFramework.Northwind.WebMvcUI.csproj" -c Release -o /app/build
+RUN dotnet build "SkillForge.WebMvcUI/SkillForge.WebMvcUI.csproj" -c Release -o /app/build
 
 FROM build AS publish 
 WORKDIR /src
 # [COPY] İmaj içine dosya veya klasör kopyalamak için kullanılırız.
 COPY . . 
 # [RUN] İmaj oluşturulurken shell'de bir komut çalıştırmak istersek bu talimat kullanılır.
-RUN dotnet restore "CoreTestFramework.Northwind.WebMvcUI/CoreTestFramework.Northwind.WebMvcUI.csproj"
+RUN dotnet restore "SkillForge.WebMvcUI/SkillForge.WebMvcUI.csproj"
 WORKDIR /src/.
-RUN dotnet publish "CoreTestFramework.Northwind.WebMvcUI/CoreTestFramework.Northwind.WebMvcUI.csproj" -c Release -o /app 
+RUN dotnet publish "SkillForge.WebMvcUI/SkillForge.WebMvcUI.csproj" -c Release -o /app 
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
-ENTRYPOINT ["dotnet", "CoreTestFramework.Northwind.WebMvcUI.dll"]
+ENTRYPOINT ["dotnet", "SkillForge.WebMvcUI.dll"]
